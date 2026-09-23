@@ -1,0 +1,369 @@
+<!-- //SYSTEM_RULES /COMPLIANCE_PROTOCOL -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HYPR // PREMIUM APPLICATION TERMINAL</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    
+    <style>
+        :root {
+            --abs-bg: #040506;
+            --abs-panel: #0b0d10;
+            --abs-accent: #ffc800; /* Endfield Yellow */
+            --abs-accent-dim: #594600;
+            --abs-text-main: #f5f7f8;
+            --abs-text-muted: #3a444d;
+            --abs-border: #141a1f;
+            --abs-success: #00ff66;
+            --abs-hazard: linear-gradient(45deg, var(--abs-accent) 25%, #000 25%, #000 50%, var(--abs-accent) 50%, var(--abs-accent) 75%, #000 75%, #000);
+        }
+
+        * { box-sizing: border-box; }
+        body { background-color: var(--abs-bg); color: var(--abs-text-main); font-family: 'Space Grotesk', sans-serif; margin: 0; padding: 40px 20px; display: flex; justify-content: center; align-items: center; min-height: 100vh; position: relative; overflow-x: hidden; }
+        body::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-image: linear-gradient(to right, #0e1216 1px, transparent 1px), linear-gradient(to bottom, #0e1216 1px, transparent 1px); background-size: 30px 30px; z-index: 0; pointer-events: none; }
+
+        .abs-container { background-color: var(--abs-panel); border: 1px solid var(--abs-border); position: relative; width: 100%; max-width: 650px; padding: 40px; box-shadow: 0 30px 80px rgba(0, 0, 0, 0.9); z-index: 10; }
+        .abs-container::before, .abs-container::after { content: ''; position: absolute; width: 14px; height: 14px; border-color: var(--abs-accent); border-style: solid; }
+        .abs-container::before { top: -2px; left: -2px; border-width: 2px 0 0 2px; }
+        .abs-container::after { bottom: -2px; right: -2px; border-width: 0 2px 2px 0; }
+        
+        .abs-header { border-bottom: 2px solid var(--abs-border); padding-bottom: 20px; margin-bottom: 30px; }
+        .abs-header h1 { font-weight: 700; font-size: 24px; letter-spacing: 3px; margin: 0; text-transform: uppercase; }
+        .abs-meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--abs-text-muted); margin-top: 6px; text-transform: uppercase; display: flex; justify-content: space-between; }
+        .abs-status { color: var(--abs-accent); font-weight: bold; animation: hardFlicker 3s infinite steps(1); }
+
+        .abs-briefing { background-color: #020304; border: 1px dashed var(--abs-border); padding: 16px; margin-bottom: 30px; font-size: 13px; color: #cbd5e1; line-height: 1.5; min-height: 80px; }
+        .abs-briefing-title { font-family: 'JetBrains Mono', monospace; color: var(--abs-accent); font-size: 11px; font-weight: bold; margin-bottom: 8px; }
+
+        .abs-step-panel { display: none; }
+        .abs-step-panel.active { display: block; animation: panelSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .abs-group { margin-bottom: 25px; }
+        .abs-label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--abs-text-muted); text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; }
+
+        .abs-input-wrapper { position: relative; background-color: #020304; border: 1px solid var(--abs-border); }
+        .abs-input-wrapper:focus-within { border-color: var(--abs-accent); box-shadow: 0 0 15px rgba(255, 200, 0, 0.1); }
+        .abs-input, .abs-textarea { width: 100%; padding: 14px 16px; background: transparent; border: none; color: var(--abs-text-main); font-family: 'Space Grotesk', sans-serif; font-size: 14px; border-radius: 0; outline: none; }
+        .abs-textarea { resize: vertical; }
+
+        .abs-dropdown-container { background-color: #020304; border: 1px solid var(--abs-border); cursor: pointer; position: relative; }
+        .abs-dropdown-trigger { padding: 14px 16px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+        .abs-dropdown-trigger::after { content: '▼'; font-size: 10px; color: var(--abs-text-muted); transition: transform 0.25s; }
+        .abs-dropdown-container.open .abs-dropdown-trigger::after { transform: rotate(180deg); color: var(--abs-accent); }
+        .abs-dropdown-container.open { border-color: var(--abs-accent); }
+        .abs-dropdown-tray { max-height: 0; overflow: hidden; transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1); background-color: #050608; }
+        .abs-dropdown-container.open .abs-dropdown-tray { max-height: 200px; border-top: 1px solid var(--abs-border); }
+        .abs-dropdown-option { padding: 12px 16px; font-size: 14px; transition: all 0.2s; color: #cbd5e1; }
+        .abs-dropdown-option:hover { background-color: #0c0f12; color: var(--abs-accent); }
+
+        .abs-checkbox-block { display: block; background: #020304; border: 1px solid var(--abs-border); padding: 16px; margin-bottom: 15px; cursor: pointer; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); position: relative; }
+        .abs-checkbox-block input { position: absolute; opacity: 0; width: 0; height: 0; }
+        .abs-checkbox-block:hover { border-color: #2a353d; background: #050709; }
+        .abs-checkbox-block.checked { border-color: var(--abs-accent); background: #07090c; box-shadow: 0 0 20px rgba(255, 200, 0, 0.2); }
+        .abs-checkbox-block.checked .abs-block-title { color: var(--abs-accent); }
+
+        .abs-block-title { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--abs-text-muted); font-weight: bold; margin-bottom: 6px; transition: color 0.2s; }
+        .abs-block-desc { font-size: 13px; color: #cbd5e1; line-height: 1.4; display: block; }
+
+        .abs-footer-grid { display: flex; gap: 15px; margin-top: 25px; }
+        .abs-btn { background-color: var(--abs-accent); color: #000000; border: none; padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: all 0.25s; flex: 1; text-align: center; }
+        .abs-btn:hover:not(:disabled) { background-color: #ffffff; box-shadow: 0 0 20px rgba(255, 200, 0, 0.3); }
+        .abs-btn:disabled { background-color: #121517; color: #2e373d; border: 1px solid var(--abs-border); cursor: not-allowed; box-shadow: none; }
+        .abs-btn-sub { background-color: transparent; border: 1px solid var(--abs-border); color: #cbd5e1; }
+        .abs-btn-sub:hover:not(:disabled) { border-color: #495661; background: #06080b; }
+
+        .abs-deco-strip { height: 5px; background: var(--abs-hazard); background-size: 20px 20px; margin-bottom: 20px; opacity: 0.85; animation: moveHazard 0.6s linear infinite; }
+
+        @keyframes moveHazard { 0% { background-position: 0 0; } 100% { background-position: 20px 0; } }
+        @keyframes panelSlideIn { 0% { opacity: 0; transform: translateY(8px); } 100% { opacity: 1; transform: translateY(0); } }
+        @keyframes hardFlicker {
+            0%, 18%, 22%, 25%, 53%, 57%, 100% { color: var(--abs-accent); opacity: 1; }
+            20%, 24%, 55% { color: #1e2429; opacity: 0.7; }
+        }
+    </style>
+</head>
+<body>
+
+<div class="abs-container">
+    <div class="abs-deco-strip"></div>
+    
+    <div class="abs-header">
+        <h1>ABSOLUTE INDUSTRIES</h1>
+        <div class="abs-meta">
+            <span>//ABSOLUTE_LOGISTICS /STAFF_PROVISIONING</span>
+            <span class="abs-status">// HYPR_NETWORK_ONLINE</span>
+        </div>
+    </div>
+
+    <div class="abs-briefing">
+        <div class="abs-briefing-title">[ DIRECTIVE COMMAND // MISSION BRIEFING ]</div>
+        <div id="scramble-text" data-text="Telemetry shows that without strict parameters, public channels eventually get cluttered with toxic chatter or rogue link injections. PEA, ITASCA, and ABSL ran the numbers. Intercept the chaos before it commits.">Initializing decryption matrix...</div>
+    </div>
+
+    <form action="https://formspree.io/f/xvkgrbar" method="POST" id="recruitmentForm">
+        <!-- PHASE NODE 1 -->
+        <div class="abs-step-panel active" id="step-1">
+            <div class="abs-group">
+                <label class="abs-label">//OPERATOR_PROFILE /BIOMETRIC_IDENTITY</label>
+                <div class="abs-input-wrapper">
+                    <input class="abs-input" type="text" name="operator_id" placeholder="Enter server username..." required>
+                </div>
+            </div>
+
+            <div class="abs-group">
+                <label class="abs-label">//SYSTEM_ARCHITECTURE /CORE_CORTEX_NODE</label>
+                <div class="abs-dropdown-container" id="customDropdown">
+                    <div class="abs-dropdown-trigger" id="dropdownValue">Select Tactical Sector...</div>
+                    <input type="hidden" name="requested_node" id="hiddenNodeInput" required>
+                    <div class="abs-dropdown-tray">
+                        <div class="abs-dropdown-option" data-value="moderation">Protocol Enforcement (Moderator)</div>
+                        <div class="abs-dropdown-option" data-value="administration">Core Operations (Admin)</div>
+                        <div class="abs-dropdown-option" data-value="support">Technical Logistics (Support)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="abs-footer-grid">
+                <button type="button" class="abs-btn" id="next-1">INITIATE PHASE 02 // NEXT</button>
+            </div>
+        </div>
+
+        <!-- PHASE NODE 2 -->
+        <div class="abs-step-panel" id="step-2">
+            <div class="abs-group">
+                <label class="abs-label">//COGNITIVE_LOAD /OPERATIONAL_HISTORY</label>
+                <div class="abs-input-wrapper">
+                    <textarea class="abs-textarea" name="experience_log" rows="5" placeholder="Document prior architectures managed..." required></textarea>
+                </div>
+            </div>
+            
+            <div class="abs-footer-grid">
+                <button type="button" class="abs-btn abs-btn-sub" id="prev-2">RETURN // PREV</button>
+                <button type="button" class="abs-btn" id="next-2">INITIATE PHASE 03 // NEXT</button>
+            </div>
+        </div>
+
+        <!-- PHASE NODE 3 -->
+        <div class="abs-step-panel" id="step-3">
+            <div class="abs-group">
+                <label class="abs-label">//COMPLIANCE_ARRAY /DIRECTIVE_VALIDATION</label>
+                
+                <label class="abs-checkbox-block">
+                    <input type="checkbox" class="directive-check" name="chk_directive_01" required>
+                    <span class="abs-block-title">//DIRECTIVE_01 /ZONE_INTEGRITY</span>
+                    <span class="abs-block-desc">Maintain absolute integrity. Zero tolerance for hostile behavior, toxic interference, malicious speech, or server drama. Wire tight—no internal firefights.</span>
+                </label>
+
+                <label class="abs-checkbox-block">
+                    <input type="checkbox" class="directive-check" name="chk_directive_02" required>
+                    <span class="abs-block-title">//DIRECTIVE_02 /TELEMETRY_COHERENCE</span>
+                    <span class="abs-block-desc">Route all transmissions strictly in English across public sectors. Network cannot parse unverified text data arrays; save the logging feed from going dead.</span>
+                </label>
+
+                <label class="abs-checkbox-block">
+                    <input type="checkbox" class="directive-check" name="chk_directive_03" required>
+                    <span class="abs-block-title">//DIRECTIVE_03 /LOGISTICS_ALLOCATION</span>
+                    <span class="abs-block-desc">Keep input logs localized to designated channels. General chatter in central comms, blueprints/sketches in the Art Sector. Do not cross the channels.</span>
+                </label>
+
+                <label class="abs-checkbox-block">
+                    <input type="checkbox" class="directive-check" name="chk_directive_04" required>
+                    <span class="abs-block-title">//DIRECTIVE_04 /BROADCAST_RESTRICTION</span>
+                    <span class="abs-block-desc">Unsolicited DMs, external recruitment, and unauthorized ads are blocked. Dropping rogue links triggers immediate revocation of clearance keys.</span>
+                </label>
+
+                <label class="abs-checkbox-block">
+                    <input type="checkbox" class="directive-check" name="chk_directive_05" required>
+                    <span class="abs-block-title">//DIRECTIVE_05 /HARDWARE_SAFEGUARD</span>
+                    <span class="abs-block-desc">Deploying malicious file payloads, unverified links, or unauthorized leaks triggers an automatic system ban strike. Shield the network framework.</span>
+                </label>
+            </div>
+            
+            <div class="abs-footer-grid">
+                <button type="button" class="abs-btn abs-btn-sub" id="prev-3">RETURN // PREV</button>
+                <button type="submit" class="abs-btn" id="submitBtn" disabled>AUTHORIZE CORTEX TRANSMISSION</button>
+            </div>
+        </div>
+    </form>
+</div>
+                      <div class="abs-dropdown-trigger" id="dropdownValue">Select Tactical Sector...</div>
+                    <input type="hidden" name="requested_node" id="hiddenNodeInput" required>
+                    <div class="abs-dropdown-tray">
+                        <div class="abs-dropdown-option" data-value="moderation">Protocol Enforcement (Moderator)</div>
+                        <div class="abs-dropdown-option" data-value="administration">Core Operations (Admin)</div>
+                        <div class="abs-dropdown-option" data-value="support">Technical Logistics (Support)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="abs-footer-grid">
+                <button type="button" class="abs-btn" id="next-1">INITIATE PHASE 02 // NEXT</button>
+            </div>
+        </div>
+
+        <!-- PHASE NODE 2 -->
+        <div class="abs-step-panel" id="step-2">
+            <div class="abs-group">
+                <label class="abs-label">//COGNITIVE_LOAD /OPERATIONAL_HISTORY</label>
+                <div class="abs-input-wrapper">
+                    <textarea class="abs-textarea" name="experience_log" rows="5" placeholder="Document prior architectures managed..." required></textarea>
+                </div>
+            </div>
+            
+            <div class="abs-footer-grid">
+                <button type="button" class="abs-btn abs-btn-sub" id="prev-2">RETURN // PREV</button>
+                <button type="button" class="abs-btn" id="next-2">INITIATE PHASE 03 // NEXT</button>
+            </div>
+        </div>
+
+        <!-- PHASE NODE 3 -->
+        <div class="abs-step-panel" id="step-3">
+            <div class="abs-group">
+                <label class="abs-label">//COMPLIANCE_ARRAY /DIRECTIVE_VALIDATION</label>
+                
+                <label class="abs-checkbox-block">
+                    <input type="checkbox" class="directive-check" name="chk_directive_01" required>
+                    <span class="abs-block-title">//DIRECTIVE_01 /ZONE_INTEGRITY</span>
+                    <span class="abs-block-desc">Maintain absolute integrity. Zero tolerance for hostile behavior, toxic interference, malicious speech, or server drama. Wire tight—no internal firefights.</span>
+                </label>
+
+                <label class="abs-checkbox-block">
+                    <input type="checkbox" class="directive-check" name="chk_directive_02" required>
+                    <span class="abs-block-title">//DIRECTIVE_02 /TELEMETRY_COHERENCE</span>
+                    <span class="abs-block-desc">Route all transmissions strictly in English across public sectors. Network cannot parse unverified text data arrays; save the logging feed from going dead.</span>
+                </label>
+
+                <label class="abs-checkbox-block">
+                    <input type="checkbox" class="directive-check" name="chk_directive_03" required>
+                    <span class="abs-block-title">//DIRECTIVE_03 /LOGISTICS_ALLOCATION</span>
+                    <span class="abs-block-desc">Keep input logs localized to designated channels. General chatter in central comms, blueprints/sketches in the Art Sector. Do not cross the channels.</span>
+                </label>
+
+                <label class="abs-checkbox-block">
+                    <input type="checkbox" class="directive-check" name="chk_directive_04" required>
+                    <span class="abs-block-title">//DIRECTIVE_04 /BROADCAST_RESTRICTION</span>
+                    <span class="abs-block-desc">Unsolicited DMs, external recruitment, and unauthorized ads are blocked. Dropping rogue links triggers immediate revocation of clearance keys.</span>
+                </label>
+
+                <label class="abs-checkbox-block">
+                    <input type="checkbox" class="directive-check" name="chk_directive_05" required>
+                    <span class="abs-block-title">//DIRECTIVE_05 /HARDWARE_SAFEGUARD</span>
+                    <span class="abs-block-desc">Deploying malicious file payloads, unverified links, or unauthorized leaks triggers an automatic system ban strike. Shield the network framework.</span>
+                </label>
+            </div>
+            
+            <div class="abs-footer-grid">
+                <button type="button" class="abs-btn abs-btn-sub" id="prev-3">RETURN // PREV</button>
+                <button type="submit" class="abs-btn" id="submitBtn" disabled>AUTHORIZE CORTEX TRANSMISSION</button>
+            </div>
+        </div>
+    </form>
+</div>
+
+<script>
+    /* //SYSTEM_LOGIC /SCRAMBLE_DECODER_ENGINE */
+    function runDecoderEffect(element) {
+        const targetText = element.getAttribute('data-text');
+        const chars = "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789@$#!%?&*/";
+        let iterations = 0;
+        
+        clearInterval(element.scrambleInterval);
+        element.scrambleInterval = setInterval(() => {
+            element.innerText = targetText
+                .split("")
+                .map((char, index) => {
+                    if (char === " ") return " ";
+                    if (index < iterations) return targetText[index];
+                    return chars[Math.floor(Math.random() * chars.length)];
+                })
+                .join("");
+            
+            if (iterations >= targetText.length) clearInterval(element.scrambleInterval);
+            iterations += 3;
+        }, 25);
+    }
+
+    document.addEventListener("DOMContentLoaded", () => {
+        runDecoderEffect(document.getElementById("scramble-text"));
+    });
+
+    /* //SYSTEM_LOGIC /PAGINATION_CONTROLLER */
+    const step1 = document.getElementById("step-1");
+    const step2 = document.getElementById("step-2");
+    const step3 = document.getElementById("step-3");
+
+    document.getElementById("next-1").addEventListener("click", () => {
+        if (document.querySelector('input[name="operator_id"]').value && document.getElementById("hiddenNodeInput").value) {
+            step1.classList.remove("active");
+            step2.classList.add("active");
+        } else {
+            alert("SECURITY ALERT: All Phase 01 parameters must be configured.");
+        }
+    });
+
+    document.getElementById("prev-2").addEventListener("click", () => {
+        step2.classList.remove("active");
+        step1.classList.add("active");
+    });
+
+    document.getElementById("next-2").addEventListener("click", () => {
+        if (document.querySelector('textarea[name="experience_log"]').value) {
+            step2.classList.remove("active");
+            step3.classList.add("active");
+        } else {
+            alert("SECURITY ALERT: Operational records are required for clearance authorization.");
+        }
+    });
+
+    document.getElementById("prev-3").addEventListener("click", () => {
+        step3.classList.remove("active");
+        step2.classList.add("active");
+    });
+
+    /* //SYSTEM_LOGIC /PHYSICAL_ACCORDION_DROPDOWN */
+    const dropdown = document.getElementById("customDropdown");
+    const trigger = document.getElementById("dropdownValue");
+    const hiddenInput = document.getElementById("hiddenNodeInput");
+
+    dropdown.addEventListener("click", (e) => {
+        e.stopPropagation();
+        dropdown.classList.toggle("open");
+    });
+
+    document.querySelectorAll(".abs-dropdown-option").forEach(option => {
+        option.addEventListener("click", (e) => {
+            e.stopPropagation();
+            const val = option.getAttribute("data-value");
+            trigger.innerText = option.innerText;
+            hiddenInput.value = val;
+            dropdown.classList.remove("open");
+        });
+    });
+
+    document.addEventListener("click", () => dropdown.classList.remove("open"));
+
+    /* //SYSTEM_LOGIC /FULL_BLOCK_CHECKBOX_GLOW */
+    const blocks = document.querySelectorAll(".abs-checkbox-block");
+    const submitBtn = document.getElementById("submitBtn");
+
+    blocks.forEach(block => {
+        const input = block.querySelector('input[type="checkbox"]');
+        
+        block.addEventListener("click", (e) => {
+            if (e.target !== input) input.checked = !input.checked;
+            
+            if (input.checked) {
+                block.classList.add("checked");
+            } else {
+                block.classList.remove("checked");
+            }
+            
+            const allChecked = Array.from(document.querySelectorAll(".directive-check")).every(c => c.checked);
+            submitBtn.disabled = !allChecked;
+        });
+    });
+</script>
+</body>
+</html>
+
