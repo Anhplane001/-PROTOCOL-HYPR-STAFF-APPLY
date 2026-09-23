@@ -7,7 +7,8 @@
     <title>HYPR // PREMIUM APPLICATION TERMINAL</title>
     <link href="https://googleapis.com" rel="stylesheet">
     
-    <style>
+       <style>
+        /* //VISUAL_SYSTEM /DESIGN_LANGUAGE_VARIABLES */
         :root {
             --abs-bg: #040506;
             --abs-panel: #0b0d10;
@@ -16,8 +17,9 @@
             --abs-text-main: #f5f7f8;
             --abs-text-muted: #3a444d;
             --abs-border: #141a1f;
-            --abs-success: #00ff66;
+            --abs-danger: #ff2a2a; /* Warning Protocol Red */
             --abs-hazard: linear-gradient(45deg, var(--abs-accent) 25%, #000 25%, #000 50%, var(--abs-accent) 50%, var(--abs-accent) 75%, #000 75%, #000);
+            --abs-hazard-red: linear-gradient(45deg, var(--abs-danger) 25%, #000 25%, #000 50%, var(--abs-danger) 50%, var(--abs-danger) 75%, #000 75%, #000);
         }
 
         * { box-sizing: border-box; }
@@ -32,41 +34,45 @@
         .abs-header { border-bottom: 2px solid var(--abs-border); padding-bottom: 20px; margin-bottom: 30px; }
         .abs-header h1 { font-weight: 700; font-size: 24px; letter-spacing: 3px; margin: 0; text-transform: uppercase; }
         .abs-meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--abs-text-muted); margin-top: 6px; text-transform: uppercase; display: flex; justify-content: space-between; }
-        .abs-status { color: var(--abs-accent); font-weight: bold; animation: hardFlicker 3s infinite steps(1); }
+        
+        /* FIXED: Status tag flickering locked to exactly a 1s cadence rhythm loop */
+        .abs-status { color: var(--abs-accent); font-weight: bold; animation: hardFlicker 1s infinite steps(1); }
 
         .abs-briefing { background-color: #020304; border: 1px dashed var(--abs-border); padding: 16px; margin-bottom: 30px; font-size: 13px; color: #cbd5e1; line-height: 1.5; min-height: 80px; }
         .abs-briefing-title { font-family: 'JetBrains Mono', monospace; color: var(--abs-accent); font-size: 11px; font-weight: bold; margin-bottom: 8px; }
 
         .abs-step-panel { display: none; }
         .abs-step-panel.active { display: block; animation: panelSlideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
-        .abs-group { margin-bottom: 25px; }
+        .abs-group { margin-bottom: 25px; position: relative; width: 100%; }
         .abs-label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--abs-text-muted); text-transform: uppercase; margin-bottom: 10px; letter-spacing: 1px; }
 
-        .abs-input-wrapper { position: relative; background-color: #020304; border: 1px solid var(--abs-border); }
+        .abs-input-wrapper { position: relative; background-color: #020304; border: 1px solid var(--abs-border); width: 100%; }
         .abs-input-wrapper:focus-within { border-color: var(--abs-accent); box-shadow: 0 0 15px rgba(255, 200, 0, 0.1); }
         .abs-input, .abs-textarea { width: 100%; padding: 14px 16px; background: transparent; border: none; color: var(--abs-text-main); font-family: 'Space Grotesk', sans-serif; font-size: 14px; border-radius: 0; outline: none; }
         .abs-textarea { resize: vertical; }
 
-        .abs-dropdown-container { background-color: #020304; border: 1px solid var(--abs-border); cursor: pointer; position: relative; }
-        .abs-dropdown-trigger { padding: 14px 16px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; }
+        /* PATCHED: Consolidated dropdown container bounding boxes to prevent leaking layout breaks */
+        .abs-dropdown-container { background-color: #020304; border: 1px solid var(--abs-border); cursor: pointer; position: relative; width: 100%; z-index: 50; }
+        .abs-dropdown-trigger { padding: 14px 16px; font-size: 14px; display: flex; justify-content: space-between; align-items: center; width: 100%; color: var(--abs-text-main); }
         .abs-dropdown-trigger::after { content: '▼'; font-size: 10px; color: var(--abs-text-muted); transition: transform 0.25s; }
         .abs-dropdown-container.open .abs-dropdown-trigger::after { transform: rotate(180deg); color: var(--abs-accent); }
         .abs-dropdown-container.open { border-color: var(--abs-accent); }
-        .abs-dropdown-tray { max-height: 0; overflow: hidden; transition: max-height 0.35s cubic-bezier(0.16, 1, 0.3, 1); background-color: #050608; }
+        .abs-dropdown-tray { max-height: 0; overflow: hidden; transition: max-height 0.3s cubic-bezier(0.16, 1, 0.3, 1); background-color: #050608; width: 100%; position: relative; }
         .abs-dropdown-container.open .abs-dropdown-tray { max-height: 200px; border-top: 1px solid var(--abs-border); }
-        .abs-dropdown-option { padding: 12px 16px; font-size: 14px; transition: all 0.2s; color: #cbd5e1; }
+        .abs-dropdown-option { padding: 12px 16px; font-size: 14px; transition: all 0.2s; color: #cbd5e1; width: 100%; }
         .abs-dropdown-option:hover { background-color: #0c0f12; color: var(--abs-accent); }
 
-        .abs-checkbox-block { display: block; background: #020304; border: 1px solid var(--abs-border); padding: 16px; margin-bottom: 15px; cursor: pointer; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); position: relative; }
-        .abs-checkbox-block input { position: absolute; opacity: 0; width: 0; height: 0; }
-        .abs-checkbox-block:hover { border-color: #2a353d; background: #050709; }
-        .abs-checkbox-block.checked { border-color: var(--abs-accent); background: #07090c; box-shadow: 0 0 20px rgba(255, 200, 0, 0.2); }
+        /* FIXED: Custom check blocks configured to prioritize full padding clickable layers */
+        .abs-checkbox-block { display: block; background: #020304; border: 1px solid var(--abs-border); padding: 18px; margin-bottom: 15px; cursor: pointer; transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1); position: relative; width: 100%; user-select: none; }
+        .abs-checkbox-block input { position: absolute; opacity: 0; width: 0; height: 0; pointer-events: none; }
+        .abs-checkbox-block:hover { border-color: #323f4a; background: #050709; }
+        .abs-checkbox-block.checked { border-color: var(--abs-accent); background: #07090c; box-shadow: 0 0 20px rgba(255, 200, 0, 0.15); }
         .abs-checkbox-block.checked .abs-block-title { color: var(--abs-accent); }
 
-        .abs-block-title { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--abs-text-muted); font-weight: bold; margin-bottom: 6px; transition: color 0.2s; }
-        .abs-block-desc { font-size: 13px; color: #cbd5e1; line-height: 1.4; display: block; }
+        .abs-block-title { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--abs-text-muted); font-weight: bold; margin-bottom: 6px; transition: color 0.2s; pointer-events: none; }
+        .abs-block-desc { font-size: 13px; color: #cbd5e1; line-height: 1.4; display: block; pointer-events: none; }
 
-        .abs-footer-grid { display: flex; gap: 15px; margin-top: 25px; }
+        .abs-footer-grid { display: flex; gap: 15px; margin-top: 25px; width: 100%; }
         .abs-btn { background-color: var(--abs-accent); color: #000000; border: none; padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: all 0.25s; flex: 1; text-align: center; }
         .abs-btn:hover:not(:disabled) { background-color: #ffffff; box-shadow: 0 0 20px rgba(255, 200, 0, 0.3); }
         .abs-btn:disabled { background-color: #121517; color: #2e373d; border: 1px solid var(--abs-border); cursor: not-allowed; box-shadow: none; }
@@ -75,12 +81,28 @@
 
         .abs-deco-strip { height: 5px; background: var(--abs-hazard); background-size: 20px 20px; margin-bottom: 20px; opacity: 0.85; animation: moveHazard 0.6s linear infinite; }
 
+        /* TACTICAL OVERSIZE WARNING POPUP LAYER WINDOW */
+        .abs-modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(3, 4, 5, 0.85); backdrop-filter: blur(4px); z-index: 2000; display: none; justify-content: center; align-items: center; padding: 20px; }
+        .abs-modal-overlay.active { display: flex; animation: panelSlideIn 0.3s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        
+        .abs-modal-box { background: var(--abs-panel); border: 2px solid var(--abs-danger); width: 100%; max-width: 580px; padding: 40px; position: relative; box-shadow: 0 0 50px rgba(255, 42, 42, 0.25); }
+        .abs-modal-box::before { content: ''; position: absolute; top: -2px; left: -2px; width: 16px; height: 16px; border-color: var(--abs-danger); border-style: solid; border-width: 2px 0 0 2px; }
+        .abs-modal-box::after { content: ''; position: absolute; bottom: -2px; right: -2px; width: 16px; height: 16px; border-color: var(--abs-danger); border-style: solid; border-width: 0 2px 2px 0; }
+        
+        .abs-modal-title { font-size: 20px; font-weight: 700; color: var(--abs-danger); letter-spacing: 2px; margin: 0 0 15px 0; text-transform: uppercase; text-shadow: 0 0 10px rgba(255, 42, 42, 0.3); }
+        .abs-modal-text { font-size: 14px; color: #e2e8f0; line-height: 1.6; margin-bottom: 25px; border-left: 3px solid var(--abs-danger); padding-left: 15px; }
+        
+        /* Giant background arrow element parameters >>> <<< */
+        .abs-modal-bg-arrows { font-family: 'JetBrains Mono', monospace; font-size: 82px; font-weight: 700; color: #160a0a; position: absolute; top: 50%; transform: translateY(-50%); letter-spacing: -10px; pointer-events: none; z-index: -1; user-select: none; width: 100%; text-align: center; left: 0; opacity: 0.6; }
+
+        .abs-btn-danger { background-color: var(--abs-danger); color: #ffffff; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; letter-spacing: 1px; }
+        .abs-btn-danger:hover { background-color: #ff4d4d; box-shadow: 0 0 25px rgba(255, 42, 42, 0.4); color: #ffffff; }
+
+        .abs-deco-strip-red { height: 6px; background: var(--abs-hazard-red); background-size: 20px 20px; margin-bottom: 20px; animation: moveHazard 0.6s linear infinite; }
+
         @keyframes moveHazard { 0% { background-position: 0 0; } 100% { background-position: 20px 0; } }
         @keyframes panelSlideIn { 0% { opacity: 0; transform: translateY(8px); } 100% { opacity: 1; transform: translateY(0); } }
-        @keyframes hardFlicker {
-            0%, 18%, 22%, 25%, 53%, 57%, 100% { color: var(--abs-accent); opacity: 1; }
-            20%, 24%, 55% { color: #1e2429; opacity: 0.7; }
-        }
+        @keyframes hardFlicker { 0%, 49% { color: var(--abs-accent); opacity: 1; } 50%, 100% { color: #1a2228; opacity: 0.4; } }
     </style>
 </head>
 <body>
