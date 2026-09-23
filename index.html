@@ -1,0 +1,153 @@
+<!-- //SYSTEM_RULES /COMPLIANCE_PROTOCOL -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HYPR // CORE SECTOR RECRUITMENT</title>
+    <link href="https://googleapis.com" rel="stylesheet">
+    <style>
+        :root {
+            --abs-bg: #0a0c0d;
+            --abs-panel: #111416;
+            --abs-accent: #ff4500;
+            --abs-accent-dim: #b33000;
+            --abs-text-main: #f5f7f8;
+            --abs-text-muted: #5c6975;
+            --abs-border: #20262b;
+            --abs-hazard: linear-gradient(45deg, var(--abs-accent) 25%, #000 25%, #000 50%, var(--abs-accent) 50%, var(--abs-accent) 75%, #000 75%, #000);
+        }
+        * { box-sizing: border-box; }
+        body { background-color: var(--abs-bg); color: var(--abs-text-main); font-family: 'Space Grotesk', sans-serif; margin: 0; padding: 60px 20px; display: flex; justify-content: center; align-items: center; }
+        .abs-container { background-color: var(--abs-panel); border: 1px solid var(--abs-border); position: relative; width: 100%; max-width: 650px; padding: 40px; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8); }
+        .abs-container::before, .abs-container::after { content: ''; position: absolute; width: 14px; height: 14px; border-color: var(--abs-accent); border-style: solid; }
+        .abs-container::before { top: -2px; left: -2px; border-width: 2px 0 0 2px; }
+        .abs-container::after { bottom: -2px; right: -2px; border-width: 0 2px 2px 0; }
+        .abs-header { border-bottom: 2px solid var(--abs-border); padding-bottom: 20px; margin-bottom: 35px; position: relative; }
+        .abs-header h1 { font-weight: 700; font-size: 24px; letter-spacing: 3px; margin: 0; text-transform: uppercase; }
+        .abs-meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--abs-text-muted); margin-top: 6px; text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between; }
+        .abs-status { color: var(--abs-accent); font-weight: bold; }
+        .abs-briefing { background-color: #060708; border: 1px dashed var(--abs-border); padding: 15px; margin-bottom: 30px; font-size: 13px; color: #cbd5e1; line-height: 1.5; }
+        .abs-briefing-title { font-family: 'JetBrains Mono', monospace; color: var(--abs-accent); font-size: 11px; font-weight: bold; margin-bottom: 8px; }
+        .abs-group { margin-bottom: 25px; }
+        .abs-label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--abs-text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
+        .abs-input, .abs-select, .abs-textarea { width: 100%; padding: 14px 16px; background-color: #060708; border: 1px solid var(--abs-border); color: var(--abs-text-main); font-family: 'Space Grotesk', sans-serif; font-size: 14px; border-radius: 0; transition: all 0.2s ease; }
+        .abs-input:focus, .abs-select:focus, .abs-textarea:focus { outline: none; border-color: var(--abs-accent); background-color: #090b0c; box-shadow: 0 0 12px rgba(255, 69, 0, 0.2); }
+        .abs-select { appearance: none; cursor: pointer; }
+        .abs-checkbox-item { display: flex; align-items: flex-start; margin-bottom: 18px; cursor: pointer; background: #060708; border: 1px solid var(--abs-border); padding: 12px; }
+        .abs-checkbox-item:hover { border-color: #3b424a; }
+        .abs-checkbox-input { margin-top: 3px; margin-right: 12px; accent-color: var(--abs-accent); width: 16px; height: 16px; cursor: pointer; }
+        .abs-checkbox-text { font-size: 13px; color: #cbd5e1; line-height: 1.4; }
+        .abs-checkbox-label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--abs-accent); font-weight: bold; margin-bottom: 4px; }
+        .abs-btn { background-color: var(--abs-accent); color: #ffffff; border: none; width: 100%; padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: all 0.2s; margin-top: 15px; }
+        .abs-btn:hover:not(:disabled) { background-color: var(--abs-accent-dim); }
+        .abs-btn:disabled { background-color: #1a1e21; color: #404952; border: 1px solid #252b30; cursor: not-allowed; }
+        .abs-deco-strip { height: 4px; background: var(--abs-hazard); background-size: 15px 15px; margin-bottom: 20px; opacity: 0.8; }
+    </style>
+</head>
+<body>
+<div class="abs-container">
+    <div class="abs-deco-strip"></div>
+    <div class="abs-header">
+        <h1>ABSOLUTE INDUSTRIES</h1>
+        <div class="abs-meta">
+            <span>//ABSOLUTE_LOGISTICS /STAFF_PROVISIONING</span>
+            <span class="abs-status">// HYPR_NETWORK_ONLINE</span>
+        </div>
+    </div>
+    <div class="abs-briefing">
+        <div class="abs-briefing-title">[ DIRECTIVE COMMAND // MISSION BRIEFING ]</div>
+        Telemetry shows that without strict parameters, public channels eventually get cluttered with toxic chatter or rogue link injections. PEA, ITASCA, and an independent think tank at ABSL all ran the numbers. If we don't tighten up our security parameters right now, this whole asset is going to blow hell wide open. Intercept the chaos before it commits.
+    </div>
+
+    <!-- Replace YOUR_ENDPOINT_HERE with your custom Formspree ID key -->
+    <form action="https://formspree.io" method="POST" id="recruitmentForm">
+        
+        <div class="abs-group">
+            <label class="abs-label">//OPERATOR_PROFILE /BIOMETRIC_IDENTITY</label>
+            <input class="abs-input" type="text" name="operator_id" placeholder="e.g., username" required>
+        </div>
+
+        <div class="abs-group">
+            <label class="abs-label">//SYSTEM_ARCHITECTURE /CORE_CORTEX_NODE</label>
+            <select class="abs-select" name="requested_node" required>
+                <option value="" disabled selected style="color:gray;">Select Tactical Sector...</option>
+                <option value="moderation">Protocol Enforcement (Moderator)</option>
+                <option value="administration">Core Operations (Admin)</option>
+                <option value="support">Technical Logistics (Support)</option>
+            </select>
+        </div>
+
+        <div class="abs-group">
+            <label class="abs-label">//COGNITIVE_LOAD /OPERATIONAL_HISTORY</label>
+            <textarea class="abs-textarea" name="experience_log" rows="3" placeholder="Document prior architectures managed..." required></textarea>
+        </div>
+
+        <div class="abs-group">
+            <label class="abs-label">//COMPLIANCE_ARRAY /DIRECTIVE_VALIDATION</label>
+            
+            <!-- Directive 1 -->
+            <label class="abs-checkbox-item">
+                <input type="checkbox" class="abs-checkbox-input directive-check" name="chk_directive_01" required>
+                <div class="abs-checkbox-text">
+                    <span class="abs-checkbox-label">//DIRECTIVE_01 /ZONE_INTEGRITY</span>
+                    Maintain absolute integrity. Zero tolerance for hostile behavior, toxic interference, malicious speech, or server drama. Wire tight—no internal firefights.
+                </div>
+            </label>
+
+            <!-- Directive 2 -->
+            <label class="abs-checkbox-item">
+                <input type="checkbox" class="abs-checkbox-input directive-check" name="chk_directive_02" required>
+                <div class="abs-checkbox-text">
+                    <span class="abs-checkbox-label">//DIRECTIVE_02 /TELEMETRY_COHERENCE</span>
+                    Route all transmissions strictly in English across public sectors. Network cannot parse unverified text data arrays; save the logging feed from going dead.
+                </div>
+            </label>
+
+            <!-- Directive 3 -->
+            <label class="abs-checkbox-item">
+                <input type="checkbox" class="abs-checkbox-input directive-check" name="chk_directive_03" required>
+                <div class="abs-checkbox-text">
+                    <span class="abs-checkbox-label">//DIRECTIVE_03 /LOGISTICS_ALLOCATION</span>
+                    Keep input logs localized to designated channels. General chatter in central comms, blueprints/sketches in the Art Sector. Do not cross the channels.
+                </div>
+            </label>
+
+                       <!-- Directive 4 -->
+            <label class="abs-checkbox-item">
+                <input type="checkbox" class="abs-checkbox-input directive-check" name="chk_directive_04" required>
+                <div class="abs-checkbox-text">
+                    <span class="abs-checkbox-label">//DIRECTIVE_04 /BROADCAST_RESTRICTION</span>
+                    Unsolicited DMs, external recruitment, and unauthorized ads are blocked. Dropping rogue links triggers immediate revocation of clearance keys.
+                </div>
+            </label>
+
+            <!-- Directive 5 -->
+            <label class="abs-checkbox-item">
+                <input type="checkbox" class="abs-checkbox-input directive-check" name="chk_directive_05" required>
+                <div class="abs-checkbox-text">
+                    <span class="abs-checkbox-label">//DIRECTIVE_05 /HARDWARE_SAFEGUARD</span>
+                    Deploying malicious file payloads, unverified links, or unauthorized leaks triggers an automatic system ban strike. Shield the network framework.
+                </div>
+            </label>
+        </div>
+
+        <button class="abs-btn" type="submit" id="submitBtn" disabled>AUTHORIZE CORTEX TRANSMISSION</button>
+    </form>
+</div>
+
+<script>
+    /* //SYSTEM_LOGIC /GATEKEEPER_SCRIPT */
+    const checkboxes = document.querySelectorAll('.directive-check');
+    const submitBtn = document.getElementById('submitBtn');
+
+    checkboxes.forEach(box => {
+        box.addEventListener('change', () => {
+            const allChecked = Array.from(checkboxes).every(c => c.checked);
+            submitBtn.disabled = !allChecked;
+        });
+    });
+</script>
+</body>
+</html>
+
