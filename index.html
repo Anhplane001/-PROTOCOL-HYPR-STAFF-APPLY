@@ -6,43 +6,115 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>HYPR // CORE SECTOR RECRUITMENT</title>
     <link href="https://googleapis.com" rel="stylesheet">
-    <style>
+        <style>
+        /* //VISUAL_SYSTEM /DESIGN_LANGUAGE_VARIABLES */
         :root {
-            --abs-bg: #0a0c0d;
-            --abs-panel: #111416;
-            --abs-accent: #ff4500;
-            --abs-accent-dim: #b33000;
-            --abs-text-main: #f5f7f8;
-            --abs-text-muted: #5c6975;
-            --abs-border: #20262b;
+            --abs-bg: #060708;            /* Deep pitch tactical black */
+            --abs-panel: #0d1013;         /* ABSOLUTE reinforced obsidian panel */
+            --abs-accent: #ff4500;        /* HYPR Alert Orange */
+            --abs-accent-dim: #992a00;
+            --abs-text-main: #f5f7f8;     /* High-contrast data text */
+            --abs-text-muted: #4e5b66;    /* Terminal metadata gray */
+            --abs-border: #1a2228;        /* Grid structural divider */
             --abs-hazard: linear-gradient(45deg, var(--abs-accent) 25%, #000 25%, #000 50%, var(--abs-accent) 50%, var(--abs-accent) 75%, #000 75%, #000);
         }
+
         * { box-sizing: border-box; }
-        body { background-color: var(--abs-bg); color: var(--abs-text-main); font-family: 'Space Grotesk', sans-serif; margin: 0; padding: 60px 20px; display: flex; justify-content: center; align-items: center; }
-        .abs-container { background-color: var(--abs-panel); border: 1px solid var(--abs-border); position: relative; width: 100%; max-width: 650px; padding: 40px; box-shadow: 0 25px 60px rgba(0, 0, 0, 0.8); }
+        body { 
+            background-color: var(--abs-bg); 
+            color: var(--abs-text-main); 
+            font-family: 'Space Grotesk', sans-serif; 
+            margin: 0; 
+            padding: 60px 20px; 
+            display: flex; 
+            justify-content: center; 
+            align-items: center;
+            background-image: radial-gradient(var(--abs-border) 1px, transparent 1px);
+            background-size: 24px 24px;
+        }
+
+        /* Ambient boot animation for core module */
+        .abs-container { 
+            background-color: var(--abs-panel); 
+            border: 1px solid var(--abs-border); 
+            position: relative; 
+            width: 100%; 
+            max-width: 650px; 
+            padding: 40px; 
+            box-shadow: 0 0 50px rgba(0, 0, 0, 0.9); 
+            animation: coreBoot 0.8s cubic-bezier(0.15, 0.85, 0.45, 1) forwards;
+            opacity: 0;
+        }
         .abs-container::before, .abs-container::after { content: ''; position: absolute; width: 14px; height: 14px; border-color: var(--abs-accent); border-style: solid; }
         .abs-container::before { top: -2px; left: -2px; border-width: 2px 0 0 2px; }
         .abs-container::after { bottom: -2px; right: -2px; border-width: 0 2px 2px 0; }
+        
         .abs-header { border-bottom: 2px solid var(--abs-border); padding-bottom: 20px; margin-bottom: 35px; position: relative; }
         .abs-header h1 { font-weight: 700; font-size: 24px; letter-spacing: 3px; margin: 0; text-transform: uppercase; }
         .abs-meta { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--abs-text-muted); margin-top: 6px; text-transform: uppercase; letter-spacing: 1px; display: flex; justify-content: space-between; }
-        .abs-status { color: var(--abs-accent); font-weight: bold; }
-        .abs-briefing { background-color: #060708; border: 1px dashed var(--abs-border); padding: 15px; margin-bottom: 30px; font-size: 13px; color: #cbd5e1; line-height: 1.5; }
+        
+        /* Pulsing indicator animation */
+        .abs-status { color: var(--abs-accent); font-weight: bold; animation: pulseTelemetry 2s infinite ease-in-out; }
+        
+        .abs-briefing { background-color: #040506; border: 1px dashed var(--abs-border); padding: 15px; margin-bottom: 30px; font-size: 13px; color: #cbd5e1; line-height: 1.5; }
         .abs-briefing-title { font-family: 'JetBrains Mono', monospace; color: var(--abs-accent); font-size: 11px; font-weight: bold; margin-bottom: 8px; }
-        .abs-group { margin-bottom: 25px; }
+
+        .abs-group { margin-bottom: 25px; position: relative; }
         .abs-label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--abs-text-muted); text-transform: uppercase; margin-bottom: 8px; letter-spacing: 1px; }
-        .abs-input, .abs-select, .abs-textarea { width: 100%; padding: 14px 16px; background-color: #060708; border: 1px solid var(--abs-border); color: var(--abs-text-main); font-family: 'Space Grotesk', sans-serif; font-size: 14px; border-radius: 0; transition: all 0.2s ease; }
-        .abs-input:focus, .abs-select:focus, .abs-textarea:focus { outline: none; border-color: var(--abs-accent); background-color: #090b0c; box-shadow: 0 0 12px rgba(255, 69, 0, 0.2); }
-        .abs-select { appearance: none; cursor: pointer; }
-        .abs-checkbox-item { display: flex; align-items: flex-start; margin-bottom: 18px; cursor: pointer; background: #060708; border: 1px solid var(--abs-border); padding: 12px; }
-        .abs-checkbox-item:hover { border-color: #3b424a; }
-        .abs-checkbox-input { margin-top: 3px; margin-right: 12px; accent-color: var(--abs-accent); width: 16px; height: 16px; cursor: pointer; }
-        .abs-checkbox-text { font-size: 13px; color: #cbd5e1; line-height: 1.4; }
-        .abs-checkbox-label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--abs-accent); font-weight: bold; margin-bottom: 4px; }
-        .abs-btn { background-color: var(--abs-accent); color: #ffffff; border: none; width: 100%; padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: all 0.2s; margin-top: 15px; }
-        .abs-btn:hover:not(:disabled) { background-color: var(--abs-accent-dim); }
-        .abs-btn:disabled { background-color: #1a1e21; color: #404952; border: 1px solid #252b30; cursor: not-allowed; }
-        .abs-deco-strip { height: 4px; background: var(--abs-hazard); background-size: 15px 15px; margin-bottom: 20px; opacity: 0.8; }
+        
+        /* Fully customized tech inputs */
+        .abs-input, .abs-textarea { width: 100%; padding: 14px 16px; background-color: #040506; border: 1px solid var(--abs-border); color: var(--abs-text-main); font-family: 'Space Grotesk', sans-serif; font-size: 14px; border-radius: 0; transition: all 0.25s ease; }
+        .abs-input:focus, .abs-textarea:focus { outline: none; border-color: var(--abs-accent); background-color: #07090b; box-shadow: 0 0 15px rgba(255, 69, 0, 0.15); }
+
+        /* CUSTOM DROPDOWN ARCHITECTURE */
+        .abs-select-wrapper { position: relative; width: 100%; }
+        .abs-select { width: 100%; padding: 14px 40px 14px 16px; background-color: #040506; border: 1px solid var(--abs-border); color: var(--abs-text-main); font-family: 'Space Grotesk', sans-serif; font-size: 14px; border-radius: 0; appearance: none; cursor: pointer; transition: all 0.25s ease; }
+        .abs-select:focus { outline: none; border-color: var(--abs-accent); background-color: #07090b; box-shadow: 0 0 15px rgba(255, 69, 0, 0.15); }
+        .abs-select-wrapper::after { content: '▼'; font-family: monospace; font-size: 10px; color: var(--abs-text-muted); position: absolute; right: 16px; top: 50%; transform: translateY(-50%); pointer-events: none; transition: color 0.25s; }
+        .abs-select-wrapper:hover::after { color: var(--abs-accent); }
+
+        /* CUSTOM CHECKBOX ARCHITECTURE */
+        .abs-checkbox-item { display: flex; align-items: flex-start; margin-bottom: 18px; cursor: pointer; background: #040506; border: 1px solid var(--abs-border); padding: 14px; transition: all 0.2s ease; position: relative; }
+        .abs-checkbox-item:hover { border-color: #2b3742; background: #07090b; }
+        .abs-checkbox-input { position: absolute; opacity: 0; cursor: pointer; height: 0; width: 0; }
+        
+        /* Custom checkbox box design */
+        .abs-custom-box { height: 16px; width: 16px; background-color: #020304; border: 1px solid var(--abs-border); margin-top: 3px; margin-right: 14px; flex-shrink: 0; position: relative; transition: all 0.2s; }
+        .abs-checkbox-item:hover .abs-custom-box { border-color: #4e5b66; }
+        .abs-checkbox-input:checked ~ .abs-custom-box { background-color: var(--abs-accent); border-color: var(--abs-accent); box-shadow: 0 0 10px rgba(255, 69, 0, 0.4); }
+        .abs-checkbox-input:checked ~ .abs-custom-box::after { content: ''; position: absolute; left: 5px; top: 2px; width: 4px; height: 8px; border: solid white; border-width: 0 2px 2px 0; transform: rotate(45deg); }
+        .abs-checkbox-input:checked ~ .abs-checkbox-text { border-left-color: var(--abs-accent); }
+        
+        .abs-checkbox-text { font-size: 13px; color: #cbd5e1; line-height: 1.4; transition: all 0.2s; }
+        .abs-checkbox-label { display: block; font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--abs-accent); font-weight: bold; margin-bottom: 4px; letter-spacing: 0.5px; }
+
+        .abs-btn { background-color: var(--abs-accent); color: #ffffff; border: none; width: 100%; padding: 16px; font-family: 'JetBrains Mono', monospace; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; cursor: pointer; transition: all 0.25s cubic-bezier(0.15, 0.85, 0.45, 1); margin-top: 15px; position: relative; overflow: hidden; }
+        .abs-btn:hover:not(:disabled) { background-color: #ff5714; box-shadow: 0 0 20px rgba(255, 69, 0, 0.3); }
+        .abs-btn:disabled { background-color: #12161a; color: #323d47; border: 1px solid #1a2228; cursor: not-allowed; box-shadow: none; }
+        
+        /* ANIMATED HAZARD STRIP RUNNER */
+        .abs-deco-strip { 
+            height: 6px; 
+            background: var(--abs-hazard); 
+            background-size: 20px 20px; 
+            margin-bottom: 20px; 
+            opacity: 0.85; 
+            animation: moveHazard 0.6s linear infinite;
+        }
+
+        /* CORE GRAPHICS ANIMATIONS TIMELINES */
+        @keyframes moveHazard {
+            0% { background-position: 0 0; }
+            100% { background-position: 20px 0; }
+        }
+        @keyframes pulseTelemetry {
+            0%, 100% { opacity: 1; text-shadow: 0 0 8px rgba(255, 69, 0, 0.6); }
+            50% { opacity: 0.4; text-shadow: 0 0 0px rgba(255, 69, 0, 0); }
+        }
+        @keyframes coreBoot {
+            0% { opacity: 0; transform: scale(0.97) translateY(10px); filter: blur(2px); }
+            100% { opacity: 1; transform: scale(1) translateY(0); filter: blur(0); }
+        }
     </style>
 </head>
 <body>
@@ -70,12 +142,14 @@
 
         <div class="abs-group">
             <label class="abs-label">//SYSTEM_ARCHITECTURE /CORE_CORTEX_NODE</label>
-            <select class="abs-select" name="requested_node" required>
-                <option value="" disabled selected style="color:gray;">Select Tactical Sector...</option>
-                <option value="moderation">Protocol Enforcement (Moderator)</option>
-                <option value="administration">Core Operations (Admin)</option>
-                <option value="support">Technical Logistics (Support)</option>
-            </select>
+            <div class="abs-select-wrapper">
+                <select class="abs-select" name="requested_node" required>
+                    <option value="" disabled selected style="color:gray;">Select Tactical Sector...</option>
+                    <option value="moderation">Protocol Enforcement (Moderator)</option>
+                    <option value="administration">Core Operations (Admin)</option>
+                    <option value="support">Technical Logistics (Support)</option>
+                </select>
+            </div>
         </div>
 
         <div class="abs-group">
@@ -83,12 +157,13 @@
             <textarea class="abs-textarea" name="experience_log" rows="3" placeholder="Document prior architectures managed..." required></textarea>
         </div>
 
-        <div class="abs-group">
+               <div class="abs-group">
             <label class="abs-label">//COMPLIANCE_ARRAY /DIRECTIVE_VALIDATION</label>
             
             <!-- Directive 1 -->
             <label class="abs-checkbox-item">
                 <input type="checkbox" class="abs-checkbox-input directive-check" name="chk_directive_01" required>
+                <div class="abs-custom-box"></div>
                 <div class="abs-checkbox-text">
                     <span class="abs-checkbox-label">//DIRECTIVE_01 /ZONE_INTEGRITY</span>
                     Maintain absolute integrity. Zero tolerance for hostile behavior, toxic interference, malicious speech, or server drama. Wire tight—no internal firefights.
@@ -98,6 +173,7 @@
             <!-- Directive 2 -->
             <label class="abs-checkbox-item">
                 <input type="checkbox" class="abs-checkbox-input directive-check" name="chk_directive_02" required>
+                <div class="abs-custom-box"></div>
                 <div class="abs-checkbox-text">
                     <span class="abs-checkbox-label">//DIRECTIVE_02 /TELEMETRY_COHERENCE</span>
                     Route all transmissions strictly in English across public sectors. Network cannot parse unverified text data arrays; save the logging feed from going dead.
@@ -107,13 +183,14 @@
             <!-- Directive 3 -->
             <label class="abs-checkbox-item">
                 <input type="checkbox" class="abs-checkbox-input directive-check" name="chk_directive_03" required>
+                <div class="abs-custom-box"></div>
                 <div class="abs-checkbox-text">
                     <span class="abs-checkbox-label">//DIRECTIVE_03 /LOGISTICS_ALLOCATION</span>
                     Keep input logs localized to designated channels. General chatter in central comms, blueprints/sketches in the Art Sector. Do not cross the channels.
                 </div>
             </label>
 
-                       <!-- Directive 4 -->
+            <!-- Directive 4 -->
             <label class="abs-checkbox-item">
                 <input type="checkbox" class="abs-checkbox-input directive-check" name="chk_directive_04" required>
                 <div class="abs-checkbox-text">
@@ -132,9 +209,6 @@
             </label>
         </div>
 
-        <button class="abs-btn" type="submit" id="submitBtn" disabled>AUTHORIZE CORTEX TRANSMISSION</button>
-    </form>
-</div>
 
 <script>
     /* //SYSTEM_LOGIC /GATEKEEPER_SCRIPT */
