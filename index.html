@@ -445,16 +445,16 @@
   
   <div class="dialog-panel">
     <div class="dialog-head">CRITICAL INTERCEPT</div>
-    <div class="dialog-subhead mono">>>> ABSOLUTE CLEARANCE PROTOCOL <<<</div>
+    <div class="dialog-subhead mono">>>> ABSOLUTE CLEARANCE PROTOCOL <<<< /div>
     
     <div class="dialog-msg mono">
-      <strong>WARNING: SECURITY CLEARANCE CHECK ENGAGED.</strong><br><br>
+      <strong>WARNING >> SECURITY CLEARANCE.</strong><br><br>
       Transmitting fake application data or fraudulent history logs triggers an instant, permanent clearance signature blacklist penalty across all Absolute Industries servers.<br><br>
       Do you absolutely confirm this application transmission is genuine?
     </div>
 
     <div style="display:flex; flex-direction:column; align-items:center;">
-      <button type="button" class="btn-danger interactable" id="btn-final-confirm">CONFIRM TRANSMISSION</button>
+      <button type="button" class="btn-danger interactable" id="btn-final-confirm">CONFIRM PROTOCOL</button>
       <button type="button" class="btn-abort interactable" id="btn-cancel">ABORT PROTOCOL</button>
     </div>
   </div>
@@ -506,7 +506,7 @@
   }
 
   const telBox = document.getElementById('telemetry-seq');
-  const seqText = ["/", "//", "///", "// HYPR NETWORK ONLINE_"];
+  const seqText = ["/", "//", "// HYPR NETWORK ONLINE_"];
   let telIndex = 0;
   setInterval(() => {
     telBox.innerText = seqText[telIndex];
