@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ABSOLUTE INDUSTRIES // CLEARANCE TERMINAL</title>
+
 <style>
   :root {
     --abs-bg: #040506;
@@ -24,11 +25,11 @@
     padding: 0;
     font-family: 'Consolas', 'Courier New', monospace;
     user-select: none;
+    cursor: none;
   }
 
-  ::selection {
-    background: var(--abs-accent);
-    color: #000;
+  html {
+    cursor: none;
   }
 
   body {
@@ -43,61 +44,103 @@
     overflow-x: hidden;
   }
 
-  /* Scanline Overlay */
+  /* =========================================================
+     GLOBAL OVERLAYS
+     ========================================================= */
+
   body::before {
-    content: " ";
+    content: "";
     position: fixed;
-    top: 0; left: 0; bottom: 0; right: 0;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.4) 50%), 
-                linear-gradient(90deg, rgba(255, 0, 0, 0.02), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.02));
-    z-index: 90;
+    inset: 0;
+    background:
+      linear-gradient(
+        rgba(18, 16, 16, 0) 50%,
+        rgba(0, 0, 0, 0.4) 50%
+      ),
+      linear-gradient(
+        90deg,
+        rgba(255, 0, 0, 0.02),
+        rgba(0, 255, 0, 0.01),
+        rgba(0, 0, 255, 0.02)
+      );
     background-size: 100% 3px, 6px 100%;
     pointer-events: none;
+    z-index: 90;
   }
 
-  /* Canvas Backdrops */
-  #terrain-canvas, #radar-canvas {
+  #terrain-canvas,
+  #radar-canvas {
     position: fixed;
-    top: 0;
-    left: 0;
+    inset: 0;
     width: 100vw;
     height: 100vh;
     pointer-events: none;
   }
-  #terrain-canvas { z-index: 1; opacity: 0.18; }
-  #radar-canvas { z-index: 2; opacity: 0.25; }
 
-  /* Custom Smooth Follow Cursor Ring */
-  #cursor-dot {
-    position: fixed;
-    width: 6px;
-    height: 6px;
-    background: var(--abs-accent);
-    border-radius: 50%;
-    pointer-events: none;
-    z-index: 9999;
-    transform: translate3d(-50%, -50%, 0);
-    transition: transform 0.05s ease-out;
+  #terrain-canvas {
+    z-index: 1;
+    opacity: 0.18;
   }
+
+  #radar-canvas {
+    z-index: 2;
+    opacity: 0.25;
+  }
+
+  /* =========================================================
+     CUSTOM CURSOR
+     ========================================================= */
+
+  #cursor-dot,
   #cursor-ring {
     position: fixed;
+    top: 0;
+    left: 0;
+    pointer-events: none;
+    z-index: 99999;
+    will-change: transform;
+  }
+
+  #cursor-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: var(--abs-accent);
+    box-shadow:
+      0 0 6px rgba(255, 200, 0, 0.8),
+      0 0 14px rgba(255, 200, 0, 0.3);
+    transform: translate3d(-100px, -100px, 0);
+  }
+
+  #cursor-ring {
     width: 28px;
     height: 28px;
     border: 1.5px solid var(--abs-accent);
     border-radius: 50%;
-    pointer-events: none;
-    z-index: 9998;
-    transform: translate3d(-50%, -50%, 0);
-    transition: width 0.2s ease, height 0.2s ease, border-color 0.2s ease, opacity 0.2s ease;
     box-shadow: 0 0 10px rgba(255, 200, 0, 0.2);
+    opacity: 0.9;
+
+    /* Only animate visual properties.
+       NEVER transition transform. */
+    transition:
+      width 0.18s ease,
+      height 0.18s ease,
+      border-color 0.18s ease,
+      opacity 0.18s ease;
+    
+    transform: translate3d(-100px, -100px, 0);
   }
+
   body:active #cursor-ring {
     width: 20px;
     height: 20px;
-    border-color: #ffffff;
+    border-color: #fff;
   }
 
-  /* Main Structural Frame */
+  /* =========================================================
+     MAIN TERMINAL
+     ========================================================= */
+
   .terminal-frame {
     width: 100%;
     max-width: 820px;
@@ -106,11 +149,13 @@
     padding: 35px;
     position: relative;
     z-index: 10;
-    box-shadow: 0 0 40px rgba(0,0,0,0.9);
+    box-shadow: 0 0 40px rgba(0, 0, 0, 0.9);
   }
 
-  /* Corner Framing Brackets */
-  .bracket-tl, .bracket-tr, .bracket-bl, .bracket-br {
+  .bracket-tl,
+  .bracket-tr,
+  .bracket-bl,
+  .bracket-br {
     position: absolute;
     width: 18px;
     height: 18px;
@@ -118,12 +163,35 @@
     border-style: solid;
     pointer-events: none;
   }
-  .bracket-tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; }
-  .bracket-tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; }
-  .bracket-bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; }
-  .bracket-br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; }
 
-  /* Header Section */
+  .bracket-tl {
+    top: -2px;
+    left: -2px;
+    border-width: 3px 0 0 3px;
+  }
+
+  .bracket-tr {
+    top: -2px;
+    right: -2px;
+    border-width: 3px 3px 0 0;
+  }
+
+  .bracket-bl {
+    bottom: -2px;
+    left: -2px;
+    border-width: 0 0 3px 3px;
+  }
+
+  .bracket-br {
+    bottom: -2px;
+    right: -2px;
+    border-width: 0 3px 3px 0;
+  }
+
+  /* =========================================================
+     HEADER
+     ========================================================= */
+
   .terminal-header {
     border-bottom: 2px solid var(--abs-accent);
     padding-bottom: 18px;
@@ -132,20 +200,21 @@
     justify-content: space-between;
     align-items: flex-start;
   }
+
   .status-line {
     font-size: 0.78rem;
     color: var(--abs-text-sub);
     letter-spacing: 2px;
     margin-bottom: 6px;
   }
+
   .main-title {
     font-size: 1.5rem;
     font-weight: 900;
     color: var(--abs-text-main);
     letter-spacing: 1.5px;
   }
-  
-  /* Telemetry Tag Flicker (1s Step) */
+
   .telemetry-tag {
     color: var(--abs-accent);
     font-weight: bold;
@@ -156,12 +225,21 @@
     padding: 4px 8px;
     border: 1px solid rgba(255, 200, 0, 0.3);
   }
+
   @keyframes sharpFlicker {
-    0%, 49% { opacity: 1; }
-    50%, 100% { opacity: 0; }
+    0%, 49% {
+      opacity: 1;
+    }
+
+    50%, 100% {
+      opacity: 0;
+    }
   }
 
-  /* Decryption Tactical Briefing Box */
+  /* =========================================================
+     BRIEFING
+     ========================================================= */
+
   .briefing-card {
     background: #06080a;
     border-left: 3px solid var(--abs-accent);
@@ -172,58 +250,76 @@
     color: #c8d0da;
     min-height: 72px;
     position: relative;
-    box-shadow: inset 0 0 15px rgba(0,0,0,0.8);
+    box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.8);
   }
 
-  /* Audio Synthesizer Control */
   .audio-toggle {
     font-size: 0.75rem;
     color: var(--abs-text-sub);
-    cursor: pointer;
     display: inline-flex;
     align-items: center;
     gap: 6px;
     border: 1px solid #222730;
     padding: 4px 8px;
     background: #07090c;
-    transition: all 0.2s;
+    transition:
+      color 0.2s ease,
+      border-color 0.2s ease,
+      background 0.2s ease;
   }
+
   .audio-toggle.active {
     color: var(--abs-accent);
     border-color: var(--abs-accent);
   }
 
-  /* Wizard Navigation Steps */
+  /* =========================================================
+     WIZARD
+     ========================================================= */
+
   .wizard-progress {
     display: flex;
     gap: 8px;
     margin-bottom: 25px;
   }
+
   .progress-step {
     flex: 1;
     height: 4px;
     background: #181d24;
-    transition: background 0.3s ease, box-shadow 0.3s ease;
+    transition:
+      background 0.3s ease,
+      box-shadow 0.3s ease;
   }
+
   .progress-step.active {
     background: var(--abs-accent);
     box-shadow: 0 0 10px var(--abs-accent-glow);
   }
+
   .progress-step.completed {
     background: #505c6e;
   }
 
-  /* Step Containers */
   .step-panel {
     display: none;
     animation: fadeInStep 0.3s ease-out forwards;
   }
+
   .step-panel.active {
     display: block;
   }
+
   @keyframes fadeInStep {
-    from { opacity: 0; transform: translateY(6px); }
-    to { opacity: 1; transform: translateY(0); }
+    from {
+      opacity: 0;
+      transform: translateY(6px);
+    }
+
+    to {
+      opacity: 1;
+      transform: translateY(0);
+    }
   }
 
   .form-label {
@@ -234,6 +330,7 @@
     margin-bottom: 8px;
     text-transform: uppercase;
   }
+
   .form-desc {
     font-size: 0.8rem;
     color: var(--abs-text-sub);
@@ -241,31 +338,40 @@
     line-height: 1.4;
   }
 
-  /* Discord Addon Input Group */
+  /* =========================================================
+     INPUTS
+     ========================================================= */
+
   .input-addon-group {
     display: flex;
     align-items: center;
     background: #06080a;
     border: 1px solid #2a303a;
-    transition: border-color 0.25s ease;
+    transition:
+      border-color 0.25s ease,
+      box-shadow 0.25s ease;
   }
+
   .input-addon-group:focus-within {
     border-color: var(--abs-accent);
     box-shadow: 0 0 12px rgba(255, 200, 0, 0.2);
   }
+
   .addon-symbol {
     padding: 12px 0 12px 14px;
     color: var(--abs-accent);
     font-weight: bold;
     font-size: 1rem;
   }
+
   .input-addon-group input {
     border: none !important;
     background: transparent !important;
     padding-left: 6px !important;
   }
 
-  input[type="text"], input[type="email"] {
+  input[type="text"],
+  input[type="email"] {
     width: 100%;
     background: #06080a;
     border: 1px solid #2a303a;
@@ -273,32 +379,45 @@
     padding: 12px 14px;
     font-size: 0.95rem;
     outline: none;
-    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+
+    transition:
+      border-color 0.25s ease,
+      box-shadow 0.25s ease;
   }
-  input[type="text"]:focus, input[type="email"]:focus {
+
+  input[type="text"]:focus,
+  input[type="email"]:focus {
     border-color: var(--abs-accent);
     box-shadow: 0 0 12px rgba(255, 200, 0, 0.2);
   }
 
-  /* Custom Inline Accordion Select */
+  /* =========================================================
+     CUSTOM SELECT
+     ========================================================= */
+
   .custom-select-wrapper {
     position: relative;
   }
+
   .select-trigger {
     background: #06080a;
     border: 1px solid #2a303a;
     color: var(--abs-text-main);
     padding: 12px 14px;
     font-size: 0.95rem;
-    cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    transition: border-color 0.2s ease;
+
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
   }
+
   .select-trigger:hover {
     border-color: var(--abs-accent);
   }
+
   .select-options {
     display: none;
     background: #090c0f;
@@ -306,30 +425,44 @@
     border-top: none;
     margin-top: 2px;
   }
+
   .select-options.open {
     display: block;
   }
+
   .select-option {
     padding: 12px 14px;
-    cursor: pointer;
     color: #a0a8b3;
     border-bottom: 1px solid #151920;
-    transition: background 0.15s ease, color 0.15s ease;
+
+    transition:
+      background 0.15s ease,
+      color 0.15s ease;
   }
+
+  .select-option:last-child {
+    border-bottom: none;
+  }
+
   .select-option:hover {
     background: var(--abs-accent);
     color: #000;
   }
 
-  /* Ultra Smooth Glowing Directive Cards */
+  /* =========================================================
+     DIRECTIVES
+     ========================================================= */
+
   .directive-list {
     max-height: 380px;
     overflow-y: auto;
     padding-right: 4px;
   }
+
   .directive-list::-webkit-scrollbar {
     width: 4px;
   }
+
   .directive-list::-webkit-scrollbar-thumb {
     background: #252b35;
   }
@@ -339,31 +472,48 @@
     border: 1px solid #1e242d;
     padding: 14px 18px;
     margin-bottom: 10px;
-    cursor: pointer;
+
     display: flex;
     align-items: center;
     justify-content: space-between;
-    /* Hardware Accelerated Smooth Transition */
-    transition: border-color 0.3s cubic-bezier(0.25, 1, 0.5, 1), 
-                box-shadow 0.3s cubic-bezier(0.25, 1, 0.5, 1), 
-                background-color 0.3s ease,
-                transform 0.2s ease;
-    will-change: border-color, box-shadow, transform;
+
+    transition:
+      border-color 0.3s cubic-bezier(0.25, 1, 0.5, 1),
+      box-shadow 0.3s cubic-bezier(0.25, 1, 0.5, 1),
+      background-color 0.3s ease,
+      transform 0.2s ease;
+
+    will-change: transform, border-color, box-shadow;
   }
+
   .directive-card:hover {
     border-color: #3b4554;
     transform: translateX(2px);
   }
+
   .directive-card.active {
     border-color: var(--abs-accent);
     background: #0d1117;
-    /* Buttery Smooth Outer & Inner Glowing Ring */
-    box-shadow: 0 0 16px rgba(255, 200, 0, 0.45), inset 0 0 12px rgba(255, 200, 0, 0.18);
+
+    box-shadow:
+      0 0 16px rgba(255, 200, 0, 0.45),
+      inset 0 0 12px rgba(255, 200, 0, 0.18);
+
     animation: smoothRingPulse 2.5s infinite ease-in-out;
   }
+
   @keyframes smoothRingPulse {
-    0%, 100% { box-shadow: 0 0 16px rgba(255, 200, 0, 0.45), inset 0 0 12px rgba(255, 200, 0, 0.18); }
-    50% { box-shadow: 0 0 24px rgba(255, 200, 0, 0.65), inset 0 0 16px rgba(255, 200, 0, 0.28); }
+    0%, 100% {
+      box-shadow:
+        0 0 16px rgba(255, 200, 0, 0.45),
+        inset 0 0 12px rgba(255, 200, 0, 0.18);
+    }
+
+    50% {
+      box-shadow:
+        0 0 24px rgba(255, 200, 0, 0.65),
+        inset 0 0 16px rgba(255, 200, 0, 0.28);
+    }
   }
 
   .directive-card .badge {
@@ -372,20 +522,29 @@
     padding: 4px 8px;
     border: 1px solid #2c323d;
     color: #656e7b;
-    transition: all 0.25s ease;
+
+    transition:
+      color 0.25s ease,
+      border-color 0.25s ease,
+      background 0.25s ease;
   }
+
   .directive-card.active .badge {
     border-color: var(--abs-accent);
     color: var(--abs-accent);
     background: rgba(255, 200, 0, 0.1);
   }
 
-  /* Navigation Action Buttons */
+  /* =========================================================
+     BUTTONS
+     ========================================================= */
+
   .wizard-controls {
     display: flex;
     gap: 12px;
     margin-top: 25px;
   }
+
   .btn-nav {
     flex: 1;
     padding: 14px;
@@ -394,18 +553,23 @@
     border: 1px solid #222935;
     font-weight: bold;
     letter-spacing: 1.5px;
-    cursor: pointer;
-    transition: all 0.25s ease;
     text-align: center;
+
+    transition:
+      background 0.25s ease,
+      color 0.25s ease,
+      border-color 0.25s ease;
   }
+
   .btn-nav:hover:not(:disabled) {
     background: #181f2a;
     color: var(--abs-text-main);
     border-color: #384354;
   }
+
   .btn-nav:disabled {
     opacity: 0.4;
-    cursor: not-allowed;
+    cursor: default;
   }
 
   .submit-btn {
@@ -417,32 +581,43 @@
     font-weight: bold;
     letter-spacing: 2px;
     text-transform: uppercase;
-    cursor: not-allowed;
-    transition: all 0.3s cubic-bezier(0.25, 1, 0.5, 1);
+
+    transition:
+      background 0.3s ease,
+      color 0.3s ease,
+      box-shadow 0.3s ease,
+      border-color 0.3s ease;
   }
+
   .submit-btn.unlocked {
     background: var(--abs-accent);
     color: #000;
-    border: 1px solid var(--abs-accent);
-    cursor: pointer;
+    border-color: var(--abs-accent);
     box-shadow: 0 0 20px rgba(255, 200, 0, 0.5);
   }
+
   .submit-btn.unlocked:hover {
     background: #ffd32a;
     box-shadow: 0 0 28px rgba(255, 200, 0, 0.7);
   }
 
-  /* Custom High-Tech Alert Modal */
+  /* =========================================================
+     ALERT MODAL
+     ========================================================= */
+
   .modal-overlay {
     position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
+    inset: 0;
     background: rgba(4, 5, 6, 0.92);
+
     display: none;
     justify-content: center;
     align-items: center;
+
     z-index: 1000;
     backdrop-filter: blur(4px);
   }
+
   .modal-overlay.active {
     display: flex;
   }
@@ -455,12 +630,14 @@
     width: 90%;
     box-shadow: 0 0 30px rgba(255, 200, 0, 0.3);
   }
+
   .alert-title {
     color: var(--abs-accent);
     font-size: 1.05rem;
     margin-bottom: 12px;
     letter-spacing: 1px;
   }
+
   .alert-btn {
     margin-top: 18px;
     background: var(--abs-accent);
@@ -468,39 +645,51 @@
     border: none;
     padding: 10px 22px;
     font-weight: bold;
-    cursor: pointer;
-    transition: background 0.2s;
   }
-  .alert-btn:hover { background: #ffd32a; }
 
-  /* Oversized Red Intercept Protocol Modal */
+  .alert-btn:hover {
+    background: #ffd32a;
+  }
+
+  /* =========================================================
+     CRITICAL MODAL
+     ========================================================= */
+
   .critical-modal-wrapper {
     position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
+    inset: 0;
+
     background: rgba(12, 1, 1, 0.95);
+
     display: none;
     justify-content: center;
     align-items: center;
+
     z-index: 2000;
     overflow: hidden;
   }
+
   .critical-modal-wrapper.active {
     display: flex;
   }
 
-  /* Dual Crashing Arrow Background Streams */
   .arrow-stream-container {
     position: absolute;
     width: 100%;
     height: 100%;
+
     pointer-events: none;
+
     display: flex;
     flex-direction: column;
     justify-content: center;
+
     gap: 40px;
+
     opacity: 0.22;
     filter: blur(4px);
   }
+
   .arrow-row {
     font-size: 6rem;
     font-weight: 900;
@@ -509,31 +698,50 @@
     letter-spacing: 12px;
     will-change: transform;
   }
+
   .arrow-row.move-right {
     animation: streamRight 12s linear infinite;
   }
+
   .arrow-row.move-left {
     animation: streamLeft 12s linear infinite;
   }
+
   @keyframes streamRight {
-    from { transform: translateX(-50%); }
-    to { transform: translateX(0%); }
+    from {
+      transform: translateX(-50%);
+    }
+
+    to {
+      transform: translateX(0%);
+    }
   }
+
   @keyframes streamLeft {
-    from { transform: translateX(0%); }
-    to { transform: translateX(-50%); }
+    from {
+      transform: translateX(0%);
+    }
+
+    to {
+      transform: translateX(-50%);
+    }
   }
 
   .critical-dialog {
     background: rgba(18, 3, 3, 0.92);
     border: 3px solid var(--abs-danger);
+
     width: 90vw;
     max-width: 780px;
+
     padding: 35px;
+
     box-shadow: 0 0 60px rgba(255, 42, 42, 0.5);
+
     position: relative;
     z-index: 10;
   }
+
   .critical-header {
     color: var(--abs-danger);
     font-size: 1.6rem;
@@ -543,6 +751,7 @@
     margin-bottom: 8px;
     text-shadow: 0 0 15px var(--abs-danger-glow);
   }
+
   .critical-subheader {
     font-size: 0.9rem;
     color: #ff9999;
@@ -550,98 +759,208 @@
     letter-spacing: 4px;
     margin-bottom: 25px;
   }
+
   .critical-body {
     border: 1px solid var(--abs-danger);
     background: rgba(45, 5, 5, 0.4);
+
     padding: 22px;
+
     font-size: 0.95rem;
     line-height: 1.7;
     color: #ffe6e6;
+
     margin-bottom: 30px;
   }
+
   .critical-actions {
     display: flex;
     gap: 15px;
   }
-  .btn-confirm-final {
+
+  .btn-confirm-final,
+  .btn-abort-final {
     flex: 1;
+    padding: 16px;
+    font-weight: bold;
+    letter-spacing: 2px;
+  }
+
+  .btn-confirm-final {
     background: var(--abs-danger);
     color: #fff;
     border: none;
-    padding: 16px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    cursor: pointer;
     box-shadow: 0 0 20px var(--abs-danger-glow);
-    transition: background 0.2s;
+
+    transition:
+      background 0.2s ease,
+      box-shadow 0.2s ease;
   }
-  .btn-confirm-final:hover { background: #ff4d4d; }
+
+  .btn-confirm-final:hover {
+    background: #ff4d4d;
+    box-shadow: 0 0 28px var(--abs-danger-glow);
+  }
+
   .btn-abort-final {
-    flex: 1;
     background: transparent;
     color: var(--abs-danger);
     border: 1px solid var(--abs-danger);
-    padding: 16px;
-    font-weight: bold;
-    letter-spacing: 2px;
-    cursor: pointer;
-    transition: all 0.2s;
+
+    transition:
+      background 0.2s ease,
+      color 0.2s ease;
   }
+
   .btn-abort-final:hover {
     background: rgba(255, 42, 42, 0.15);
   }
 
-  /* Watermark Footer Topography Label */
+  /* =========================================================
+     FOOTER
+     ========================================================= */
+
   .footer-watermark {
     position: fixed;
     bottom: 12px;
     left: 20px;
+
     font-size: 0.7rem;
     color: #4a525d;
     letter-spacing: 2px;
+
     z-index: 10;
     pointer-events: none;
+
     display: flex;
     gap: 15px;
   }
+
+  /* =========================================================
+     MOBILE
+     ========================================================= */
+
+  @media (max-width: 650px) {
+    body {
+      padding: 10px;
+    }
+
+    .terminal-frame {
+      padding: 22px;
+    }
+
+    .terminal-header {
+      gap: 15px;
+    }
+
+    .main-title {
+      font-size: 1.2rem;
+    }
+
+    .telemetry-tag {
+      font-size: 0.65rem;
+    }
+
+    .footer-watermark {
+      display: none;
+    }
+
+    .critical-dialog {
+      padding: 22px;
+    }
+
+    .critical-header {
+      font-size: 1.15rem;
+    }
+
+    .critical-subheader {
+      font-size: 0.7rem;
+    }
+
+    .critical-actions {
+      flex-direction: column;
+    }
+
+    .arrow-row {
+      font-size: 4rem;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.001ms !important;
+      animation-iteration-count: 1 !important;
+      scroll-behavior: auto !important;
+    }
+  }
 </style>
 </head>
+
 <body>
 
-<!-- Custom Smooth Cursor -->
+<!-- =========================================================
+     CURSOR
+     ========================================================= -->
+
 <div id="cursor-dot"></div>
 <div id="cursor-ring"></div>
 
-<!-- Background Canvases -->
+<!-- =========================================================
+     BACKGROUND
+     ========================================================= -->
+
 <canvas id="terrain-canvas"></canvas>
 <canvas id="radar-canvas"></canvas>
 
-<!-- Main Terminal Container -->
+<!-- =========================================================
+     TERMINAL
+     ========================================================= -->
+
 <div class="terminal-frame">
+
   <div class="bracket-tl"></div>
   <div class="bracket-tr"></div>
   <div class="bracket-bl"></div>
   <div class="bracket-br"></div>
 
   <div class="terminal-header">
+
     <div>
-      <div class="status-line">SYSTEM STATUS: ACTIVE // DEPLOYED</div>
-      <div class="main-title">ABSOLUTE INDUSTRIES</div>
-    </div>
-    <div style="text-align: right;">
-      <div class="telemetry-tag">// HYPR_NETWORK_ONLINE</div>
-      <div style="margin-top: 8px;">
-        <span class="audio-toggle active" id="audio-btn">[AUDIO: ON]</span>
+      <div class="status-line">
+        SYSTEM STATUS: ACTIVE // DEPLOYED
+      </div>
+
+      <div class="main-title">
+        ABSOLUTE INDUSTRIES
       </div>
     </div>
+
+    <div style="text-align: right;">
+
+      <div class="telemetry-tag">
+        // HYPR_NETWORK_ONLINE
+      </div>
+
+      <div style="margin-top: 8px;">
+        <span class="audio-toggle active" id="audio-btn">
+          [AUDIO: ON]
+        </span>
+      </div>
+
+    </div>
+
   </div>
 
-  <!-- Decryption Tactical Briefing Box -->
+  <!-- BRIEFING -->
+
   <div class="briefing-card" id="decryption-box">
     [INITIALIZING PACED DECRYPTION SEQUENCE...]
   </div>
 
-  <!-- Wizard Step Progress Bar -->
+  <!-- PROGRESS -->
+
   <div class="wizard-progress">
     <div class="progress-step active" id="pstep-0"></div>
     <div class="progress-step" id="pstep-1"></div>
@@ -649,471 +968,1239 @@
     <div class="progress-step" id="pstep-3"></div>
   </div>
 
-  <!-- Master Form Action -->
-  <form id="dispatch-form" action="https://formspree.io/f/xvkgrbar" method="POST">
+  <!-- FORM -->
 
-    <!-- STEP 1: OPERATOR DISCORD IDENTIFIER -->
+  <form
+    id="dispatch-form"
+    action="https://formspree.io/f/xvkgrbar"
+    method="POST"
+  >
+
+    <!-- STEP 1 -->
+
     <div class="step-panel active" id="step-0">
-      <label class="form-label">01 // OPERATOR DISCORD HANDLE</label>
-      <div class="form-desc">Provide your exact Discord username (e.g., operator_99) for identity verification.</div>
+
+      <label class="form-label">
+        01 // OPERATOR DISCORD HANDLE
+      </label>
+
+      <div class="form-desc">
+        Provide your exact Discord username (e.g., operator_99)
+        for identity verification.
+      </div>
+
       <div class="input-addon-group">
+
         <span class="addon-symbol">@</span>
-        <input type="text" name="operator_discord" id="field-op-id" placeholder="username" autocomplete="off">
+
+        <input
+          type="text"
+          name="operator_discord"
+          id="field-op-id"
+          placeholder="username"
+          autocomplete="off"
+        >
+
       </div>
+
     </div>
 
-    <!-- STEP 2: DISPATCH EMAIL -->
+    <!-- STEP 2 -->
+
     <div class="step-panel" id="step-1">
-      <label class="form-label">02 // DISPATCH COMMUNICATION EMAIL</label>
-      <div class="form-desc">Official email address for dispatch alerts and telemetry clearance notices.</div>
-      <input type="email" name="email" id="field-email" placeholder="operator@absolute.network" autocomplete="off">
+
+      <label class="form-label">
+        02 // DISPATCH COMMUNICATION EMAIL
+      </label>
+
+      <div class="form-desc">
+        Official email address for dispatch alerts and telemetry
+        clearance notices.
+      </div>
+
+      <input
+        type="email"
+        name="email"
+        id="field-email"
+        placeholder="operator@absolute.network"
+        autocomplete="off"
+      >
+
     </div>
 
-    <!-- STEP 3: DISCORD ROLE ASSIGNMENT -->
+    <!-- STEP 3 -->
+
     <div class="step-panel" id="step-2">
-      <label class="form-label">03 // DISCORD ROLE ASSIGNMENT SECTOR</label>
-      <div class="form-desc">Select the primary administrative sector position you are applying to operate.</div>
-      <input type="hidden" name="assigned_role" id="role-input" value="">
+
+      <label class="form-label">
+        03 // DISCORD ROLE ASSIGNMENT SECTOR
+      </label>
+
+      <div class="form-desc">
+        Select the primary administrative sector position you
+        are applying to operate.
+      </div>
+
+      <input
+        type="hidden"
+        name="assigned_role"
+        id="role-input"
+        value=""
+      >
+
       <div class="custom-select-wrapper">
+
         <div class="select-trigger" id="select-trigger">
-          <span id="select-label">SELECT STAFF CLEARANCE ROLE...</span>
-          <span style="font-size: 0.7rem; color: var(--abs-accent);">▼</span>
+
+          <span id="select-label">
+            SELECT STAFF CLEARANCE ROLE...
+          </span>
+
+          <span style="font-size: 0.7rem; color: var(--abs-accent);">
+            ▼
+          </span>
+
         </div>
+
         <div class="select-options" id="select-options">
-          <div class="select-option" data-value="ADMINISTRATOR">ADMINISTRATOR // CORE SYSTEM OVERSEER</div>
-          <div class="select-option" data-value="MANAGEMENT_MOD">MANAGEMENT [MOD] // SECTOR ENFORCEMENT</div>
-          <div class="select-option" data-value="SUPPORT_OPERATIVE">SUPPORT OPERATIVE // DISPATCH ASSIST</div>
+
+          <div
+            class="select-option"
+            data-value="ADMINISTRATOR"
+          >
+            ADMINISTRATOR // CORE SYSTEM OVERSEER
+          </div>
+
+          <div
+            class="select-option"
+            data-value="MANAGEMENT_MOD"
+          >
+            MANAGEMENT [MOD] // SECTOR ENFORCEMENT
+          </div>
+
+          <div
+            class="select-option"
+            data-value="SUPPORT_OPERATIVE"
+          >
+            SUPPORT OPERATIVE // DISPATCH ASSIST
+          </div>
+
         </div>
+
       </div>
+
     </div>
 
-    <!-- STEP 4: MANDATORY DIRECTIVE COMPLIANCE -->
+    <!-- STEP 4 -->
+
     <div class="step-panel" id="step-3">
-      <label class="form-label">04 // COMPLIANCE DIRECTIVES (5/5 REQUIRED)</label>
-      <div class="form-desc">Acknowledge all protocol mandates to unlock request transmission.</div>
-      
-      <div class="directive-list">
-        <div class="directive-card" data-index="0">
-          <div style="font-size: 0.82rem;">1. VERIFY TELEMETRY INTEGRITY & GATEWAY HANDSHAKE</div>
-          <div class="badge">UNCHECKED</div>
-          <input type="checkbox" name="directive_1" hidden>
-        </div>
-        <div class="directive-card" data-index="1">
-          <div style="font-size: 0.82rem;">2. ACKNOWLEDGE ABSOLUTE DATA PROTECTION MANDATE</div>
-          <div class="badge">UNCHECKED</div>
-          <input type="checkbox" name="directive_2" hidden>
-        </div>
-        <div class="directive-card" data-index="2">
-          <div style="font-size: 0.82rem;">3. ACCEPT REAL-TIME STAFF LOG MONITORING PROTOCOLS</div>
-          <div class="badge">UNCHECKED</div>
-          <input type="checkbox" name="directive_3" hidden>
-        </div>
-        <div class="directive-card" data-index="3">
-          <div style="font-size: 0.82rem;">4. CONFIRM HARDWARE ENCRYPTION SIGNATURE MATCH</div>
-          <div class="badge">UNCHECKED</div>
-          <input type="checkbox" name="directive_4" hidden>
-        </div>
-        <div class="directive-card" data-index="4">
-          <div style="font-size: 0.82rem;">5. WAIVE APPEAL RIGHTS REGARDING SIGNATURE BLACKLISTS</div>
-          <div class="badge">UNCHECKED</div>
-          <input type="checkbox" name="directive_5" hidden>
-        </div>
+
+      <label class="form-label">
+        04 // COMPLIANCE DIRECTIVES (5/5 REQUIRED)
+      </label>
+
+      <div class="form-desc">
+        Acknowledge all protocol mandates to unlock request
+        transmission.
       </div>
+
+      <div class="directive-list">
+
+        <div class="directive-card" data-index="0">
+          <div style="font-size: 0.82rem;">
+            1. VERIFY TELEMETRY INTEGRITY & GATEWAY HANDSHAKE
+          </div>
+
+          <div class="badge">
+            UNCHECKED
+          </div>
+
+          <input
+            type="checkbox"
+            name="directive_1"
+            hidden
+          >
+        </div>
+
+        <div class="directive-card" data-index="1">
+          <div style="font-size: 0.82rem;">
+            2. ACKNOWLEDGE ABSOLUTE DATA PROTECTION MANDATE
+          </div>
+
+          <div class="badge">
+            UNCHECKED
+          </div>
+
+          <input
+            type="checkbox"
+            name="directive_2"
+            hidden
+          >
+        </div>
+
+        <div class="directive-card" data-index="2">
+          <div style="font-size: 0.82rem;">
+            3. ACCEPT REAL-TIME STAFF LOG MONITORING PROTOCOLS
+          </div>
+
+          <div class="badge">
+            UNCHECKED
+          </div>
+
+          <input
+            type="checkbox"
+            name="directive_3"
+            hidden
+          >
+        </div>
+
+        <div class="directive-card" data-index="3">
+          <div style="font-size: 0.82rem;">
+            4. CONFIRM HARDWARE ENCRYPTION SIGNATURE MATCH
+          </div>
+
+          <div class="badge">
+            UNCHECKED
+          </div>
+
+          <input
+            type="checkbox"
+            name="directive_4"
+            hidden
+          >
+        </div>
+
+        <div class="directive-card" data-index="4">
+          <div style="font-size: 0.82rem;">
+            5. WAIVE APPEAL RIGHTS REGARDING SIGNATURE BLACKLISTS
+          </div>
+
+          <div class="badge">
+            UNCHECKED
+          </div>
+
+          <input
+            type="checkbox"
+            name="directive_5"
+            hidden
+          >
+        </div>
+
+      </div>
+
     </div>
 
-    <!-- Controls -->
+    <!-- CONTROLS -->
+
     <div class="wizard-controls">
-      <button type="button" class="btn-nav" id="btn-prev" disabled>BACK</button>
-      <button type="button" class="btn-nav" id="btn-next">NEXT STEP</button>
-      <button type="button" class="submit-btn" id="submit-btn" style="display: none;" disabled>
+
+      <button
+        type="button"
+        class="btn-nav"
+        id="btn-prev"
+        disabled
+      >
+        BACK
+      </button>
+
+      <button
+        type="button"
+        class="btn-nav"
+        id="btn-next"
+      >
+        NEXT STEP
+      </button>
+
+      <button
+        type="button"
+        class="submit-btn"
+        id="submit-btn"
+        style="display: none;"
+        disabled
+      >
         INITIATE REQUEST TRANSMISSION
       </button>
+
     </div>
 
   </form>
+
 </div>
 
-<!-- Custom Tech Alert Modal -->
+<!-- =========================================================
+     NORMAL ALERT
+     ========================================================= -->
+
 <div class="modal-overlay" id="alert-modal">
+
   <div class="alert-box">
-    <div class="alert-title">// DATA EXCEPTION DETECTED</div>
-    <div id="alert-msg" style="font-size: 0.85rem; color: #a0a8b3; line-height: 1.5;"></div>
-    <button class="alert-btn" id="alert-close">ACKNOWLEDGE</button>
+
+    <div class="alert-title">
+      // DATA EXCEPTION DETECTED
+    </div>
+
+    <div
+      id="alert-msg"
+      style="
+        font-size: 0.85rem;
+        color: #a0a8b3;
+        line-height: 1.5;
+      "
+    ></div>
+
+    <button
+      class="alert-btn"
+      id="alert-close"
+      type="button"
+    >
+      ACKNOWLEDGE
+    </button>
+
   </div>
+
 </div>
 
-<!-- Oversized Red Intercept Protocol Modal -->
-<div class="critical-modal-wrapper" id="critical-modal">
-  <!-- Dual Moving Arrow Backdrops -->
+<!-- =========================================================
+     CRITICAL MODAL
+     ========================================================= -->
+
+<div
+  class="critical-modal-wrapper"
+  id="critical-modal"
+>
+
   <div class="arrow-stream-container">
-    <div class="arrow-row move-right">&gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt;</div>
-    <div class="arrow-row move-left">&lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt;</div>
-    <div class="arrow-row move-right">&gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt;</div>
+
+    <div class="arrow-row move-right">
+      &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt;
+      &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt;
+    </div>
+
+    <div class="arrow-row move-left">
+      &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt;
+      &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt;
+    </div>
+
+    <div class="arrow-row move-right">
+      &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt;
+      &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt;
+    </div>
+
   </div>
 
   <div class="critical-dialog">
-    <div class="critical-header">CRITICAL TRANSMISSION INTERCEPT</div>
-    <div class="critical-subheader">&gt;&gt;&gt; ABSOLUTE CLEARANCE PROTOCOL &lt;&lt;&lt;</div>
-    
+
+    <div class="critical-header">
+      CRITICAL TRANSMISSION INTERCEPT
+    </div>
+
+    <div class="critical-subheader">
+      &gt;&gt;&gt; ABSOLUTE CLEARANCE PROTOCOL &lt;&lt;&lt;
+    </div>
+
     <div class="critical-body">
-      <strong>WARNING: SECURITY CLEARANCE CHECK ENGAGED.</strong><br><br>
-      Transmitting fake data or fraudulent history logs triggers an instant permanent ban clearance signature blacklist penalty across all Absolute Industries servers.<br><br>
+
+      <strong>
+        WARNING: SECURITY CLEARANCE CHECK ENGAGED.
+      </strong>
+
+      <br><br>
+
+      Transmitting fake data or fraudulent history logs triggers
+      an instant permanent ban clearance signature blacklist
+      penalty across all Absolute Industries servers.
+
+      <br><br>
+
       Do you confirm this transmission log as genuine?
+
     </div>
 
     <div class="critical-actions">
-      <button type="button" class="btn-confirm-final" id="btn-final-confirm">CONFIRM TRANSMISSION</button>
-      <button type="button" class="btn-abort-final" id="btn-final-abort">ABORT</button>
+
+      <button
+        type="button"
+        class="btn-confirm-final"
+        id="btn-final-confirm"
+      >
+        CONFIRM TRANSMISSION
+      </button>
+
+      <button
+        type="button"
+        class="btn-abort-final"
+        id="btn-final-abort"
+      >
+        ABORT
+      </button>
+
     </div>
+
   </div>
+
 </div>
 
-<!-- Watermark Footer Label -->
+<!-- FOOTER -->
+
 <div class="footer-watermark">
   <span>GRID: 34.12.09 // 108.58.22</span>
   <span>TOPOGRAPHY: ALIGNED</span>
   <span>ABSOLUTE MODULE v4.8</span>
 </div>
 
+
 <script>
-  // --- Audio Synthesizer (Web Audio API) ---
-  let audioEnabled = true;
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+/* ============================================================
+   AUDIO SYNTHESIZER
+   ============================================================ */
 
-  function playSynthSound(freq, duration, type = 'sine') {
-    if (!audioEnabled || audioCtx.state === 'suspended') return;
-    try {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-      gain.gain.setValueAtTime(0.05, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + duration);
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + duration);
-    } catch(e){}
+let audioEnabled = true;
+
+const AudioContextClass =
+  window.AudioContext || window.webkitAudioContext;
+
+const audioCtx = new AudioContextClass();
+
+function playSynthSound(
+  frequency,
+  duration,
+  type = "sine"
+) {
+  if (!audioEnabled || audioCtx.state === "suspended") {
+    return;
   }
 
-  document.getElementById('audio-btn').addEventListener('click', () => {
-    audioEnabled = !audioEnabled;
-    const btn = document.getElementById('audio-btn');
-    if (audioEnabled) {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      btn.innerText = "[AUDIO: ON]";
-      btn.classList.add('active');
-      playSynthSound(880, 0.1);
-    } else {
-      btn.innerText = "[AUDIO: OFF]";
-      btn.classList.remove('active');
+  try {
+    const oscillator = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    oscillator.type = type;
+    oscillator.frequency.setValueAtTime(
+      frequency,
+      audioCtx.currentTime
+    );
+
+    gain.gain.setValueAtTime(
+      0.05,
+      audioCtx.currentTime
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+      0.001,
+      audioCtx.currentTime + duration
+    );
+
+    oscillator.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    oscillator.start();
+    oscillator.stop(
+      audioCtx.currentTime + duration
+    );
+
+  } catch (error) {
+    // Audio failure should never break the form.
+  }
+}
+
+const audioButton =
+  document.getElementById("audio-btn");
+
+audioButton.addEventListener("click", () => {
+
+  audioEnabled = !audioEnabled;
+
+  if (audioEnabled) {
+
+    if (audioCtx.state === "suspended") {
+      audioCtx.resume();
     }
-  });
 
-  // Enable audio context on first click anywhere
-  window.addEventListener('click', () => {
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-  }, { once: true });
+    audioButton.innerText = "[AUDIO: ON]";
+    audioButton.classList.add("active");
 
-  // --- Hardware-Accelerated Smooth Custom Cursor ---
-  const cursorDot = document.getElementById('cursor-dot');
-  const cursorRing = document.getElementById('cursor-ring');
-  let targetX = window.innerWidth / 2;
-  let targetY = window.innerHeight / 2;
-  let currentX = targetX;
-  let currentY = targetY;
+    playSynthSound(880, 0.1);
 
-  window.addEventListener('mousemove', (e) => {
-    targetX = e.clientX;
-    targetY = e.clientY;
-    cursorDot.style.transform = `translate3d(${targetX}px, ${targetY}px, 0) translate(-50%, -50%)`;
-  });
+  } else {
 
-  function animateCursor() {
-    // Buttery Smooth Lerp calculation
-    currentX += (targetX - currentX) * 0.18;
-    currentY += (targetY - currentY) * 0.18;
-    cursorRing.style.transform = `translate3d(${currentX}px, ${currentY}px, 0) translate(-50%, -50%)`;
-    requestAnimationFrame(animateCursor);
+    audioButton.innerText = "[AUDIO: OFF]";
+    audioButton.classList.remove("active");
+
   }
-  animateCursor();
+});
 
-  // --- Swiss Topography Mountain Canvas ---
-  const terrainCanvas = document.getElementById('terrain-canvas');
-  const tCtx = terrainCanvas.getContext('2d');
-  
-  function resizeCanvases() {
-    terrainCanvas.width = window.innerWidth;
-    terrainCanvas.height = window.innerHeight;
-    radarCanvas.width = window.innerWidth;
-    radarCanvas.height = window.innerHeight;
-  }
-  
-  function drawTerrain() {
-    tCtx.clearRect(0, 0, terrainCanvas.width, terrainCanvas.height);
-    tCtx.strokeStyle = '#ffc800';
-    tCtx.lineWidth = 1;
-
-    const width = terrainCanvas.width;
-    const height = terrainCanvas.height;
-    
-    // Draw Topographic Elevation Lines
-    for (let j = 0; j < 6; j++) {
-      tCtx.beginPath();
-      const cy = height * 0.6 + j * 45;
-      for (let x = 0; x <= width; x += 30) {
-        const y = cy + Math.sin(x * 0.005 + j) * 35 + Math.cos(x * 0.012) * 20;
-        if (x === 0) tCtx.moveTo(x, y);
-        else tCtx.lineTo(x, y);
-      }
-      tCtx.stroke();
+window.addEventListener(
+  "pointerdown",
+  () => {
+    if (audioCtx.state === "suspended") {
+      audioCtx.resume();
     }
+  },
+  { once: true }
+);
+
+
+/* ============================================================
+   CUSTOM CURSOR
+   ============================================================
+
+   IMPORTANT:
+   The cursor is now controlled entirely by ONE animation loop.
+
+   No CSS transform transition.
+   No mousemove transform writes.
+   No competing animation systems.
+   ============================================================ */
+
+const cursorDot =
+  document.getElementById("cursor-dot");
+
+const cursorRing =
+  document.getElementById("cursor-ring");
+
+let mouseX = -100;
+let mouseY = -100;
+
+let ringX = -100;
+let ringY = -100;
+
+let cursorVisible = false;
+
+window.addEventListener(
+  "pointermove",
+  (event) => {
+
+    mouseX = event.clientX;
+    mouseY = event.clientY;
+
+    cursorVisible = true;
+
+  },
+  { passive: true }
+);
+
+window.addEventListener(
+  "pointerleave",
+  () => {
+    cursorVisible = false;
+  }
+);
+
+function animateCursor() {
+
+  /*
+   * Dot follows directly.
+   * Ring follows using exponential smoothing.
+   */
+
+  const followStrength = 0.20;
+
+  ringX +=
+    (mouseX - ringX) * followStrength;
+
+  ringY +=
+    (mouseY - ringY) * followStrength;
+
+  if (cursorVisible) {
+
+    cursorDot.style.transform =
+      `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+
+    cursorRing.style.transform =
+      `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`;
+
+    cursorDot.style.opacity = "1";
+    cursorRing.style.opacity = "0.9";
+
+  } else {
+
+    cursorDot.style.opacity = "0";
+    cursorRing.style.opacity = "0";
+
   }
 
-  // --- Smooth Radar Radar Canvas ---
-  const radarCanvas = document.getElementById('radar-canvas');
-  const rCtx = radarCanvas.getContext('2d');
-  let radarAngle = 0;
-  let pingRings = [
-    { r: 20, opacity: 1 },
-    { r: 80, opacity: 0.6 },
-    { r: 160, opacity: 0.3 }
-  ];
+  requestAnimationFrame(animateCursor);
+}
 
-  function drawRadar(timestamp) {
-    rCtx.clearRect(0, 0, radarCanvas.width, radarCanvas.height);
-    const cx = radarCanvas.width * 0.85;
-    const cy = radarCanvas.height * 0.25;
+requestAnimationFrame(animateCursor);
 
-    // Draw Smooth Radar Circles
-    rCtx.strokeStyle = 'rgba(255, 200, 0, 0.2)';
-    rCtx.lineWidth = 1;
-    [40, 90, 150, 220].forEach(radius => {
-      rCtx.beginPath();
-      rCtx.arc(cx, cy, radius, 0, Math.PI * 2);
-      rCtx.stroke();
-    });
 
-    // Expanding Smooth Ping Rings
-    pingRings.forEach(ring => {
-      rCtx.strokeStyle = `rgba(255, 200, 0, ${ring.opacity * 0.35})`;
-      rCtx.beginPath();
-      rCtx.arc(cx, cy, ring.r, 0, Math.PI * 2);
-      rCtx.stroke();
-      
-      ring.r += 0.4;
-      ring.opacity -= 0.0018;
-      if (ring.opacity <= 0) {
-        ring.r = 10;
-        ring.opacity = 0.8;
+/* ============================================================
+   TERRAIN CANVAS
+   ============================================================ */
+
+const terrainCanvas =
+  document.getElementById("terrain-canvas");
+
+const tCtx =
+  terrainCanvas.getContext("2d");
+
+const radarCanvas =
+  document.getElementById("radar-canvas");
+
+const rCtx =
+  radarCanvas.getContext("2d");
+
+function resizeCanvases() {
+
+  const width = window.innerWidth;
+  const height = window.innerHeight;
+
+  terrainCanvas.width = width;
+  terrainCanvas.height = height;
+
+  radarCanvas.width = width;
+  radarCanvas.height = height;
+}
+
+function drawTerrain() {
+
+  tCtx.clearRect(
+    0,
+    0,
+    terrainCanvas.width,
+    terrainCanvas.height
+  );
+
+  tCtx.strokeStyle = "#ffc800";
+  tCtx.lineWidth = 1;
+
+  const width = terrainCanvas.width;
+  const height = terrainCanvas.height;
+
+  for (let j = 0; j < 6; j++) {
+
+    tCtx.beginPath();
+
+    const centerY =
+      height * 0.6 + j * 45;
+
+    for (
+      let x = 0;
+      x <= width;
+      x += 30
+    ) {
+
+      const y =
+        centerY +
+        Math.sin(x * 0.005 + j) * 35 +
+        Math.cos(x * 0.012) * 20;
+
+      if (x === 0) {
+        tCtx.moveTo(x, y);
+      } else {
+        tCtx.lineTo(x, y);
       }
-    });
 
-    // Rotating Sweep Line
-    radarAngle += 0.015;
-    const sweepX = cx + Math.cos(radarAngle) * 220;
-    const sweepY = cy + Math.sin(radarAngle) * 220;
-    rCtx.strokeStyle = 'rgba(255, 200, 0, 0.6)';
+    }
+
+    tCtx.stroke();
+  }
+}
+
+
+/* ============================================================
+   RADAR
+   ============================================================ */
+
+let radarAngle = 0;
+
+const pingRings = [
+  { r: 20, opacity: 1 },
+  { r: 80, opacity: 0.6 },
+  { r: 160, opacity: 0.3 }
+];
+
+function drawRadar() {
+
+  rCtx.clearRect(
+    0,
+    0,
+    radarCanvas.width,
+    radarCanvas.height
+  );
+
+  const cx =
+    radarCanvas.width * 0.85;
+
+  const cy =
+    radarCanvas.height * 0.25;
+
+  /* Radar circles */
+
+  rCtx.strokeStyle =
+    "rgba(255, 200, 0, 0.2)";
+
+  rCtx.lineWidth = 1;
+
+  [40, 90, 150, 220].forEach(
+    (radius) => {
+
+      rCtx.beginPath();
+
+      rCtx.arc(
+        cx,
+        cy,
+        radius,
+        0,
+        Math.PI * 2
+      );
+
+      rCtx.stroke();
+    }
+  );
+
+  /* Ping rings */
+
+  pingRings.forEach((ring) => {
+
+    rCtx.strokeStyle =
+      `rgba(255, 200, 0, ${ring.opacity * 0.35})`;
+
     rCtx.beginPath();
-    rCtx.moveTo(cx, cy);
-    rCtx.lineTo(sweepX, sweepY);
+
+    rCtx.arc(
+      cx,
+      cy,
+      ring.r,
+      0,
+      Math.PI * 2
+    );
+
     rCtx.stroke();
 
-    requestAnimationFrame(drawRadar);
-  }
+    ring.r += 0.4;
+    ring.opacity -= 0.0018;
 
-  window.addEventListener('resize', () => {
+    if (ring.opacity <= 0) {
+
+      ring.r = 10;
+      ring.opacity = 0.8;
+
+    }
+
+  });
+
+  /* Sweep */
+
+  radarAngle += 0.015;
+
+  const sweepX =
+    cx + Math.cos(radarAngle) * 220;
+
+  const sweepY =
+    cy + Math.sin(radarAngle) * 220;
+
+  rCtx.strokeStyle =
+    "rgba(255, 200, 0, 0.6)";
+
+  rCtx.beginPath();
+
+  rCtx.moveTo(cx, cy);
+  rCtx.lineTo(sweepX, sweepY);
+
+  rCtx.stroke();
+
+  requestAnimationFrame(drawRadar);
+}
+
+resizeCanvases();
+drawTerrain();
+
+window.addEventListener(
+  "resize",
+  () => {
     resizeCanvases();
     drawTerrain();
-  });
-  resizeCanvases();
-  drawTerrain();
-  requestAnimationFrame(drawRadar);
+  },
+  { passive: true }
+);
 
-  // --- Zero-Shift Decryption Engine ---
-  const decryptionBox = document.getElementById('decryption-box');
-  const targetBriefing = "TACTICAL BRIEFING: Discord Staff Role Application portal active. Ensure all identity handles match your true credentials. Fraudulent entries will trigger automatic clearance blacklists.";
-  const scrambleChars = '@$#!%?ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let iteration = 0;
+requestAnimationFrame(drawRadar);
 
-  const decryptInterval = setInterval(() => {
-    decryptionBox.innerText = targetBriefing
-      .split('')
-      .map((char, index) => {
-        if (char === ' ') return ' ';
-        if (index < iteration) {
-          return targetBriefing[index];
-        }
-        return scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
-      })
-      .join('');
+
+/* ============================================================
+   DECRYPTION ENGINE
+   ============================================================ */
+
+const decryptionBox =
+  document.getElementById("decryption-box");
+
+const targetBriefing =
+  "TACTICAL BRIEFING: Discord Staff Role Application portal active. Ensure all identity handles match your true credentials. Fraudulent entries will trigger automatic clearance blacklists.";
+
+const scrambleChars =
+  "@$#!%?ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+
+let iteration = 0;
+
+const decryptInterval =
+  setInterval(() => {
+
+    decryptionBox.innerText =
+      targetBriefing
+        .split("")
+        .map((char, index) => {
+
+          if (char === " ") {
+            return " ";
+          }
+
+          if (index < iteration) {
+            return targetBriefing[index];
+          }
+
+          return scrambleChars[
+            Math.floor(
+              Math.random() *
+              scrambleChars.length
+            )
+          ];
+
+        })
+        .join("");
 
     if (iteration >= targetBriefing.length) {
+
       clearInterval(decryptInterval);
+
     }
+
     iteration += 1.8;
+
   }, 25);
 
-  // --- Custom Accordion Role Select ---
-  const selectTrigger = document.getElementById('select-trigger');
-  const selectOptions = document.getElementById('select-options');
-  const selectLabel = document.getElementById('select-label');
-  const roleInput = document.getElementById('role-input');
 
-  selectTrigger.addEventListener('click', () => {
-    selectOptions.classList.toggle('open');
+/* ============================================================
+   ROLE SELECT
+   ============================================================ */
+
+const selectTrigger =
+  document.getElementById("select-trigger");
+
+const selectOptions =
+  document.getElementById("select-options");
+
+const selectLabel =
+  document.getElementById("select-label");
+
+const roleInput =
+  document.getElementById("role-input");
+
+selectTrigger.addEventListener(
+  "click",
+  () => {
+
+    selectOptions.classList.toggle("open");
+
     playSynthSound(600, 0.05);
-  });
 
-  document.querySelectorAll('.select-option').forEach(opt => {
-    opt.addEventListener('click', () => {
-      selectLabel.innerText = opt.innerText;
-      roleInput.value = opt.dataset.value;
-      selectOptions.classList.remove('open');
-      playSynthSound(750, 0.08);
-    });
-  });
+  }
+);
 
-  // --- Step Wizard Navigation Logic ---
-  let currentStep = 0;
-  const totalSteps = 4;
-  const btnPrev = document.getElementById('btn-prev');
-  const btnNext = document.getElementById('btn-next');
-  const submitBtn = document.getElementById('submit-btn');
+document
+  .querySelectorAll(".select-option")
+  .forEach((option) => {
 
-  function updateWizardUI() {
-    for (let i = 0; i < totalSteps; i++) {
-      const panel = document.getElementById(`step-${i}`);
-      const pstep = document.getElementById(`pstep-${i}`);
+    option.addEventListener(
+      "click",
+      () => {
 
-      if (i === currentStep) {
-        panel.classList.add('active');
-        pstep.classList.add('active');
-        pstep.classList.remove('completed');
-      } else {
-        panel.classList.remove('active');
-        pstep.classList.remove('active');
-        if (i < currentStep) pstep.classList.add('completed');
-        else pstep.classList.remove('completed');
+        selectLabel.innerText =
+          option.innerText;
+
+        roleInput.value =
+          option.dataset.value;
+
+        selectOptions.classList.remove(
+          "open"
+        );
+
+        playSynthSound(750, 0.08);
+
       }
-    }
+    );
 
-    btnPrev.disabled = (currentStep === 0);
+  });
 
-    if (currentStep === totalSteps - 1) {
-      btnNext.style.display = 'none';
-      submitBtn.style.display = 'block';
-    } else {
-      btnNext.style.display = 'block';
-      submitBtn.style.display = 'none';
+
+/* ============================================================
+   WIZARD
+   ============================================================ */
+
+let currentStep = 0;
+
+const totalSteps = 4;
+
+const btnPrev =
+  document.getElementById("btn-prev");
+
+const btnNext =
+  document.getElementById("btn-next");
+
+const submitBtn =
+  document.getElementById("submit-btn");
+
+function updateWizardUI() {
+
+  for (
+    let i = 0;
+    i < totalSteps;
+    i++
+  ) {
+
+    const panel =
+      document.getElementById(
+        `step-${i}`
+      );
+
+    const progress =
+      document.getElementById(
+        `pstep-${i}`
+      );
+
+    const isCurrent =
+      i === currentStep;
+
+    const isCompleted =
+      i < currentStep;
+
+    panel.classList.toggle(
+      "active",
+      isCurrent
+    );
+
+    progress.classList.toggle(
+      "active",
+      isCurrent
+    );
+
+    progress.classList.toggle(
+      "completed",
+      isCompleted
+    );
+  }
+
+  btnPrev.disabled =
+    currentStep === 0;
+
+  const isFinalStep =
+    currentStep === totalSteps - 1;
+
+  btnNext.style.display =
+    isFinalStep ? "none" : "block";
+
+  submitBtn.style.display =
+    isFinalStep ? "block" : "none";
+}
+
+
+/* ============================================================
+   VALIDATION
+   ============================================================ */
+
+function validateStep(stepIndex) {
+
+  if (stepIndex === 0) {
+
+    const value =
+      document
+        .getElementById("field-op-id")
+        .value
+        .trim();
+
+    if (!value) {
+
+      showCustomAlert(
+        "OPERATOR IDENTIFIER REQUIRED: Enter your Discord username to proceed."
+      );
+
+      return false;
     }
   }
 
-  function validateStep(stepIdx) {
-    if (stepIdx === 0) {
-      const val = document.getElementById('field-op-id').value.trim();
-      if (!val) {
-        showCustomAlert("OPERATOR IDENTIFIER REQUIRED: Enter your Discord username to proceed.");
-        return false;
-      }
-    } else if (stepIdx === 1) {
-      const email = document.getElementById('field-email').value.trim();
-      if (!email || !email.includes('@')) {
-        showCustomAlert("DISPATCH EMAIL INVALID: Provide a valid email address.");
-        return false;
-      }
-    } else if (stepIdx === 2) {
-      if (!roleInput.value) {
-        showCustomAlert("ROLE ASSIGNMENT REQUIRED: Please select a clearance role position.");
-        return false;
-      }
-    }
-    return true;
-  }
+  else if (stepIndex === 1) {
 
-  btnNext.addEventListener('click', () => {
-    if (validateStep(currentStep)) {
-      currentStep++;
-      updateWizardUI();
-      playSynthSound(520, 0.08);
-    }
-  });
+    const email =
+      document
+        .getElementById("field-email")
+        .value
+        .trim();
 
-  btnPrev.addEventListener('click', () => {
-    if (currentStep > 0) {
-      currentStep--;
-      updateWizardUI();
-      playSynthSound(400, 0.08);
-    }
-  });
+    if (
+      !email ||
+      !email.includes("@")
+    ) {
 
-  // --- Directive Card Interactivity ---
-  const directiveCards = document.querySelectorAll('.directive-card');
-  let checkedStates = [false, false, false, false, false];
+      showCustomAlert(
+        "DISPATCH EMAIL INVALID: Provide a valid email address."
+      );
 
-  directiveCards.forEach((card, idx) => {
-    card.addEventListener('click', () => {
-      checkedStates[idx] = !checkedStates[idx];
-      const checkbox = card.querySelector('input[type="checkbox"]');
-      const badge = card.querySelector('.badge');
-
-      checkbox.checked = checkedStates[idx];
-
-      if (checkedStates[idx]) {
-        card.classList.add('active');
-        badge.innerText = "VERIFIED";
-        playSynthSound(800, 0.06);
-      } else {
-        card.classList.remove('active');
-        badge.innerText = "UNCHECKED";
-        playSynthSound(350, 0.06);
-      }
-
-      checkDirectivesLockout();
-    });
-  });
-
-  function checkDirectivesLockout() {
-    const allChecked = checkedStates.every(state => state === true);
-    if (allChecked) {
-      submitBtn.disabled = false;
-      submitBtn.classList.add('unlocked');
-    } else {
-      submitBtn.disabled = true;
-      submitBtn.classList.remove('unlocked');
+      return false;
     }
   }
 
-  // --- Custom Alert Modal ---
-  function showCustomAlert(msg) {
-    document.getElementById('alert-msg').innerText = msg;
-    document.getElementById('alert-modal').classList.add('active');
-    playSynthSound(300, 0.2, 'sawtooth');
+  else if (stepIndex === 2) {
+
+    if (!roleInput.value) {
+
+      showCustomAlert(
+        "ROLE ASSIGNMENT REQUIRED: Please select a clearance role position."
+      );
+
+      return false;
+    }
   }
-  document.getElementById('alert-close').addEventListener('click', () => {
-    document.getElementById('alert-modal').classList.remove('active');
-  });
 
-  // --- Oversized Red Security Intercept Modal ---
-  const criticalModal = document.getElementById('critical-modal');
-  const dispatchForm = document.getElementById('dispatch-form');
+  return true;
+}
 
-  submitBtn.addEventListener('click', (e) => {
-    e.preventDefault();
-    if (submitBtn.disabled) return;
-    criticalModal.classList.add('active');
-    playSynthSound(220, 0.3, 'sawtooth');
-  });
 
-  document.getElementById('btn-final-abort').addEventListener('click', () => {
-    criticalModal.classList.remove('active');
-    playSynthSound(450, 0.1);
-  });
+/* ============================================================
+   WIZARD NAVIGATION
+   ============================================================ */
 
-  document.getElementById('btn-final-confirm').addEventListener('click', () => {
-    playSynthSound(900, 0.2);
-    dispatchForm.submit();
-  });
+btnNext.addEventListener(
+  "click",
+  () => {
+
+    if (!validateStep(currentStep)) {
+      return;
+    }
+
+    currentStep++;
+
+    updateWizardUI();
+
+    playSynthSound(520, 0.08);
+  }
+);
+
+btnPrev.addEventListener(
+  "click",
+  () => {
+
+    if (currentStep <= 0) {
+      return;
+    }
+
+    currentStep--;
+
+    updateWizardUI();
+
+    playSynthSound(400, 0.08);
+  }
+);
+
+
+/* ============================================================
+   DIRECTIVE CARDS
+   ============================================================ */
+
+const directiveCards =
+  document.querySelectorAll(
+    ".directive-card"
+  );
+
+const checkedStates = [
+  false,
+  false,
+  false,
+  false,
+  false
+];
+
+directiveCards.forEach(
+  (card, index) => {
+
+    card.addEventListener(
+      "click",
+      () => {
+
+        checkedStates[index] =
+          !checkedStates[index];
+
+        const checkbox =
+          card.querySelector(
+            'input[type="checkbox"]'
+          );
+
+        const badge =
+          card.querySelector(".badge");
+
+        checkbox.checked =
+          checkedStates[index];
+
+        if (checkedStates[index]) {
+
+          card.classList.add("active");
+
+          badge.innerText =
+            "VERIFIED";
+
+          playSynthSound(800, 0.06);
+
+        } else {
+
+          card.classList.remove("active");
+
+          badge.innerText =
+            "UNCHECKED";
+
+          playSynthSound(350, 0.06);
+
+        }
+
+        checkDirectivesLockout();
+      }
+    );
+
+  }
+);
+
+function checkDirectivesLockout() {
+
+  const allChecked =
+    checkedStates.every(
+      (state) => state === true
+    );
+
+  submitBtn.disabled =
+    !allChecked;
+
+  submitBtn.classList.toggle(
+    "unlocked",
+    allChecked
+  );
+}
+
+
+/* ============================================================
+   ALERT MODAL
+   ============================================================ */
+
+const alertModal =
+  document.getElementById(
+    "alert-modal"
+  );
+
+const alertMessage =
+  document.getElementById(
+    "alert-msg"
+  );
+
+function showCustomAlert(message) {
+
+  alertMessage.innerText =
+    message;
+
+  alertModal.classList.add(
+    "active"
+  );
+
+  playSynthSound(
+    300,
+    0.2,
+    "sawtooth"
+  );
+}
+
+document
+  .getElementById("alert-close")
+  .addEventListener(
+    "click",
+    () => {
+
+      alertModal.classList.remove(
+        "active"
+      );
+
+    }
+  );
+
+
+/* ============================================================
+   FINAL TRANSMISSION
+   ============================================================ */
+
+const criticalModal =
+  document.getElementById(
+    "critical-modal"
+  );
+
+const dispatchForm =
+  document.getElementById(
+    "dispatch-form"
+  );
+
+submitBtn.addEventListener(
+  "click",
+  (event) => {
+
+    event.preventDefault();
+
+    if (submitBtn.disabled) {
+      return;
+    }
+
+    criticalModal.classList.add(
+      "active"
+    );
+
+    playSynthSound(
+      220,
+      0.3,
+      "sawtooth"
+    );
+  }
+);
+
+
+/* ABORT */
+
+document
+  .getElementById("btn-final-abort")
+  .addEventListener(
+    "click",
+    () => {
+
+      criticalModal.classList.remove(
+        "active"
+      );
+
+      playSynthSound(
+        450,
+        0.1
+      );
+    }
+  );
+
+
+/* CONFIRM */
+
+document
+  .getElementById("btn-final-confirm")
+  .addEventListener(
+    "click",
+    () => {
+
+      playSynthSound(
+        900,
+        0.2
+      );
+
+      dispatchForm.submit();
+
+    }
+  );
+
+
+/* ============================================================
+   INITIAL STATE
+   ============================================================ */
+
+updateWizardUI();
+
 </script>
 
 </body>
