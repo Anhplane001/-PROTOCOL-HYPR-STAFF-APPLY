@@ -3,13 +3,13 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>ABSOLUTE INDUSTRIES // ENDFIELD CLEARANCE HUB</title>
+<title>ABSOLUTE INDUSTRIES // STAFF RECRUITMENT HUB</title>
 <style>
   :root {
     --abs-bg: #080a0c;
     --abs-panel: rgba(12, 15, 19, 0.92);
     --abs-panel-light: #12161f;
-    --abs-accent: #eefb00; /* Endfield signature high-vis yellow */
+    --abs-accent: #eefb00; /* High-vis tactical yellow */
     --abs-accent-glow: rgba(238, 251, 0, 0.45);
     --abs-danger: #ff2a2a;
     --abs-danger-glow: rgba(255, 42, 42, 0.5);
@@ -44,7 +44,7 @@
     cursor: none;
   }
 
-  /* --- ARKNIGHTS: ENDFIELD MINIMALIST INTRO SCREEN --- */
+  /* --- INTRO SPLASH SCREEN --- */
   .splash-screen {
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
@@ -60,7 +60,6 @@
     pointer-events: none;
   }
 
-  /* Left vertical hazard accent bar */
   .splash-left-accent {
     position: absolute;
     top: 0;
@@ -71,7 +70,6 @@
     box-shadow: 0 0 20px rgba(238, 251, 0, 0.4);
   }
 
-  /* Subtle background contour watermark overlay */
   .splash-topo-bg {
     position: absolute;
     width: 100%;
@@ -82,27 +80,21 @@
     pointer-events: none;
   }
 
-  /* Bottom-Left Progress Display */
+  /* Bottom-Left Loading Display */
   .splash-bottom-left {
     position: absolute;
     bottom: 50px;
     left: 50px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 12px;
     z-index: 10;
   }
 
   .splash-percent-wrapper {
     display: flex;
     align-items: center;
-    gap: 12px;
-  }
-
-  .percent-accent-bar {
-    width: 6px;
-    height: 52px;
-    background-color: var(--abs-accent);
+    gap: 16px;
   }
 
   .percent-number {
@@ -112,6 +104,7 @@
     line-height: 0.9;
     color: var(--abs-accent);
     letter-spacing: -2px;
+    min-width: 170px;
   }
 
   .percent-symbol {
@@ -120,14 +113,33 @@
     margin-left: 2px;
   }
 
+  /* DYNAMIC LOADING PROGRESS BAR */
+  .progress-track {
+    width: 260px;
+    height: 10px;
+    background: #141820;
+    border: 1px solid #2a323d;
+    position: relative;
+    overflow: hidden;
+    box-shadow: inset 0 0 5px rgba(0,0,0,0.8);
+  }
+
+  .progress-fill {
+    width: 0%;
+    height: 100%;
+    background-color: var(--abs-accent);
+    box-shadow: 0 0 15px var(--abs-accent-glow);
+    transition: width 0.05s linear;
+  }
+
   .splash-status-text {
-    font-size: 0.75rem;
+    font-size: 0.8rem;
     color: #8c96a3;
     letter-spacing: 2px;
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-left: 18px;
+    gap: 10px;
+    min-height: 20px;
   }
 
   .square-icon {
@@ -135,7 +147,7 @@
     font-size: 0.6rem;
   }
 
-  /* Center-Right Title Lockup */
+  /* Center-Right Branding */
   .splash-right-content {
     position: absolute;
     right: 12%;
@@ -147,8 +159,7 @@
     z-index: 10;
   }
 
-  /* Industrial Typography Logo */
-  .endfield-logo-block {
+  .absl-logo-block {
     display: flex;
     flex-direction: column;
   }
@@ -162,34 +173,16 @@
     margin-bottom: 2px;
   }
 
-  .logo-main-group {
-    position: relative;
-    display: inline-block;
-  }
-
   .logo-title {
     font-family: 'Arial Black', 'Impact', sans-serif;
-    font-size: 5rem;
+    font-size: 4.5rem;
     font-weight: 900;
-    line-height: 0.85;
+    line-height: 0.88;
     color: #ffffff;
     letter-spacing: -1px;
     text-transform: uppercase;
   }
 
-  .logo-kanji-badge {
-    display: inline-block;
-    background-color: #ffffff;
-    color: #000000;
-    font-weight: 900;
-    font-size: 0.9rem;
-    padding: 2px 5px;
-    vertical-align: super;
-    margin-left: 6px;
-    letter-spacing: 1px;
-  }
-
-  /* Tactical System Metadata Block */
   .splash-tactical-block {
     display: flex;
     flex-direction: column;
@@ -251,7 +244,6 @@
     text-transform: uppercase;
   }
 
-  /* Enter Prompt Button */
   .splash-enter-btn {
     margin-top: 10px;
     background: transparent;
@@ -287,7 +279,7 @@
     50% { box-shadow: 0 0 30px rgba(238, 251, 0, 0.5); }
   }
 
-  /* --- 3D PERSPECTIVE WRAPPER & MAIN TERMINAL --- */
+  /* --- MAIN TERMINAL UI --- */
   .bg-geometry {
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
@@ -737,7 +729,7 @@
     background: transparent; color: var(--abs-danger); border: 1px solid var(--abs-danger);
   }
 
-  /* CUSTOM HARDWARE CURSOR WITH PRESS ANIMATION */
+  /* HARDWARE CURSOR */
   #cursor-dot, #cursor-ring {
     position: fixed;
     top: 0; left: 0;
@@ -760,7 +752,6 @@
     transform: translate(-50%, -50%);
   }
 
-  /* CURSOR PRESS/CLICK STATES */
   body.mouse-pressed #cursor-dot {
     width: 10px;
     height: 10px;
@@ -791,38 +782,37 @@
 </head>
 <body>
 
-<!-- Custom Hardware Cursor -->
 <div id="cursor-dot"></div>
 <div id="cursor-ring"></div>
 
-<!-- Exact Arknights: Endfield Style Intro Screen -->
+<!-- Splash Intro Screen -->
 <div class="splash-screen" id="splash-screen">
   <div class="splash-left-accent"></div>
   <div class="splash-topo-bg"></div>
 
-  <!-- Bottom Left Percentage Counter -->
+  <!-- Bottom Left Loading Counter & Dynamic Bar -->
   <div class="splash-bottom-left">
     <div class="splash-percent-wrapper">
-      <div class="percent-accent-bar"></div>
       <div class="percent-number">
         <span id="boot-percent">0</span><span class="percent-symbol">%</span>
+      </div>
+      <!-- DYNAMIC MOVING YELLOW PROGRESS BAR -->
+      <div class="progress-track">
+        <div class="progress-fill" id="boot-progress-fill"></div>
       </div>
     </div>
     <div class="splash-status-text">
       <span class="square-icon">■ ■</span>
-      <span id="boot-status-label">Updating...</span>
+      <span id="boot-status-label">INITIALIZING SYSTEM MODULES...</span>
     </div>
   </div>
 
-  <!-- Center Right Endfield Logo Lockup -->
+  <!-- Center Right Branding -->
   <div class="splash-right-content">
-    <div class="endfield-logo-block">
+    <div class="absl-logo-block">
       <div class="logo-top-sub">A B S O L U T E</div>
-      <div class="logo-main-group">
-        <div class="logo-title">
-          END<br>FIELD
-          <span class="logo-kanji-badge">終末地</span>
-        </div>
+      <div class="logo-title">
+        ABSL<br>INDUSTRIES
       </div>
     </div>
 
@@ -831,7 +821,7 @@
         <span class="yellow-arrow">▼</span>
         <div class="meta-details">
           <span class="plus-tag">+</span>
-          <span class="meta-label">** MISSION-DEPENDENT PAYLOAD<br>SYSTEM INTERFACES</span>
+          <span class="meta-label">MISSION-DEPENDENT PAYLOAD<br>STAFF RECRUITMENT INTERFACE</span>
           <div class="dot-grid">■ ■ ■ ■ ■ ■</div>
         </div>
       </div>
@@ -845,7 +835,7 @@
   </div>
 </div>
 
-<!-- Topographic Terrain Background -->
+<!-- Background Visualizer Canvas -->
 <div class="bg-geometry">
   <canvas id="terrain-canvas"></canvas>
 </div>
@@ -871,12 +861,10 @@
       </div>
     </div>
 
-    <!-- Briefing Box -->
     <div class="briefing-card" id="decryption-box">
       [INITIALIZING DECRYPTION SEQUENCE...]
     </div>
 
-    <!-- Step Progress Bar -->
     <div class="wizard-progress">
       <div class="progress-step active" id="pstep-0"></div>
       <div class="progress-step" id="pstep-1"></div>
@@ -1039,7 +1027,7 @@
     }
   });
 
-  // --- Custom Hardware Cursor with Press Animation ---
+  // --- Hardware Cursor ---
   const cursorDot = document.getElementById('cursor-dot');
   const cursorRing = document.getElementById('cursor-ring');
   let mouseX = window.innerWidth / 2;
@@ -1053,7 +1041,6 @@
     cursorDot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
   });
 
-  // Mouse Down / Up Press Visual Animation Trigger
   window.addEventListener('mousedown', () => {
     document.body.classList.add('mouse-pressed');
     playSynthSound(900, 0.04, 'square');
@@ -1071,10 +1058,36 @@
   }
   requestAnimationFrame(animateCursor);
 
-  // --- Endfield Loading Counter Logic ---
+  // --- Scramble Text Decoding Effect ---
+  function scrambleText(element, targetText, duration = 1200) {
+    const chars = '!@#$%^&*()_+-=[]{}|;:,.<>?/0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ';
+    let frame = 0;
+    const totalFrames = 30;
+    const interval = setInterval(() => {
+      frame++;
+      let currentText = '';
+      const progressRatio = frame / totalFrames;
+      for (let i = 0; i < targetText.length; i++) {
+        if (i / targetText.length < progressRatio) {
+          currentText += targetText[i];
+        } else {
+          currentText += chars[Math.floor(Math.random() * chars.length)];
+        }
+      }
+      element.innerText = currentText;
+      playSynthSound(1000 + Math.random() * 400, 0.02, 'square');
+      if (frame >= totalFrames) {
+        clearInterval(interval);
+        element.innerText = targetText;
+      }
+    }, duration / totalFrames);
+  }
+
+  // --- Boot Counter & Moving Yellow Bar Logic ---
   const splashScreen = document.getElementById('splash-screen');
   const splashBtn = document.getElementById('splash-btn');
   const bootPercent = document.getElementById('boot-percent');
+  const bootProgressFill = document.getElementById('boot-progress-fill');
   const bootStatusLabel = document.getElementById('boot-status-label');
   let systemInitialized = false;
   let isPointerInWindow = true;
@@ -1085,12 +1098,18 @@
     if (progress >= 100) {
       progress = 100;
       clearInterval(loadInterval);
-      bootStatusLabel.innerText = "SYSTEM READY // CLEARANCE VERIFIED";
+      
+      // Trigger Scramble Text Decoding on completion
+      scrambleText(bootStatusLabel, "WELCOME TO STAFF RECRUITMENT", 1200);
+
       splashBtn.classList.add('ready');
       splashBtn.disabled = false;
       playSynthSound(880, 0.15);
     }
+    
+    // Update Percentage and Moving Yellow Bar
     bootPercent.innerText = progress;
+    bootProgressFill.style.width = progress + '%';
   }, 35);
 
   splashBtn.addEventListener('click', () => {
@@ -1107,7 +1126,7 @@
     return alertActive || criticalActive;
   }
 
-  // --- 3D Perspective Tilt Control ---
+  // --- 3D Perspective Frame Controls ---
   const terminalFrame = document.getElementById('terminal-frame');
 
   function updateFrameTilt(e) {
@@ -1141,7 +1160,7 @@
     cursorRing.style.opacity = '1';
   });
 
-  // --- Topographic Canvas Visualizer ---
+  // --- Topographic Canvas Animation ---
   const terrainCanvas = document.getElementById('terrain-canvas');
   const ctx = terrainCanvas.getContext('2d');
 
@@ -1196,7 +1215,7 @@
   window.addEventListener('resize', resizeTerrainCanvas);
   resizeTerrainCanvas();
 
-  // --- Decryption Scrambler ---
+  // --- Briefing Decryption ---
   function startDecryptionSequence() {
     const decryptionBox = document.getElementById('decryption-box');
     const targetBriefing = "TACTICAL BRIEFING: Discord Staff Role Application portal active. Ensure all identity handles match your true credentials. Fraudulent entries will trigger automatic clearance blacklists.";
@@ -1217,7 +1236,7 @@
     }, 25);
   }
 
-  // --- Custom Dropdown Select ---
+  // --- Custom Select Dropdown ---
   const selectTrigger = document.getElementById('select-trigger');
   const selectOptions = document.getElementById('select-options');
   const selectLabel = document.getElementById('select-label');
@@ -1237,7 +1256,7 @@
     });
   });
 
-  // --- Wizard Logic ---
+  // --- Multi-Step Wizard ---
   let currentStep = 0;
   const totalSteps = 4;
   const btnPrev = document.getElementById('btn-prev');
@@ -1305,7 +1324,7 @@
     }
   });
 
-  // --- Directives Logic ---
+  // --- Directive Cards ---
   const directiveCards = document.querySelectorAll('.directive-card');
   let checkedStates = [false, false, false, false, false];
 
