@@ -528,7 +528,7 @@
     padding-left: 8px !important;
   }
 
-  input[type="text"], input[type="email"] {
+  input[type="text"], input[type="email"], textarea {
     width: 100%;
     background: rgba(6, 8, 12, 0.85);
     border: 1px solid var(--abs-border-light);
@@ -539,9 +539,27 @@
     transition: border-color 0.25s ease, box-shadow 0.25s ease;
     cursor: none;
   }
-  input[type="text"]:focus, input[type="email"]:focus {
+  input[type="text"]:focus, input[type="email"]:focus, textarea:focus {
     border-color: var(--abs-accent);
     box-shadow: 0 0 14px rgba(255, 200, 0, 0.25);
+  }
+
+  textarea {
+    resize: vertical;
+    min-height: 110px;
+    line-height: 1.5;
+  }
+
+  .char-counter {
+    display: flex;
+    justify-content: flex-end;
+    font-size: 0.72rem;
+    color: var(--abs-text-sub);
+    margin-top: 6px;
+    letter-spacing: 1px;
+  }
+  .char-counter.valid {
+    color: var(--abs-accent);
   }
 
   .custom-accordion-dropdown {
@@ -751,7 +769,6 @@
   }
   .critical-modal-wrapper.active { display: flex; }
 
-  /* Background Scrolling Red Stream Arrows */
   .arrow-stream-container {
     position: absolute;
     width: 100%; height: 100%;
@@ -885,12 +902,10 @@
 
 <!-- Splash Intro Screen -->
 <div class="splash-screen" id="splash-screen">
-  <!-- Left Side Vertical Yellow Progress Track -->
   <div class="splash-left-track">
     <div class="splash-left-fill" id="boot-left-fill"></div>
   </div>
 
-  <!-- Unified Clamped Tip Tracker Container -->
   <div class="splash-percent-tracker" id="boot-percent-tracker">
     <div class="percent-row">
       <div class="tip-connector"></div>
@@ -903,7 +918,6 @@
     </div>
   </div>
 
-  <!-- Center Right Branding -->
   <div class="splash-right-content">
     <div class="absl-logo-block">
       <div class="logo-top-sub">//PROTOCOL /HYPR</div>
@@ -961,11 +975,13 @@
       [INITIALIZING DECRYPTION SEQUENCE...]
     </div>
 
+    <!-- Step Progress Tracker (5 steps) -->
     <div class="wizard-progress">
       <div class="progress-step active" id="pstep-0"></div>
       <div class="progress-step" id="pstep-1"></div>
       <div class="progress-step" id="pstep-2"></div>
       <div class="progress-step" id="pstep-3"></div>
+      <div class="progress-step" id="pstep-4"></div>
     </div>
 
     <!-- Application Formspree Form -->
@@ -1008,9 +1024,17 @@
         </div>
       </div>
 
-      <!-- STEP 4 -->
+      <!-- STEP 4: NEW AUTHORIZATION JUSTIFICATION FIELD -->
       <div class="step-panel" id="step-3">
-        <label class="form-label">04 // COMPLIANCE DIRECTIVES (5/5 REQUIRED)</label>
+        <label class="form-label">04 // AUTHORIZATION JUSTIFICATION</label>
+        <div class="form-desc">WHY SHOULD WE AUTH YOU? State your operational qualifications, past experience, and core motivation for clearance.</div>
+        <textarea name="authorization_justification" id="field-justification" placeholder="State your qualifications, relevant sector experience, and tactical reason for clearance..." autocomplete="off"></textarea>
+        <div class="char-counter" id="char-counter"><span id="char-count">0</span> / 500 (MIN: 30 CHARS)</div>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="step-panel" id="step-4">
+        <label class="form-label">05 // COMPLIANCE DIRECTIVES (5/5 REQUIRED)</label>
         <div class="form-desc">Acknowledge all protocol mandates to unlock request transmission.</div>
         
         <div class="directive-list">
@@ -1090,6 +1114,7 @@
 </div>
 
 <script>
+  // Web Audio Synthesizer Feedback
   let audioEnabled = true;
   const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
 
@@ -1123,6 +1148,7 @@
     }
   });
 
+  // Cursor Following
   const cursorDot = document.getElementById('cursor-dot');
   const cursorRing = document.getElementById('cursor-ring');
   let mouseX = window.innerWidth / 2;
@@ -1133,357 +1159,350 @@
   window.addEventListener('mousemove', (e) => {
     mouseX = e.clientX;
     mouseY = e.clientY;
-    cursorDot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
-  });
-
-  window.addEventListener('mousedown', () => {
-    document.body.classList.add('mouse-pressed');
-    playSynthSound(900, 0.04, 'square');
-  });
-
-  window.addEventListener('mouseup', () => {
-    document.body.classList.remove('mouse-pressed');
+    cursorDot.style.left = `${mouseX}px`;
+    cursorDot.style.top = `${mouseY}px`;
   });
 
   function animateCursor() {
     ringX += (mouseX - ringX) * 0.22;
     ringY += (mouseY - ringY) * 0.22;
-    cursorRing.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`;
+    cursorRing.style.left = `${ringX}px`;
+    cursorRing.style.top = `${ringY}px`;
     requestAnimationFrame(animateCursor);
   }
-  requestAnimationFrame(animateCursor);
+  animateCursor();
 
-  function scrambleTextLengthPreserved(element, targetText, duration = 1200) {
-    const scrambleChars = '@$#!%?ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-    let frame = 0;
-    const totalFrames = 32;
-    const interval = setInterval(() => {
-      frame++;
-      const progressRatio = frame / totalFrames;
-      const revealedLength = Math.floor(targetText.length * progressRatio);
-      let result = '';
-      for (let i = 0; i < targetText.length; i++) {
-        if (targetText[i] === ' ') {
-          result += ' ';
-        } else if (i < revealedLength) {
-          result += targetText[i];
-        } else {
-          result += scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
-        }
-      }
-      element.innerText = result;
-      playSynthSound(850 + Math.random() * 350, 0.02, 'square', 0.015);
-      if (frame >= totalFrames) {
-        clearInterval(interval);
-        element.innerText = targetText;
-      }
-    }, duration / totalFrames);
+  window.addEventListener('mousedown', () => document.body.classList.add('mouse-pressed'));
+  window.addEventListener('mouseup', () => document.body.classList.remove('mouse-pressed'));
+
+  // 3D Perspective Tilt on MouseMove
+  const terminalFrame = document.getElementById('terminal-frame');
+  window.addEventListener('mousemove', (e) => {
+    const cx = window.innerWidth / 2;
+    const cy = window.innerHeight / 2;
+    const dx = (e.clientX - cx) / cx;
+    const dy = (e.clientY - cy) / cy;
+    terminalFrame.style.transform = `rotateY(${dx * 3.5}deg) rotateX(${-dy * 3.5}deg)`;
+  });
+
+  // Terrain Matrix Wireframe Canvas
+  const canvas = document.getElementById('terrain-canvas');
+  const ctx = canvas.getContext('2d');
+  let w, h, gridOffset = 0;
+
+  function resizeCanvas() {
+    w = canvas.width = window.innerWidth;
+    h = canvas.height = window.innerHeight;
   }
+  window.addEventListener('resize', resizeCanvas);
+  resizeCanvas();
 
-  const splashScreen = document.getElementById('splash-screen');
-  const splashBtn = document.getElementById('splash-btn');
-  const bootLeftFill = document.getElementById('boot-left-fill');
-  const bootPercentNum = document.getElementById('boot-percent-num');
-  const bootPercentTracker = document.getElementById('boot-percent-tracker');
-  const bootStatusLabel = document.getElementById('boot-status-label');
+  function renderTerrain() {
+    ctx.clearRect(0, 0, w, h);
+    ctx.strokeStyle = 'rgba(255, 200, 0, 0.1)';
+    ctx.lineWidth = 1;
 
-  let systemInitialized = false;
-  let isPointerInWindow = true;
-  let progress = 0;
+    const horizon = h * 0.52;
+    const fov = 320;
 
-  function updateSplashTracker(currentProgress) {
-    bootPercentNum.innerText = currentProgress;
-    bootLeftFill.style.height = currentProgress + '%';
+    gridOffset = (gridOffset + 0.75) % 40;
 
-    // Strict JS Clamping Logic
-    const trackerHeight = bootPercentTracker.offsetHeight || 90;
-    const windowHeight = window.innerHeight;
-    const targetTop = (currentProgress / 100) * windowHeight;
-    const clampedTop = Math.max(20, Math.min(targetTop, windowHeight - trackerHeight - 20));
-
-    bootPercentTracker.style.top = clampedTop + 'px';
-  }
-
-  const loadInterval = setInterval(() => {
-    progress += Math.floor(Math.random() * 3) + 1;
-    
-    if (progress >= 35 && progress < 70) {
-      if (bootStatusLabel.innerText !== 'VERIFYING TELEMETRY...') {
-        bootStatusLabel.innerText = 'VERIFYING TELEMETRY...';
-      }
+    ctx.beginPath();
+    for (let z = 10; z < 600; z += 40) {
+      let currentZ = z - gridOffset;
+      if (currentZ <= 0) continue;
+      let y = horizon + (fov * 80) / currentZ;
+      if (y > h) continue;
+      ctx.moveTo(0, y);
+      ctx.lineTo(w, y);
     }
 
-    if (progress >= 100) {
-      progress = 100;
-      clearInterval(loadInterval);
-      
-      // Decodes status text without line shifts
-      scrambleTextLengthPreserved(bootStatusLabel, 'WELCOME TO STAFF RECRUITMENT', 1200);
+    const centerX = w / 2;
+    for (let x = -w * 2; x <= w * 3; x += 80) {
+      ctx.moveTo(centerX, horizon);
+      ctx.lineTo(x, h);
+    }
+    ctx.stroke();
 
+    ctx.strokeStyle = 'rgba(255, 200, 0, 0.22)';
+    ctx.beginPath();
+    ctx.moveTo(0, horizon);
+    ctx.lineTo(w, horizon);
+    ctx.stroke();
+
+    requestAnimationFrame(renderTerrain);
+  }
+  renderTerrain();
+
+  // Boot Loading Animation Sequence
+  let bootProgress = 0;
+  const bootFill = document.getElementById('boot-left-fill');
+  const bootNum = document.getElementById('boot-percent-num');
+  const bootStatusLabel = document.getElementById('boot-status-label');
+  const bootTracker = document.getElementById('boot-percent-tracker');
+  const splashBtn = document.getElementById('splash-btn');
+
+  const bootStatuses = [
+    "INITIALIZING SYSTEM MODULES...",
+    "CONNECTING HYPR TELEMETRY GATEWAY...",
+    "DECRYPTING ABSOLUTE RADIANCE PROTOCOLS...",
+    "VERIFYING OPERATOR INTERFACE...",
+    "SYSTEM ONLINE. READY FOR INITIALIZATION."
+  ];
+
+  const bootInterval = setInterval(() => {
+    bootProgress += Math.floor(Math.random() * 4) + 1;
+    if (bootProgress >= 100) {
+      bootProgress = 100;
+      clearInterval(bootInterval);
+      bootStatusLabel.innerText = bootStatuses[4];
       splashBtn.classList.add('ready');
       splashBtn.disabled = false;
-      playSynthSound(880, 0.2);
+      playSynthSound(1200, 0.2, 'triangle', 0.1);
+    } else {
+      let statusIdx = Math.floor((bootProgress / 100) * (bootStatuses.length - 1));
+      bootStatusLabel.innerText = bootStatuses[statusIdx];
     }
-
-    updateSplashTracker(progress);
-  }, 38);
-
-  window.addEventListener('resize', () => {
-    updateSplashTracker(progress);
-    resizeTerrainCanvas();
-  });
+    bootFill.style.height = bootProgress + '%';
+    bootNum.innerText = bootProgress;
+    bootTracker.style.top = Math.min(Math.max(bootProgress, 5), 82) + '%';
+  }, 35);
 
   splashBtn.addEventListener('click', () => {
-    if (audioCtx.state === 'suspended') audioCtx.resume();
-    playSynthSound(750, 0.18);
-    splashScreen.classList.add('hidden');
-    systemInitialized = true;
-    startDecryptionSequence();
+    playSynthSound(600, 0.3, 'square', 0.08);
+    document.getElementById('splash-screen').classList.add('hidden');
+    updateBriefingText(stepBriefings[0]);
   });
 
-  function isAnyModalOpen() {
-    const alertActive = document.getElementById('alert-modal').classList.contains('active');
-    const criticalActive = document.getElementById('critical-modal').classList.contains('active');
-    return alertActive || criticalActive;
-  }
-
-  const terminalFrame = document.getElementById('terminal-frame');
-
-  function updateFrameTilt(e) {
-    if (!systemInitialized || isAnyModalOpen() || !isPointerInWindow) {
-      terminalFrame.style.transition = 'transform 0.5s cubic-bezier(0.25, 1, 0.5, 1)';
-      terminalFrame.style.transform = 'rotateX(0deg) rotateY(0deg)';
-      return;
-    }
-
-    terminalFrame.style.transition = 'transform 0.12s ease-out';
-    const x = (window.innerWidth / 2 - e.clientX) / 42;
-    const y = (window.innerHeight / 2 - e.clientY) / 42;
-    const rotX = Math.max(-6, Math.min(6, y));
-    const rotY = Math.max(-6, Math.min(6, -x));
-    terminalFrame.style.transform = `rotateX(${rotX}deg) rotateY(${rotY}deg)`;
-  }
-
-  window.addEventListener('mousemove', updateFrameTilt);
-
-  document.addEventListener('mouseleave', () => {
-    isPointerInWindow = false;
-    terminalFrame.style.transition = 'transform 0.6s cubic-bezier(0.25, 1, 0.5, 1)';
-    terminalFrame.style.transform = 'rotateX(0deg) rotateY(0deg)';
-    cursorDot.style.opacity = '0';
-    cursorRing.style.opacity = '0';
-  });
-
-  document.addEventListener('mouseenter', () => {
-    isPointerInWindow = true;
-    cursorDot.style.opacity = '1';
-    cursorRing.style.opacity = '1';
-  });
-
-  const terrainCanvas = document.getElementById('terrain-canvas');
-  const ctx = terrainCanvas.getContext('2d');
-
-  function resizeTerrainCanvas() {
-    terrainCanvas.width = window.innerWidth;
-    terrainCanvas.height = window.innerHeight;
-    drawTopographicMap();
-  }
-
-  function drawTopographicMap() {
-    ctx.clearRect(0, 0, terrainCanvas.width, terrainCanvas.height);
-    const centerX = terrainCanvas.width * 0.5;
-    const centerY = terrainCanvas.height * 0.5;
-
-    ctx.lineWidth = 1;
-    for (let r = 80; r < 1600; r += 110) {
-      ctx.beginPath();
-      ctx.arc(centerX, centerY, r, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(255, 200, 0, ${Math.max(0.015, 0.12 - r / 1600)})`;
-      ctx.stroke();
-    }
-
-    function drawContourLoop(cx, cy, baseRadius, variance, points, alpha, isAccent = false) {
-      ctx.beginPath();
-      for (let i = 0; i <= points; i++) {
-        const angle = (i / points) * Math.PI * 2;
-        const offset = Math.sin(angle * 3) * variance + Math.cos(angle * 5) * (variance * 0.5);
-        const r = baseRadius + offset;
-        const x = cx + Math.cos(angle) * r;
-        const y = cy + Math.sin(angle) * r;
-
-        if (i === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.closePath();
-      ctx.lineWidth = isAccent ? 1.5 : 0.8;
-      ctx.strokeStyle = isAccent ? `rgba(255, 200, 0, ${alpha * 1.5})` : `rgba(160, 175, 190, ${alpha})`;
-      ctx.stroke();
-    }
-
-    for (let i = 1; i <= 16; i++) drawContourLoop(centerX - 250, centerY - 150, i * 45, 22 + i * 2, 60, 0.04 + (i / 16) * 0.08, i % 5 === 0);
-    for (let i = 1; i <= 20; i++) drawContourLoop(centerX + 350, centerY + 200, i * 50, 30 + i * 2.5, 70, 0.03 + (i / 20) * 0.07, i % 6 === 0);
-
-    ctx.strokeStyle = 'rgba(255, 255, 255, 0.05)';
-    ctx.lineWidth = 1;
-    ctx.beginPath();
-    ctx.moveTo(centerX, 0); ctx.lineTo(centerX, terrainCanvas.height);
-    ctx.moveTo(0, centerY); ctx.lineTo(terrainCanvas.width, centerY);
-    ctx.stroke();
-  }
-
-  resizeTerrainCanvas();
-
-  function startDecryptionSequence() {
-    const decryptionBox = document.getElementById('decryption-box');
-    const targetBriefing = "TACTICAL BRIEFING // MODULE: ABSOLUTE RADIANCE: Discord Staff Role Application portal active. Ensure all identity handles match your true credentials. Fraudulent entries will trigger automatic clearance blacklists.";
-    scrambleTextLengthPreserved(decryptionBox, targetBriefing, 1600);
-  }
-
-  const accordion = document.getElementById('clearance-accordion');
-  const accordionTrigger = document.getElementById('accordion-trigger');
-  const accordionLabel = document.getElementById('accordion-label');
-  const roleInput = document.getElementById('role-input');
-
-  accordionTrigger.addEventListener('click', () => {
-    accordion.classList.toggle('open');
-    playSynthSound(600, 0.05);
-  });
-
-  document.querySelectorAll('.accordion-option').forEach(opt => {
-    opt.addEventListener('click', () => {
-      accordionLabel.innerText = opt.innerText;
-      roleInput.value = opt.dataset.value;
-      accordion.classList.remove('open');
-      playSynthSound(750, 0.08);
-    });
-  });
-
-  let currentStep = 0;
-  const totalSteps = 4;
-  const btnPrev = document.getElementById('btn-prev');
-  const btnNext = document.getElementById('btn-next');
-  const submitBtn = document.getElementById('submit-btn');
-
-  function updateWizardUI() {
-    for (let i = 0; i < totalSteps; i++) {
-      const panel = document.getElementById(`step-${i}`);
-      const pstep = document.getElementById(`pstep-${i}`);
-
-      if (i === currentStep) {
-        panel.classList.add('active');
-        pstep.classList.add('active');
-        pstep.classList.remove('completed');
+  // Typewriter Decryption Briefing Card
+  let typeInterval;
+  function updateBriefingText(text) {
+    const box = document.getElementById('decryption-box');
+    clearInterval(typeInterval);
+    box.innerText = "";
+    let i = 0;
+    typeInterval = setInterval(() => {
+      if (i < text.length) {
+        box.innerText += text.charAt(i);
+        if (i % 3 === 0) playSynthSound(1400, 0.02, 'sine', 0.012);
+        i++;
       } else {
-        panel.classList.remove('active');
-        pstep.classList.remove('active');
-        if (i < currentStep) pstep.classList.add('completed');
-        else pstep.classList.remove('completed');
+        clearInterval(typeInterval);
       }
-    }
-    btnPrev.disabled = (currentStep === 0);
-    if (currentStep === totalSteps - 1) {
-      btnNext.style.display = 'none';
+    }, 14);
+  }
+
+  // Wizard Logic (5 Steps: 0 to 4)
+  let currentStep = 0;
+  const maxSteps = 5;
+
+  const stepBriefings = [
+    "[STEP 01/05] Operator Identification. Enter your exact Discord handle for initial telemetry handshake.",
+    "[STEP 02/05] Dispatch Channel. Provide your official email address for authorization clearance notices.",
+    "[STEP 03/05] Sector Designation. Select your intended staff sector and administrative role.",
+    "[STEP 04/05] Authorization Justification. Why should we auth you? Provide strategic reasoning and capability.",
+    "[STEP 05/05] Directive Compliance. Affirm all 5 mandatory compliance directives to unlock dispatch sequence."
+  ];
+
+  function showStep(index) {
+    document.querySelectorAll('.step-panel').forEach((panel, i) => {
+      panel.classList.toggle('active', i === index);
+    });
+
+    document.querySelectorAll('.progress-step').forEach((pstep, i) => {
+      pstep.classList.remove('active', 'completed');
+      if (i === index) pstep.classList.add('active');
+      else if (i < index) pstep.classList.add('completed');
+    });
+
+    document.getElementById('btn-prev').disabled = (index === 0);
+
+    const nextBtn = document.getElementById('btn-next');
+    const submitBtn = document.getElementById('submit-btn');
+
+    if (index === maxSteps - 1) {
+      nextBtn.style.display = 'none';
       submitBtn.style.display = 'block';
     } else {
-      btnNext.style.display = 'block';
+      nextBtn.style.display = 'block';
       submitBtn.style.display = 'none';
+    }
+
+    updateBriefingText(stepBriefings[index]);
+    checkStepCompletion();
+  }
+
+  function checkStepCompletion() {
+    let isValid = false;
+
+    if (currentStep === 0) {
+      isValid = document.getElementById('field-op-id').value.trim().length > 0;
+    } else if (currentStep === 1) {
+      const email = document.getElementById('field-email').value.trim();
+      isValid = email.includes('@') && email.includes('.');
+    } else if (currentStep === 2) {
+      isValid = document.getElementById('role-input').value !== "";
+    } else if (currentStep === 3) {
+      const text = document.getElementById('field-justification').value.trim();
+      isValid = text.length >= 30;
+    } else if (currentStep === 4) {
+      const checkboxes = document.querySelectorAll('.directive-card input[type="checkbox"]');
+      isValid = Array.from(checkboxes).every(cb => cb.checked);
+    }
+
+    if (currentStep === maxSteps - 1) {
+      const submitBtn = document.getElementById('submit-btn');
+      submitBtn.disabled = !isValid;
+      if (isValid) {
+        submitBtn.classList.add('unlocked');
+      } else {
+        submitBtn.classList.remove('unlocked');
+      }
     }
   }
 
-  function validateStep(stepIdx) {
-    if (stepIdx === 0 && !document.getElementById('field-op-id').value.trim()) {
-      showCustomAlert("OPERATOR IDENTIFIER REQUIRED: Enter your Discord username to proceed.");
-      return false;
-    }
-    if (stepIdx === 1) {
-      const email = document.getElementById('field-email').value.trim();
-      if (!email || !email.includes('@')) {
-        showCustomAlert("DISPATCH EMAIL INVALID: Provide a valid email address.");
+  function validateStep(step) {
+    if (step === 0) {
+      const val = document.getElementById('field-op-id').value.trim();
+      if (!val) {
+        showAlert("OPERATOR DISCORD HANDLE REQUIRED FOR TELEMETRY VERIFICATION.");
         return false;
       }
-    }
-    if (stepIdx === 2 && !roleInput.value) {
-      showCustomAlert("ROLE ASSIGNMENT REQUIRED: Select a clearance role position.");
-      return false;
+    } else if (step === 1) {
+      const email = document.getElementById('field-email').value.trim();
+      if (!email || !email.includes('@') || !email.includes('.')) {
+        showAlert("INVALID DISPATCH COMMUNICATION EMAIL ADDRESS.");
+        return false;
+      }
+    } else if (step === 2) {
+      const role = document.getElementById('role-input').value;
+      if (!role) {
+        showAlert("PLEASE SELECT A DISCORD ROLE ASSIGNMENT SECTOR.");
+        return false;
+      }
+    } else if (step === 3) {
+      const text = document.getElementById('field-justification').value.trim();
+      if (text.length < 30) {
+        showAlert("JUSTIFICATION PAYLOAD TOO SHORT. PROVIDE AT LEAST 30 CHARACTERS EXPLAINING WHY WE SHOULD AUTHORIZE YOU.");
+        return false;
+      }
     }
     return true;
   }
 
-  btnNext.addEventListener('click', () => {
-    if (validateStep(currentStep)) {
+  document.getElementById('btn-next').addEventListener('click', () => {
+    if (!validateStep(currentStep)) return;
+    if (currentStep < maxSteps - 1) {
       currentStep++;
-      updateWizardUI();
-      playSynthSound(520, 0.08);
+      showStep(currentStep);
+      playSynthSound(800, 0.08, 'triangle', 0.05);
     }
   });
 
-  btnPrev.addEventListener('click', () => {
+  document.getElementById('btn-prev').addEventListener('click', () => {
     if (currentStep > 0) {
       currentStep--;
-      updateWizardUI();
-      playSynthSound(400, 0.08);
+      showStep(currentStep);
+      playSynthSound(500, 0.08, 'triangle', 0.05);
     }
   });
 
-  const directiveCards = document.querySelectorAll('.directive-card');
-  let checkedStates = [false, false, false, false, false];
-
-  directiveCards.forEach((card, idx) => {
-    card.addEventListener('click', () => {
-      checkedStates[idx] = !checkedStates[idx];
-      card.querySelector('input[type="checkbox"]').checked = checkedStates[idx];
-      const badge = card.querySelector('.badge');
-      if (checkedStates[idx]) {
-        card.classList.add('active');
-        badge.innerText = "VERIFIED";
-        playSynthSound(820, 0.06);
-      } else {
-        card.classList.remove('active');
-        badge.innerText = "UNCHECKED";
-        playSynthSound(350, 0.06);
-      }
-      checkDirectivesLockout();
-    });
-  });
-
-  function checkDirectivesLockout() {
-    if (checkedStates.every(state => state === true)) {
-      submitBtn.disabled = false;
-      submitBtn.classList.add('unlocked');
-    } else {
-      submitBtn.disabled = true;
-      submitBtn.classList.remove('unlocked');
-    }
-  }
-
-  function showCustomAlert(msg) {
+  function showAlert(msg) {
     document.getElementById('alert-msg').innerText = msg;
     document.getElementById('alert-modal').classList.add('active');
-    playSynthSound(300, 0.2, 'sawtooth');
+    playSynthSound(300, 0.2, 'sawtooth', 0.08);
   }
 
   document.getElementById('alert-close').addEventListener('click', () => {
     document.getElementById('alert-modal').classList.remove('active');
   });
 
+  // Character Counter for Justification Textarea
+  const justificationField = document.getElementById('field-justification');
+  const charCountSpan = document.getElementById('char-count');
+  const charCounterBox = document.getElementById('char-counter');
+
+  justificationField.addEventListener('input', () => {
+    const len = justificationField.value.length;
+    charCountSpan.innerText = len;
+    if (len >= 30) {
+      charCounterBox.classList.add('valid');
+    } else {
+      charCounterBox.classList.remove('valid');
+    }
+    checkStepCompletion();
+  });
+
+  // Accordion Dropdown Setup
+  const accordion = document.getElementById('clearance-accordion');
+  const trigger = document.getElementById('accordion-trigger');
+  const label = document.getElementById('accordion-label');
+  const roleInput = document.getElementById('role-input');
+  const options = document.querySelectorAll('.accordion-option');
+
+  trigger.addEventListener('click', () => {
+    accordion.classList.toggle('open');
+    playSynthSound(700, 0.05, 'triangle', 0.04);
+  });
+
+  options.forEach(opt => {
+    opt.addEventListener('click', () => {
+      const val = opt.getAttribute('data-value');
+      const text = opt.innerText;
+      roleInput.value = val;
+      label.innerText = text;
+      accordion.classList.remove('open');
+      playSynthSound(900, 0.08, 'sine', 0.06);
+      checkStepCompletion();
+    });
+  });
+
+  // Directive Checkbox Cards
+  const directiveCards = document.querySelectorAll('.directive-card');
+  directiveCards.forEach((card) => {
+    card.addEventListener('click', () => {
+      const checkbox = card.querySelector('input[type="checkbox"]');
+      const badge = card.querySelector('.badge');
+      checkbox.checked = !checkbox.checked;
+      if (checkbox.checked) {
+        card.classList.add('active');
+        badge.innerText = 'VERIFIED';
+        playSynthSound(1000, 0.05, 'sine', 0.05);
+      } else {
+        card.classList.remove('active');
+        badge.innerText = 'UNCHECKED';
+        playSynthSound(400, 0.05, 'sine', 0.05);
+      }
+      checkStepCompletion();
+    });
+  });
+
+  // Input Event Listeners
+  document.getElementById('field-op-id').addEventListener('input', checkStepCompletion);
+  document.getElementById('field-email').addEventListener('input', checkStepCompletion);
+
+  // Critical Intercept Warning Modal & Submission
   const criticalModal = document.getElementById('critical-modal');
-  submitBtn.addEventListener('click', (e) => {
-    e.preventDefault();
+  const submitBtn = document.getElementById('submit-btn');
+  const finalConfirmBtn = document.getElementById('btn-final-confirm');
+  const finalAbortBtn = document.getElementById('btn-final-abort');
+  const dispatchForm = document.getElementById('dispatch-form');
+
+  submitBtn.addEventListener('click', () => {
     if (submitBtn.disabled) return;
     criticalModal.classList.add('active');
-    playSynthSound(220, 0.35, 'sawtooth', 0.08);
+    playSynthSound(250, 0.4, 'sawtooth', 0.1);
   });
 
-  document.getElementById('btn-final-abort').addEventListener('click', () => {
+  finalAbortBtn.addEventListener('click', () => {
     criticalModal.classList.remove('active');
-    playSynthSound(450, 0.1);
+    playSynthSound(400, 0.1, 'sine', 0.05);
   });
 
-  document.getElementById('btn-final-confirm').addEventListener('click', () => {
-    playSynthSound(900, 0.2);
-    document.getElementById('dispatch-form').submit();
+  finalConfirmBtn.addEventListener('click', () => {
+    playSynthSound(1100, 0.5, 'square', 0.1);
+    dispatchForm.submit();
   });
 </script>
-
 </body>
 </html>
