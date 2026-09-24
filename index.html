@@ -9,8 +9,8 @@
     --abs-bg: #080a0c;
     --abs-panel: rgba(12, 15, 19, 0.92);
     --abs-panel-light: #12161f;
-    --abs-accent: #ffc800;
-    --abs-accent-glow: rgba(255, 200, 0, 0.45);
+    --abs-accent: #eefb00; /* Endfield signature high-vis yellow */
+    --abs-accent-glow: rgba(238, 251, 0, 0.45);
     --abs-danger: #ff2a2a;
     --abs-danger-glow: rgba(255, 42, 42, 0.5);
     --abs-text-main: #f5f7f8;
@@ -44,16 +44,13 @@
     cursor: none;
   }
 
-  /* --- ENDFIELD / IRONSIDE STYLE INTRO SCREEN --- */
+  /* --- ARKNIGHTS: ENDFIELD MINIMALIST INTRO SCREEN --- */
   .splash-screen {
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
-    background: #050608;
+    background: #0d0e10;
     z-index: 5000;
     display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
     transition: opacity 0.7s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.7s ease;
     overflow: hidden;
   }
@@ -63,101 +60,234 @@
     pointer-events: none;
   }
 
-  /* Hazard background stripes for Endfield aesthetic */
-  .splash-bg-stripes {
+  /* Left vertical hazard accent bar */
+  .splash-left-accent {
     position: absolute;
-    width: 200vw;
-    height: 200vh;
-    background: repeating-linear-gradient(
-      -45deg,
-      rgba(255, 200, 0, 0.015),
-      rgba(255, 200, 0, 0.015) 20px,
-      transparent 20px,
-      transparent 40px
-    );
+    top: 0;
+    left: 0;
+    width: 12px;
+    height: 100%;
+    background-color: var(--abs-accent);
+    box-shadow: 0 0 20px rgba(238, 251, 0, 0.4);
+  }
+
+  /* Subtle background contour watermark overlay */
+  .splash-topo-bg {
+    position: absolute;
+    width: 100%;
+    height: 100%;
+    opacity: 0.08;
+    background-image: radial-gradient(circle at 70% 50%, #ffffff 1px, transparent 1px);
+    background-size: 40px 40px;
     pointer-events: none;
   }
 
-  .splash-container {
-    width: 90%;
-    max-width: 680px;
-    background: rgba(10, 12, 16, 0.85);
-    border: 1px solid var(--abs-border);
-    border-top: 3px solid var(--abs-accent);
-    padding: 40px;
-    position: relative;
-    box-shadow: 0 0 50px rgba(0, 0, 0, 0.9), 0 0 30px rgba(255, 200, 0, 0.1);
-    backdrop-filter: blur(8px);
-  }
-
-  .splash-header-tag {
+  /* Bottom-Left Progress Display */
+  .splash-bottom-left {
+    position: absolute;
+    bottom: 50px;
+    left: 50px;
     display: flex;
-    justify-content: space-between;
-    align-items: center;
-    font-size: 0.72rem;
-    color: var(--abs-accent);
-    letter-spacing: 2px;
-    margin-bottom: 20px;
-    border-bottom: 1px solid #1c222b;
-    padding-bottom: 10px;
+    flex-direction: column;
+    gap: 8px;
+    z-index: 10;
   }
 
-  .splash-logo {
-    font-size: 2.4rem;
+  .splash-percent-wrapper {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .percent-accent-bar {
+    width: 6px;
+    height: 52px;
+    background-color: var(--abs-accent);
+  }
+
+  .percent-number {
+    font-family: 'Arial Black', 'Impact', sans-serif;
+    font-size: 4.8rem;
     font-weight: 900;
-    color: var(--abs-text-main);
-    letter-spacing: 5px;
-    margin-bottom: 6px;
+    line-height: 0.9;
+    color: var(--abs-accent);
+    letter-spacing: -2px;
+  }
+
+  .percent-symbol {
+    font-size: 2.8rem;
+    font-weight: 800;
+    margin-left: 2px;
+  }
+
+  .splash-status-text {
+    font-size: 0.75rem;
+    color: #8c96a3;
+    letter-spacing: 2px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-left: 18px;
+  }
+
+  .square-icon {
+    color: var(--abs-accent);
+    font-size: 0.6rem;
+  }
+
+  /* Center-Right Title Lockup */
+  .splash-right-content {
+    position: absolute;
+    right: 12%;
+    top: 45%;
+    transform: translateY(-50%);
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+    z-index: 10;
+  }
+
+  /* Industrial Typography Logo */
+  .endfield-logo-block {
+    display: flex;
+    flex-direction: column;
+  }
+
+  .logo-top-sub {
+    font-family: 'Arial Black', sans-serif;
+    font-size: 0.75rem;
+    letter-spacing: 8px;
+    color: #ffffff;
+    opacity: 0.9;
+    margin-bottom: 2px;
+  }
+
+  .logo-main-group {
+    position: relative;
+    display: inline-block;
+  }
+
+  .logo-title {
+    font-family: 'Arial Black', 'Impact', sans-serif;
+    font-size: 5rem;
+    font-weight: 900;
+    line-height: 0.85;
+    color: #ffffff;
+    letter-spacing: -1px;
     text-transform: uppercase;
   }
 
-  .splash-sub {
-    font-size: 0.82rem;
-    color: var(--abs-text-sub);
-    letter-spacing: 3px;
-    margin-bottom: 28px;
+  .logo-kanji-badge {
+    display: inline-block;
+    background-color: #ffffff;
+    color: #000000;
+    font-weight: 900;
+    font-size: 0.9rem;
+    padding: 2px 5px;
+    vertical-align: super;
+    margin-left: 6px;
+    letter-spacing: 1px;
   }
 
-  /* Diagnostics Console Log Box */
-  .splash-console {
-    background: rgba(4, 5, 7, 0.9);
-    border: 1px solid #1a2028;
-    padding: 14px;
-    font-size: 0.75rem;
-    color: #a0abb8;
-    height: 100px;
-    overflow: hidden;
-    margin-bottom: 30px;
-    line-height: 1.6;
-  }
-  .console-line {
+  /* Tactical System Metadata Block */
+  .splash-tactical-block {
     display: flex;
+    flex-direction: column;
     gap: 10px;
   }
-  .console-line .sys-ok { color: var(--abs-accent); font-weight: bold; }
 
-  .splash-btn {
+  .tactical-meta-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 12px;
+  }
+
+  .yellow-arrow {
+    color: var(--abs-accent);
+    font-size: 0.85rem;
+    margin-top: 2px;
+  }
+
+  .meta-details {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .plus-tag {
+    font-size: 0.7rem;
+    color: #65707d;
+    border: 1px solid #2a323d;
+    padding: 0 4px;
+    width: fit-content;
+  }
+
+  .meta-label {
+    font-size: 0.65rem;
+    color: #8a95a3;
+    letter-spacing: 1.5px;
+    line-height: 1.3;
+    font-weight: bold;
+  }
+
+  .dot-grid {
+    color: #3b4450;
+    font-size: 0.6rem;
+    letter-spacing: 3px;
+  }
+
+  .tactical-divider {
     width: 100%;
-    background: rgba(255, 200, 0, 0.08);
+    height: 1px;
+    background-color: #242b35;
+    margin: 4px 0;
+  }
+
+  .tactical-tagline {
+    font-size: 0.85rem;
+    font-weight: 800;
+    color: #ffffff;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+  }
+
+  /* Enter Prompt Button */
+  .splash-enter-btn {
+    margin-top: 10px;
+    background: transparent;
     border: 1px solid var(--abs-accent);
     color: var(--abs-accent);
-    padding: 18px;
-    font-size: 0.95rem;
+    padding: 16px 28px;
+    font-size: 0.85rem;
     font-weight: bold;
-    letter-spacing: 4px;
+    letter-spacing: 3px;
     cursor: none;
-    box-shadow: 0 0 15px var(--abs-accent-glow);
-    transition: all 0.2s ease;
+    transition: all 0.25s ease;
     text-transform: uppercase;
-    position: relative;
-  }
-  .splash-btn:hover {
-    background: var(--abs-accent);
-    color: #000;
-    box-shadow: 0 0 30px var(--abs-accent-glow);
+    opacity: 0.3;
+    pointer-events: none;
   }
 
-  /* --- TOPOGRAPHIC TERRAIN BACKGROUND --- */
+  .splash-enter-btn.ready {
+    opacity: 1;
+    pointer-events: auto;
+    background: rgba(238, 251, 0, 0.08);
+    box-shadow: 0 0 20px rgba(238, 251, 0, 0.2);
+    animation: pulseYellow 2s infinite ease-in-out;
+  }
+
+  .splash-enter-btn.ready:hover {
+    background: var(--abs-accent);
+    color: #000;
+    box-shadow: 0 0 35px var(--abs-accent-glow);
+  }
+
+  @keyframes pulseYellow {
+    0%, 100% { box-shadow: 0 0 15px rgba(238, 251, 0, 0.2); }
+    50% { box-shadow: 0 0 30px rgba(238, 251, 0, 0.5); }
+  }
+
+  /* --- 3D PERSPECTIVE WRAPPER & MAIN TERMINAL --- */
   .bg-geometry {
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
@@ -173,7 +303,6 @@
     opacity: 0.65;
   }
 
-  /* --- 3D PERSPECTIVE WRAPPER --- */
   .perspective-wrapper {
     perspective: 1200px;
     z-index: 10;
@@ -194,7 +323,6 @@
     will-change: transform;
   }
 
-  /* Framing Corner Brackets */
   .bracket-tl, .bracket-tr, .bracket-bl, .bracket-br {
     position: absolute;
     width: 18px;
@@ -209,7 +337,6 @@
   .bracket-bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; }
   .bracket-br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; }
 
-  /* Header Section */
   .terminal-header {
     border-bottom: 2px solid var(--abs-accent);
     padding-bottom: 18px;
@@ -238,16 +365,15 @@
     font-size: 0.85rem;
     letter-spacing: 1px;
     animation: sharpFlicker 1s infinite steps(1);
-    background: rgba(255, 200, 0, 0.08);
+    background: rgba(238, 251, 0, 0.08);
     padding: 4px 8px;
-    border: 1px solid rgba(255, 200, 0, 0.3);
+    border: 1px solid rgba(238, 251, 0, 0.3);
   }
   @keyframes sharpFlicker {
     0%, 49% { opacity: 1; }
     50%, 100% { opacity: 0; }
   }
 
-  /* Briefing Box */
   .briefing-card {
     background: rgba(6, 8, 10, 0.7);
     border-left: 3px solid var(--abs-accent);
@@ -278,7 +404,6 @@
     border-color: var(--abs-accent);
   }
 
-  /* Wizard Navigation Steps */
   .wizard-progress {
     display: flex;
     gap: 8px;
@@ -299,7 +424,6 @@
     background: #505c6e;
   }
 
-  /* Step Containers */
   .step-panel {
     display: none;
     animation: fadeInStep 0.3s ease-out forwards;
@@ -337,7 +461,7 @@
   }
   .input-addon-group:focus-within {
     border-color: var(--abs-accent);
-    box-shadow: 0 0 12px rgba(255, 200, 0, 0.2);
+    box-shadow: 0 0 12px rgba(238, 251, 0, 0.2);
   }
   .addon-symbol {
     padding: 12px 0 12px 14px;
@@ -364,10 +488,9 @@
   }
   input[type="text"]:focus, input[type="email"]:focus {
     border-color: var(--abs-accent);
-    box-shadow: 0 0 12px rgba(255, 200, 0, 0.2);
+    box-shadow: 0 0 12px rgba(238, 251, 0, 0.2);
   }
 
-  /* Inline Dropdown Select */
   .custom-select-wrapper {
     position: relative;
   }
@@ -408,7 +531,6 @@
     color: #000;
   }
 
-  /* Directive Selection Cards */
   .directive-list {
     max-height: 380px;
     overflow-y: auto;
@@ -435,7 +557,7 @@
   .directive-card.active {
     border-color: var(--abs-accent);
     background: #0d1117;
-    box-shadow: 0 0 16px rgba(255, 200, 0, 0.45), inset 0 0 12px rgba(255, 200, 0, 0.18);
+    box-shadow: 0 0 16px rgba(238, 251, 0, 0.45), inset 0 0 12px rgba(238, 251, 0, 0.18);
   }
 
   .directive-card .badge {
@@ -449,10 +571,9 @@
   .directive-card.active .badge {
     border-color: var(--abs-accent);
     color: var(--abs-accent);
-    background: rgba(255, 200, 0, 0.1);
+    background: rgba(238, 251, 0, 0.1);
   }
 
-  /* Navigation Buttons */
   .wizard-controls {
     display: flex;
     gap: 12px;
@@ -496,14 +617,13 @@
     background: var(--abs-accent);
     color: #000;
     border: 1px solid var(--abs-accent);
-    box-shadow: 0 0 20px rgba(255, 200, 0, 0.5);
+    box-shadow: 0 0 20px rgba(238, 251, 0, 0.5);
   }
   .submit-btn.unlocked:hover {
-    background: #ffd32a;
-    box-shadow: 0 0 28px rgba(255, 200, 0, 0.7);
+    background: #f7ff3d;
+    box-shadow: 0 0 28px rgba(238, 251, 0, 0.7);
   }
 
-  /* Modals */
   .modal-overlay {
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
@@ -522,7 +642,7 @@
     padding: 25px;
     max-width: 440px;
     width: 90%;
-    box-shadow: 0 0 30px rgba(255, 200, 0, 0.3);
+    box-shadow: 0 0 30px rgba(238, 251, 0, 0.3);
   }
   .alert-title {
     color: var(--abs-accent);
@@ -636,7 +756,7 @@
     width: 28px; height: 28px;
     border: 1.5px solid var(--abs-accent);
     border-radius: 50%;
-    box-shadow: 0 0 10px rgba(255, 200, 0, 0.2);
+    box-shadow: 0 0 10px rgba(238, 251, 0, 0.2);
     transform: translate(-50%, -50%);
   }
 
@@ -652,10 +772,9 @@
     height: 18px;
     border-color: #ffffff;
     box-shadow: 0 0 20px var(--abs-accent);
-    background: rgba(255, 200, 0, 0.2);
+    background: rgba(238, 251, 0, 0.25);
   }
 
-  /* Clean Minimal Watermark */
   .footer-watermark {
     position: fixed; bottom: 16px; left: 24px;
     font-size: 0.72rem; color: var(--abs-accent); letter-spacing: 2.5px;
@@ -676,24 +795,53 @@
 <div id="cursor-dot"></div>
 <div id="cursor-ring"></div>
 
-<!-- Endfield / Ironside Style Intro Boot Screen -->
+<!-- Exact Arknights: Endfield Style Intro Screen -->
 <div class="splash-screen" id="splash-screen">
-  <div class="splash-bg-stripes"></div>
-  <div class="splash-container">
-    <div class="splash-header-tag">
-      <span>// ENDFIELD_OS // SYSTEM_BOOT</span>
-      <span>SEC_LEVEL_04</span>
-    </div>
-    <div class="splash-logo">ABSOLUTE // HQ</div>
-    <div class="splash-sub">TACTICAL CLEARANCE OVERLAY INTERFACE</div>
+  <div class="splash-left-accent"></div>
+  <div class="splash-topo-bg"></div>
 
-    <div class="splash-console" id="boot-console">
-      <div class="console-line"><span>[0.0012]</span> <span>INITIALIZING ENCRYPTED HARDWARE BUS...</span> <span class="sys-ok">[OK]</span></div>
-      <div class="console-line"><span>[0.0045]</span> <span>ESTABLISHING GATEWAY HANDSHAKE...</span> <span class="sys-ok">[OK]</span></div>
-      <div class="console-line"><span>[0.0089]</span> <span>LOADING PROTOCOL DIRECTIVES...</span> <span class="sys-ok">[DONE]</span></div>
+  <!-- Bottom Left Percentage Counter -->
+  <div class="splash-bottom-left">
+    <div class="splash-percent-wrapper">
+      <div class="percent-accent-bar"></div>
+      <div class="percent-number">
+        <span id="boot-percent">0</span><span class="percent-symbol">%</span>
+      </div>
+    </div>
+    <div class="splash-status-text">
+      <span class="square-icon">■ ■</span>
+      <span id="boot-status-label">Updating...</span>
+    </div>
+  </div>
+
+  <!-- Center Right Endfield Logo Lockup -->
+  <div class="splash-right-content">
+    <div class="endfield-logo-block">
+      <div class="logo-top-sub">A B S O L U T E</div>
+      <div class="logo-main-group">
+        <div class="logo-title">
+          END<br>FIELD
+          <span class="logo-kanji-badge">終末地</span>
+        </div>
+      </div>
     </div>
 
-    <button class="splash-btn" id="splash-btn">INITIALIZE SYSTEM TERMINAL</button>
+    <div class="splash-tactical-block">
+      <div class="tactical-meta-row">
+        <span class="yellow-arrow">▼</span>
+        <div class="meta-details">
+          <span class="plus-tag">+</span>
+          <span class="meta-label">** MISSION-DEPENDENT PAYLOAD<br>SYSTEM INTERFACES</span>
+          <div class="dot-grid">■ ■ ■ ■ ■ ■</div>
+        </div>
+      </div>
+      <div class="tactical-divider"></div>
+      <div class="tactical-tagline">OVER THE FRONTIER / INTO THE FRONT</div>
+    </div>
+
+    <button class="splash-enter-btn" id="splash-btn" disabled>
+      INITIALIZE SYSTEM
+    </button>
   </div>
 </div>
 
@@ -851,7 +999,6 @@
   </div>
 </div>
 
-<!-- Cleaned Bottom Footer (No topographic reference) -->
 <div class="footer-watermark">
   <span>ABSOLUTE MODULE v4.9</span>
   <span>// SYSTEM CLEARANCE ONLINE</span>
@@ -924,32 +1071,27 @@
   }
   requestAnimationFrame(animateCursor);
 
-  // --- Splash Screen Boot Animation & Control ---
+  // --- Endfield Loading Counter Logic ---
   const splashScreen = document.getElementById('splash-screen');
   const splashBtn = document.getElementById('splash-btn');
-  const bootConsole = document.getElementById('boot-console');
+  const bootPercent = document.getElementById('boot-percent');
+  const bootStatusLabel = document.getElementById('boot-status-label');
   let systemInitialized = false;
   let isPointerInWindow = true;
 
-  // Add realistic log entries to boot console
-  const logLines = [
-    "[0.0120] SYNCHRONIZING WITH ABSOLUTE CORE...",
-    "[0.0154] VERIFYING HARDWARE SIGNATURE...",
-    "[0.0198] CLEARANCE OVERLAY READY."
-  ];
-  let logIdx = 0;
-  const logInterval = setInterval(() => {
-    if (logIdx < logLines.length) {
-      const line = document.createElement('div');
-      line.className = 'console-line';
-      line.innerHTML = `<span>${logLines[logIdx].substr(0, 8)}</span> <span>${logLines[logIdx].substr(9)}</span> <span class="sys-ok">[OK]</span>`;
-      bootConsole.appendChild(line);
-      bootConsole.scrollTop = bootConsole.scrollHeight;
-      logIdx++;
-    } else {
-      clearInterval(logInterval);
+  let progress = 0;
+  const loadInterval = setInterval(() => {
+    progress += Math.floor(Math.random() * 4) + 1;
+    if (progress >= 100) {
+      progress = 100;
+      clearInterval(loadInterval);
+      bootStatusLabel.innerText = "SYSTEM READY // CLEARANCE VERIFIED";
+      splashBtn.classList.add('ready');
+      splashBtn.disabled = false;
+      playSynthSound(880, 0.15);
     }
-  }, 450);
+    bootPercent.innerText = progress;
+  }, 35);
 
   splashBtn.addEventListener('click', () => {
     if (audioCtx.state === 'suspended') audioCtx.resume();
@@ -959,14 +1101,13 @@
     startDecryptionSequence();
   });
 
-  // Check if any popup modal is active
   function isAnyModalOpen() {
     const alertActive = document.getElementById('alert-modal').classList.contains('active');
     const criticalActive = document.getElementById('critical-modal').classList.contains('active');
     return alertActive || criticalActive;
   }
 
-  // --- 3D Perspective Tilt Control (Resets on Popup or Mouse Leave) ---
+  // --- 3D Perspective Tilt Control ---
   const terminalFrame = document.getElementById('terminal-frame');
 
   function updateFrameTilt(e) {
@@ -1019,7 +1160,7 @@
     for (let r = 80; r < 1600; r += 110) {
       ctx.beginPath();
       ctx.arc(centerX, centerY, r, 0, Math.PI * 2);
-      ctx.strokeStyle = `rgba(255, 200, 0, ${Math.max(0.015, 0.12 - r / 1600)})`;
+      ctx.strokeStyle = `rgba(238, 251, 0, ${Math.max(0.015, 0.12 - r / 1600)})`;
       ctx.stroke();
     }
 
@@ -1037,7 +1178,7 @@
       }
       ctx.closePath();
       ctx.lineWidth = isAccent ? 1.5 : 0.8;
-      ctx.strokeStyle = isAccent ? `rgba(255, 200, 0, ${alpha * 1.5})` : `rgba(160, 175, 190, ${alpha})`;
+      ctx.strokeStyle = isAccent ? `rgba(238, 251, 0, ${alpha * 1.5})` : `rgba(160, 175, 190, ${alpha})`;
       ctx.stroke();
     }
 
