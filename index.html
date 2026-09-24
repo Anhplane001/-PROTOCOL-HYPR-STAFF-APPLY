@@ -93,7 +93,7 @@
   .splash-left-track {
     position: absolute;
     top: 0; left: 0;
-    width: 10px; height: 100%;
+    width: 12px; height: 100%;
     background: rgba(255, 255, 255, 0.05);
     border-right: 1px solid rgba(255, 255, 255, 0.1);
     z-index: 20;
@@ -325,13 +325,17 @@
     z-index: 1;
     pointer-events: none;
     overflow: hidden;
+    background-image: url('endfield-terrain-h4i7zj3r-2256x1505.jpg');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
   }
 
-  #terrain-canvas {
+  .bg-overlay {
     position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 100%;
-    opacity: 0.55;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: radial-gradient(circle at center, rgba(4, 5, 6, 0.35) 0%, rgba(4, 5, 6, 0.85) 100%);
+    pointer-events: none;
   }
 
   .perspective-wrapper {
@@ -421,19 +425,6 @@
   @keyframes sharpFlicker {
     0%, 49% { opacity: 1; }
     50%, 100% { opacity: 0; }
-  }
-
-  .briefing-card {
-    background: rgba(6, 8, 12, 0.85);
-    border-left: 3px solid var(--abs-accent);
-    padding: 16px;
-    margin-bottom: 24px;
-    font-size: 0.86rem;
-    line-height: 1.6;
-    color: #c4d0df;
-    min-height: 76px;
-    position: relative;
-    transform: translateZ(15px);
   }
 
   .audio-toggle {
@@ -944,9 +935,9 @@
   </div>
 </div>
 
-<!-- Background Visualizer Canvas -->
+<!-- Static Tactical Terrain Background Container -->
 <div class="bg-geometry">
-  <canvas id="terrain-canvas"></canvas>
+  <div class="bg-overlay"></div>
 </div>
 
 <div class="perspective-wrapper">
@@ -965,14 +956,9 @@
       <div style="text-align: right;">
         <div class="telemetry-tag">// HYPR_NETWORK_ONLINE</div>
         <div style="margin-top: 10px;">
-          <span class="audio-toggle active" id="audio-btn">[AUDIO: ON]</span>
+          <span class="audio-toggle" id="audio-btn">[AUDIO: OFF]</span>
         </div>
       </div>
-    </div>
-
-    <!-- Decryption Briefing Card -->
-    <div class="briefing-card" id="decryption-box">
-      [INITIALIZING DECRYPTION SEQUENCE...]
     </div>
 
     <!-- Step Progress Tracker (5 steps) -->
@@ -1024,7 +1010,7 @@
         </div>
       </div>
 
-      <!-- STEP 4: NEW AUTHORIZATION JUSTIFICATION FIELD -->
+      <!-- STEP 4: AUTHORIZATION JUSTIFICATION FIELD -->
       <div class="step-panel" id="step-3">
         <label class="form-label">04 // AUTHORIZATION JUSTIFICATION</label>
         <div class="form-desc">WHY SHOULD WE AUTH YOU? State your operational qualifications, past experience, and core motivation for clearance.</div>
@@ -1114,395 +1100,453 @@
 </div>
 
 <script>
-  // Web Audio Synthesizer Feedback
-  let audioEnabled = true;
-  const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+// -------------------------------------------------------------
+// WEB AUDIO SYNTHESIZER ENGINE (REDESIGNED: ULTRA-SUBTLE MICRO-ACOUSTICS)
+// -------------------------------------------------------------
+let audioCtx = null;
+let audioMuted = true; // Sound OFF by default per spec
 
-  function playSynthSound(freq, duration, type = 'sine', volume = 0.05) {
-    if (!audioEnabled || audioCtx.state === 'suspended') return;
-    try {
+function initAudio() {
+  if (!audioCtx) {
+    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+    if (AudioContextClass) {
+      audioCtx = new AudioContextClass();
+    }
+  }
+  if (audioCtx && audioCtx.state === 'suspended') {
+    audioCtx.resume();
+  }
+}
+
+// Gentle, non-intrusive sine tone generator with smooth exponential envelope decay
+function playTone(freq, duration = 0.05, gainVal = 0.03, freqEnd = null) {
+  if (audioMuted) return;
+  try {
+    initAudio();
+    if (!audioCtx) return;
+
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc.type = 'sine'; // Always use gentle sine waves
+    osc.frequency.setValueAtTime(freq, now);
+    if (freqEnd) {
+      osc.frequency.exponentialRampToValueAtTime(Math.max(freqEnd, 20), now + duration);
+    }
+
+    // Soft attack, rapid smooth exponential decay
+    gain.gain.setValueAtTime(0.0001, now);
+    gain.gain.linearRampToValueAtTime(gainVal, now + 0.004);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
+
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc.start(now);
+    osc.stop(now + duration + 0.01);
+  } catch (e) {
+    // Audio context fallback
+  }
+}
+
+// Micro-acoustic UI Hover Tick (Warm low frequency tick)
+function soundHover() {
+  playTone(280, 0.02, 0.015);
+}
+
+// Sleek Tactile Micro-Click
+function soundClick() {
+  playTone(480, 0.03, 0.03, 240);
+}
+
+// Smooth Subtle Step Transition
+function soundStep() {
+  if (audioMuted) return;
+  try {
+    initAudio();
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    
+    // Soft dual sine chord (warm 220Hz + 330Hz)
+    [220, 330].forEach((freq) => {
       const osc = audioCtx.createOscillator();
       const gain = audioCtx.createGain();
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
-      gain.gain.setValueAtTime(volume, audioCtx.currentTime);
-      gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+      
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now);
+      osc.frequency.exponentialRampToValueAtTime(freq * 1.2, now + 0.08);
+      
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.linearRampToValueAtTime(0.025, now + 0.005);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+      
       osc.connect(gain);
       gain.connect(audioCtx.destination);
-      osc.start();
-      osc.stop(audioCtx.currentTime + duration);
-    } catch(e){}
+      osc.start(now);
+      osc.stop(now + 0.09);
+    });
+  } catch(e) {}
+}
+
+// Gentle Ambient Boot Chime Triad
+function soundBootChime() {
+  if (audioMuted) return;
+  try {
+    initAudio();
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    const triad = [261.63, 329.63, 392.00]; // Warm C-major triad
+    triad.forEach((freq, i) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now + (i * 0.05));
+      
+      gain.gain.setValueAtTime(0.0001, now + (i * 0.05));
+      gain.gain.linearRampToValueAtTime(0.025, now + (i * 0.05) + 0.005);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + (i * 0.05) + 0.25);
+      
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now + (i * 0.05));
+      osc.stop(now + (i * 0.05) + 0.26);
+    });
+  } catch(e) {}
+}
+
+// Soft Subtle Warning Ping (Replaces harsh sawtooth alarm)
+function soundAlarm() {
+  if (audioMuted) return;
+  try {
+    initAudio();
+    if (!audioCtx) return;
+    const now = audioCtx.currentTime;
+    [180, 240].forEach((freq) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now);
+      
+      gain.gain.setValueAtTime(0.0001, now);
+      gain.gain.linearRampToValueAtTime(0.035, now + 0.008);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+      
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+      osc.start(now);
+      osc.stop(now + 0.19);
+    });
+  } catch(e) {}
+}
+
+// Audio Mute Toggle Listener
+const audioBtn = document.getElementById('audio-btn');
+audioBtn.addEventListener('click', () => {
+  audioMuted = !audioMuted;
+  if (audioMuted) {
+    audioBtn.textContent = '[AUDIO: OFF]';
+    audioBtn.classList.remove('active');
+  } else {
+    audioBtn.textContent = '[AUDIO: ON]';
+    audioBtn.classList.add('active');
+    playTone(440, 0.04, 0.03);
   }
+});
 
-  document.getElementById('audio-btn').addEventListener('click', () => {
-    audioEnabled = !audioEnabled;
-    const btn = document.getElementById('audio-btn');
-    if (audioEnabled) {
-      if (audioCtx.state === 'suspended') audioCtx.resume();
-      btn.innerText = "[AUDIO: ON]";
-      btn.classList.add('active');
-      playSynthSound(880, 0.1);
-    } else {
-      btn.innerText = "[AUDIO: OFF]";
-      btn.classList.remove('active');
-    }
-  });
+// -------------------------------------------------------------
+// TACTICAL CUSTOM CURSOR & 3D TILT EFFECT
+// -------------------------------------------------------------
+const cursorDot = document.getElementById('cursor-dot');
+const cursorRing = document.getElementById('cursor-ring');
+const terminalFrame = document.getElementById('terminal-frame');
 
-  // Cursor Following
-  const cursorDot = document.getElementById('cursor-dot');
-  const cursorRing = document.getElementById('cursor-ring');
-  let mouseX = window.innerWidth / 2;
-  let mouseY = window.innerHeight / 2;
-  let ringX = mouseX;
-  let ringY = mouseY;
+let mouseX = window.innerWidth / 2;
+let mouseY = window.innerHeight / 2;
+let ringX = mouseX;
+let ringY = mouseY;
 
-  window.addEventListener('mousemove', (e) => {
-    mouseX = e.clientX;
-    mouseY = e.clientY;
-    cursorDot.style.left = `${mouseX}px`;
-    cursorDot.style.top = `${mouseY}px`;
-  });
+window.addEventListener('mousemove', (e) => {
+  mouseX = e.clientX;
+  mouseY = e.clientY;
 
-  function animateCursor() {
-    ringX += (mouseX - ringX) * 0.22;
-    ringY += (mouseY - ringY) * 0.22;
-    cursorRing.style.left = `${ringX}px`;
-    cursorRing.style.top = `${ringY}px`;
-    requestAnimationFrame(animateCursor);
-  }
-  animateCursor();
+  cursorDot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
 
-  window.addEventListener('mousedown', () => document.body.classList.add('mouse-pressed'));
-  window.addEventListener('mouseup', () => document.body.classList.remove('mouse-pressed'));
+  // 3D Perspective Tilt on Terminal Frame
+  const cx = window.innerWidth / 2;
+  const cy = window.innerHeight / 2;
+  const tiltX = (mouseY - cy) / cy * -6; // deg
+  const tiltY = (mouseX - cx) / cx * 6;  // deg
 
-  // 3D Perspective Tilt on MouseMove
-  const terminalFrame = document.getElementById('terminal-frame');
-  window.addEventListener('mousemove', (e) => {
-    const cx = window.innerWidth / 2;
-    const cy = window.innerHeight / 2;
-    const dx = (e.clientX - cx) / cx;
-    const dy = (e.clientY - cy) / cy;
-    terminalFrame.style.transform = `rotateY(${dx * 3.5}deg) rotateX(${-dy * 3.5}deg)`;
-  });
+  terminalFrame.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+});
 
-  // Terrain Matrix Wireframe Canvas
-  const canvas = document.getElementById('terrain-canvas');
-  const ctx = canvas.getContext('2d');
-  let w, h, gridOffset = 0;
+window.addEventListener('mousedown', () => document.body.classList.add('mouse-pressed'));
+window.addEventListener('mouseup', () => document.body.classList.remove('mouse-pressed'));
 
-  function resizeCanvas() {
-    w = canvas.width = window.innerWidth;
-    h = canvas.height = window.innerHeight;
-  }
-  window.addEventListener('resize', resizeCanvas);
-  resizeCanvas();
+function renderCursor() {
+  ringX += (mouseX - ringX) * 0.2;
+  ringY += (mouseY - ringY) * 0.2;
+  cursorRing.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
+  requestAnimationFrame(renderCursor);
+}
+renderCursor();
 
-  function renderTerrain() {
-    ctx.clearRect(0, 0, w, h);
-    ctx.strokeStyle = 'rgba(255, 200, 0, 0.1)';
-    ctx.lineWidth = 1;
+// -------------------------------------------------------------
+// BOOT / SPLASH PROGRESS COUNTER
+// -------------------------------------------------------------
+const bootFill = document.getElementById('boot-left-fill');
+const bootNum = document.getElementById('boot-percent-num');
+const bootLabel = document.getElementById('boot-status-label');
+const splashBtn = document.getElementById('splash-btn');
+const splashScreen = document.getElementById('splash-screen');
 
-    const horizon = h * 0.52;
-    const fov = 320;
+let bootProgress = 0;
+const bootStatuses = [
+  { pct: 0, text: "INITIALIZING SYSTEM MODULES..." },
+  { pct: 22, text: "ESTABLISHING HYPR SECURE LINK..." },
+  { pct: 54, text: "VERIFYING TELEMETRY ENCRYPTION..." },
+  { pct: 78, text: "SYNCHRONIZING RECRUITMENT LOGS..." },
+  { pct: 100, text: "SYSTEM READY // CLEARANCE GRANTED" }
+];
 
-    gridOffset = (gridOffset + 0.75) % 40;
-
-    ctx.beginPath();
-    for (let z = 10; z < 600; z += 40) {
-      let currentZ = z - gridOffset;
-      if (currentZ <= 0) continue;
-      let y = horizon + (fov * 80) / currentZ;
-      if (y > h) continue;
-      ctx.moveTo(0, y);
-      ctx.lineTo(w, y);
-    }
-
-    const centerX = w / 2;
-    for (let x = -w * 2; x <= w * 3; x += 80) {
-      ctx.moveTo(centerX, horizon);
-      ctx.lineTo(x, h);
-    }
-    ctx.stroke();
-
-    ctx.strokeStyle = 'rgba(255, 200, 0, 0.22)';
-    ctx.beginPath();
-    ctx.moveTo(0, horizon);
-    ctx.lineTo(w, horizon);
-    ctx.stroke();
-
-    requestAnimationFrame(renderTerrain);
-  }
-  renderTerrain();
-
-  // Boot Loading Animation Sequence
-  let bootProgress = 0;
-  const bootFill = document.getElementById('boot-left-fill');
-  const bootNum = document.getElementById('boot-percent-num');
-  const bootStatusLabel = document.getElementById('boot-status-label');
-  const bootTracker = document.getElementById('boot-percent-tracker');
-  const splashBtn = document.getElementById('splash-btn');
-
-  const bootStatuses = [
-    "INITIALIZING SYSTEM MODULES...",
-    "CONNECTING HYPR TELEMETRY GATEWAY...",
-    "DECRYPTING ABSOLUTE RADIANCE PROTOCOLS...",
-    "VERIFYING OPERATOR INTERFACE...",
-    "SYSTEM ONLINE. READY FOR INITIALIZATION."
-  ];
-
-  const bootInterval = setInterval(() => {
+function runBootSequence() {
+  const interval = setInterval(() => {
     bootProgress += Math.floor(Math.random() * 4) + 1;
     if (bootProgress >= 100) {
       bootProgress = 100;
-      clearInterval(bootInterval);
-      bootStatusLabel.innerText = bootStatuses[4];
-      splashBtn.classList.add('ready');
-      splashBtn.disabled = false;
-      playSynthSound(1200, 0.2, 'triangle', 0.1);
+      clearInterval(interval);
+      onBootComplete();
+    }
+
+    bootFill.style.height = `${bootProgress}%`;
+    bootNum.textContent = bootProgress;
+
+    for (let i = bootStatuses.length - 1; i >= 0; i--) {
+      if (bootProgress >= bootStatuses[i].pct) {
+        bootLabel.textContent = bootStatuses[i].text;
+        break;
+      }
+    }
+  }, 45);
+}
+
+function onBootComplete() {
+  soundBootChime();
+  splashBtn.classList.add('ready');
+  splashBtn.removeAttribute('disabled');
+}
+
+splashBtn.addEventListener('click', () => {
+  soundClick();
+  splashScreen.classList.add('hidden');
+});
+
+runBootSequence();
+
+// -------------------------------------------------------------
+// 5-STEP APPLICATION WIZARD LOGIC
+// -------------------------------------------------------------
+let currentStep = 0;
+const totalSteps = 5;
+
+const btnNext = document.getElementById('btn-next');
+const btnPrev = document.getElementById('btn-prev');
+const submitBtn = document.getElementById('submit-btn');
+
+const alertModal = document.getElementById('alert-modal');
+const alertMsg = document.getElementById('alert-msg');
+const alertClose = document.getElementById('alert-close');
+
+function showAlert(message) {
+  soundAlarm();
+  alertMsg.textContent = message;
+  alertModal.classList.add('active');
+}
+
+alertClose.addEventListener('click', () => {
+  soundClick();
+  alertModal.classList.remove('active');
+});
+
+// Step 3: Custom Accordion Inline Dropdown
+const accordion = document.getElementById('clearance-accordion');
+const accordionTrigger = document.getElementById('accordion-trigger');
+const accordionLabel = document.getElementById('accordion-label');
+const roleInput = document.getElementById('role-input');
+const accordionOptions = document.querySelectorAll('.accordion-option');
+
+accordionTrigger.addEventListener('click', () => {
+  soundClick();
+  accordion.classList.toggle('open');
+});
+
+accordionOptions.forEach(opt => {
+  opt.addEventListener('mouseenter', soundHover);
+  opt.addEventListener('click', () => {
+    soundClick();
+    const roleVal = opt.getAttribute('data-value');
+    const roleText = opt.textContent;
+    roleInput.value = roleVal;
+    accordionLabel.textContent = roleText;
+    accordionLabel.style.color = '#ffc800';
+    accordion.classList.remove('open');
+  });
+});
+
+// Step 4: Justification Textarea Character Counter
+const fieldJustification = document.getElementById('field-justification');
+const charCountSpan = document.getElementById('char-count');
+const charCounterDiv = document.getElementById('char-counter');
+
+fieldJustification.addEventListener('input', () => {
+  const len = fieldJustification.value.length;
+  charCountSpan.textContent = len;
+  if (len >= 30) {
+    charCounterDiv.classList.add('valid');
+  } else {
+    charCounterDiv.classList.remove('valid');
+  }
+});
+
+// Step 5: Directives Checkbox Cards
+const directiveCards = document.querySelectorAll('.directive-card');
+let directivesChecked = [false, false, false, false, false];
+
+directiveCards.forEach(card => {
+  card.addEventListener('mouseenter', soundHover);
+  card.addEventListener('click', () => {
+    soundClick();
+    const idx = parseInt(card.getAttribute('data-index'));
+    directivesChecked[idx] = !directivesChecked[idx];
+
+    const checkbox = card.querySelector('input[type="checkbox"]');
+    const badge = card.querySelector('.badge');
+
+    checkbox.checked = directivesChecked[idx];
+
+    if (directivesChecked[idx]) {
+      card.classList.add('active');
+      badge.textContent = 'CHECKED';
     } else {
-      let statusIdx = Math.floor((bootProgress / 100) * (bootStatuses.length - 1));
-      bootStatusLabel.innerText = bootStatuses[statusIdx];
+      card.classList.remove('active');
+      badge.textContent = 'UNCHECKED';
     }
-    bootFill.style.height = bootProgress + '%';
-    bootNum.innerText = bootProgress;
-    bootTracker.style.top = Math.min(Math.max(bootProgress, 5), 82) + '%';
-  }, 35);
 
-  splashBtn.addEventListener('click', () => {
-    playSynthSound(600, 0.3, 'square', 0.08);
-    document.getElementById('splash-screen').classList.add('hidden');
-    updateBriefingText(stepBriefings[0]);
+    validateStep5Directives();
   });
+});
 
-  // Typewriter Decryption Briefing Card
-  let typeInterval;
-  function updateBriefingText(text) {
-    const box = document.getElementById('decryption-box');
-    clearInterval(typeInterval);
-    box.innerText = "";
-    let i = 0;
-    typeInterval = setInterval(() => {
-      if (i < text.length) {
-        box.innerText += text.charAt(i);
-        if (i % 3 === 0) playSynthSound(1400, 0.02, 'sine', 0.012);
-        i++;
-      } else {
-        clearInterval(typeInterval);
-      }
-    }, 14);
+function validateStep5Directives() {
+  const allChecked = directivesChecked.every(v => v === true);
+  if (allChecked) {
+    submitBtn.removeAttribute('disabled');
+    submitBtn.classList.add('unlocked');
+  } else {
+    submitBtn.setAttribute('disabled', 'disabled');
+    submitBtn.classList.remove('unlocked');
   }
+}
 
-  // Wizard Logic (5 Steps: 0 to 4)
-  let currentStep = 0;
-  const maxSteps = 5;
+function updateWizardUI() {
+  // Update step panels
+  for (let i = 0; i < totalSteps; i++) {
+    const stepEl = document.getElementById(`step-${i}`);
+    const progEl = document.getElementById(`pstep-${i}`);
 
-  const stepBriefings = [
-    "[STEP 01/05] Operator Identification. Enter your exact Discord handle for initial telemetry handshake.",
-    "[STEP 02/05] Dispatch Channel. Provide your official email address for authorization clearance notices.",
-    "[STEP 03/05] Sector Designation. Select your intended staff sector and administrative role.",
-    "[STEP 04/05] Authorization Justification. Why should we auth you? Provide strategic reasoning and capability.",
-    "[STEP 05/05] Directive Compliance. Affirm all 5 mandatory compliance directives to unlock dispatch sequence."
-  ];
-
-  function showStep(index) {
-    document.querySelectorAll('.step-panel').forEach((panel, i) => {
-      panel.classList.toggle('active', i === index);
-    });
-
-    document.querySelectorAll('.progress-step').forEach((pstep, i) => {
-      pstep.classList.remove('active', 'completed');
-      if (i === index) pstep.classList.add('active');
-      else if (i < index) pstep.classList.add('completed');
-    });
-
-    document.getElementById('btn-prev').disabled = (index === 0);
-
-    const nextBtn = document.getElementById('btn-next');
-    const submitBtn = document.getElementById('submit-btn');
-
-    if (index === maxSteps - 1) {
-      nextBtn.style.display = 'none';
-      submitBtn.style.display = 'block';
+    if (i === currentStep) {
+      stepEl.classList.add('active');
+      progEl.className = 'progress-step active';
     } else {
-      nextBtn.style.display = 'block';
-      submitBtn.style.display = 'none';
-    }
-
-    updateBriefingText(stepBriefings[index]);
-    checkStepCompletion();
-  }
-
-  function checkStepCompletion() {
-    let isValid = false;
-
-    if (currentStep === 0) {
-      isValid = document.getElementById('field-op-id').value.trim().length > 0;
-    } else if (currentStep === 1) {
-      const email = document.getElementById('field-email').value.trim();
-      isValid = email.includes('@') && email.includes('.');
-    } else if (currentStep === 2) {
-      isValid = document.getElementById('role-input').value !== "";
-    } else if (currentStep === 3) {
-      const text = document.getElementById('field-justification').value.trim();
-      isValid = text.length >= 30;
-    } else if (currentStep === 4) {
-      const checkboxes = document.querySelectorAll('.directive-card input[type="checkbox"]');
-      isValid = Array.from(checkboxes).every(cb => cb.checked);
-    }
-
-    if (currentStep === maxSteps - 1) {
-      const submitBtn = document.getElementById('submit-btn');
-      submitBtn.disabled = !isValid;
-      if (isValid) {
-        submitBtn.classList.add('unlocked');
-      } else {
-        submitBtn.classList.remove('unlocked');
-      }
+      stepEl.classList.remove('active');
+      progEl.className = i < currentStep ? 'progress-step completed' : 'progress-step';
     }
   }
 
-  function validateStep(step) {
-    if (step === 0) {
-      const val = document.getElementById('field-op-id').value.trim();
-      if (!val) {
-        showAlert("OPERATOR DISCORD HANDLE REQUIRED FOR TELEMETRY VERIFICATION.");
-        return false;
-      }
-    } else if (step === 1) {
-      const email = document.getElementById('field-email').value.trim();
-      if (!email || !email.includes('@') || !email.includes('.')) {
-        showAlert("INVALID DISPATCH COMMUNICATION EMAIL ADDRESS.");
-        return false;
-      }
-    } else if (step === 2) {
-      const role = document.getElementById('role-input').value;
-      if (!role) {
-        showAlert("PLEASE SELECT A DISCORD ROLE ASSIGNMENT SECTOR.");
-        return false;
-      }
-    } else if (step === 3) {
-      const text = document.getElementById('field-justification').value.trim();
-      if (text.length < 30) {
-        showAlert("JUSTIFICATION PAYLOAD TOO SHORT. PROVIDE AT LEAST 30 CHARACTERS EXPLAINING WHY WE SHOULD AUTHORIZE YOU.");
-        return false;
-      }
-    }
-    return true;
+  // Update controls
+  btnPrev.disabled = (currentStep === 0);
+
+  if (currentStep === totalSteps - 1) {
+    btnNext.style.display = 'none';
+    submitBtn.style.display = 'block';
+  } else {
+    btnNext.style.display = 'block';
+    submitBtn.style.display = 'none';
   }
+}
 
-  document.getElementById('btn-next').addEventListener('click', () => {
-    if (!validateStep(currentStep)) return;
-    if (currentStep < maxSteps - 1) {
-      currentStep++;
-      showStep(currentStep);
-      playSynthSound(800, 0.08, 'triangle', 0.05);
+function validateCurrentStep() {
+  if (currentStep === 0) {
+    const val = document.getElementById('field-op-id').value.trim();
+    if (!val) {
+      showAlert("OPERATOR DISCORD HANDLE REQUIRED. TELEMETRY ENTRY CANNOT BE BLANK.");
+      return false;
     }
-  });
-
-  document.getElementById('btn-prev').addEventListener('click', () => {
-    if (currentStep > 0) {
-      currentStep--;
-      showStep(currentStep);
-      playSynthSound(500, 0.08, 'triangle', 0.05);
+  } else if (currentStep === 1) {
+    const val = document.getElementById('field-email').value.trim();
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    if (!val || !emailRegex.test(val)) {
+      showAlert("INVALID DISPATCH COMMUNICATION EMAIL FORMAT DETECTED.");
+      return false;
     }
-  });
-
-  function showAlert(msg) {
-    document.getElementById('alert-msg').innerText = msg;
-    document.getElementById('alert-modal').classList.add('active');
-    playSynthSound(300, 0.2, 'sawtooth', 0.08);
+  } else if (currentStep === 2) {
+    if (!roleInput.value) {
+      showAlert("SECTOR ROLE SELECTION MANDATORY. SELECT CLEARANCE POSITION.");
+      return false;
+    }
+  } else if (currentStep === 3) {
+    const val = fieldJustification.value.trim();
+    if (val.length < 30) {
+      showAlert("JUSTIFICATION TOO BRIEF. MINIMUM 30 CHARACTERS REQUIRED FOR AUTHORIZATION AUDIT.");
+      return false;
+    }
   }
+  return true;
+}
 
-  document.getElementById('alert-close').addEventListener('click', () => {
-    document.getElementById('alert-modal').classList.remove('active');
-  });
+btnNext.addEventListener('click', () => {
+  if (validateCurrentStep()) {
+    soundStep();
+    currentStep++;
+    updateWizardUI();
+  }
+});
 
-  // Character Counter for Justification Textarea
-  const justificationField = document.getElementById('field-justification');
-  const charCountSpan = document.getElementById('char-count');
-  const charCounterBox = document.getElementById('char-counter');
+btnPrev.addEventListener('click', () => {
+  soundClick();
+  currentStep--;
+  updateWizardUI();
+});
 
-  justificationField.addEventListener('input', () => {
-    const len = justificationField.value.length;
-    charCountSpan.innerText = len;
-    if (len >= 30) {
-      charCounterBox.classList.add('valid');
-    } else {
-      charCounterBox.classList.remove('valid');
-    }
-    checkStepCompletion();
-  });
+// Button hovers
+document.querySelectorAll('button, .btn-nav, .directive-card, .accordion-trigger').forEach(el => {
+  el.addEventListener('mouseenter', soundHover);
+});
 
-  // Accordion Dropdown Setup
-  const accordion = document.getElementById('clearance-accordion');
-  const trigger = document.getElementById('accordion-trigger');
-  const label = document.getElementById('accordion-label');
-  const roleInput = document.getElementById('role-input');
-  const options = document.querySelectorAll('.accordion-option');
+// -------------------------------------------------------------
+// CRITICAL RED INTERCEPT WARNING MODAL & FORMSPREE SUBMISSION
+// -------------------------------------------------------------
+const criticalModal = document.getElementById('critical-modal');
+const btnFinalConfirm = document.getElementById('btn-final-confirm');
+const btnFinalAbort = document.getElementById('btn-final-abort');
+const dispatchForm = document.getElementById('dispatch-form');
 
-  trigger.addEventListener('click', () => {
-    accordion.classList.toggle('open');
-    playSynthSound(700, 0.05, 'triangle', 0.04);
-  });
-
-  options.forEach(opt => {
-    opt.addEventListener('click', () => {
-      const val = opt.getAttribute('data-value');
-      const text = opt.innerText;
-      roleInput.value = val;
-      label.innerText = text;
-      accordion.classList.remove('open');
-      playSynthSound(900, 0.08, 'sine', 0.06);
-      checkStepCompletion();
-    });
-  });
-
-  // Directive Checkbox Cards
-  const directiveCards = document.querySelectorAll('.directive-card');
-  directiveCards.forEach((card) => {
-    card.addEventListener('click', () => {
-      const checkbox = card.querySelector('input[type="checkbox"]');
-      const badge = card.querySelector('.badge');
-      checkbox.checked = !checkbox.checked;
-      if (checkbox.checked) {
-        card.classList.add('active');
-        badge.innerText = 'VERIFIED';
-        playSynthSound(1000, 0.05, 'sine', 0.05);
-      } else {
-        card.classList.remove('active');
-        badge.innerText = 'UNCHECKED';
-        playSynthSound(400, 0.05, 'sine', 0.05);
-      }
-      checkStepCompletion();
-    });
-  });
-
-  // Input Event Listeners
-  document.getElementById('field-op-id').addEventListener('input', checkStepCompletion);
-  document.getElementById('field-email').addEventListener('input', checkStepCompletion);
-
-  // Critical Intercept Warning Modal & Submission
-  const criticalModal = document.getElementById('critical-modal');
-  const submitBtn = document.getElementById('submit-btn');
-  const finalConfirmBtn = document.getElementById('btn-final-confirm');
-  const finalAbortBtn = document.getElementById('btn-final-abort');
-  const dispatchForm = document.getElementById('dispatch-form');
-
-  submitBtn.addEventListener('click', () => {
-    if (submitBtn.disabled) return;
+submitBtn.addEventListener('click', () => {
+  if (directivesChecked.every(v => v === true)) {
+    soundAlarm();
     criticalModal.classList.add('active');
-    playSynthSound(250, 0.4, 'sawtooth', 0.1);
-  });
+  }
+});
 
-  finalAbortBtn.addEventListener('click', () => {
-    criticalModal.classList.remove('active');
-    playSynthSound(400, 0.1, 'sine', 0.05);
-  });
+btnFinalAbort.addEventListener('click', () => {
+  soundClick();
+  criticalModal.classList.remove('active');
+});
 
-  finalConfirmBtn.addEventListener('click', () => {
-    playSynthSound(1100, 0.5, 'square', 0.1);
-    dispatchForm.submit();
-  });
+btnFinalConfirm.addEventListener('click', () => {
+  soundClick();
+  dispatchForm.submit();
+});
 </script>
 </body>
 </html>
