@@ -5,343 +5,319 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>ABSOLUTE INDUSTRIES // CLEARANCE TERMINAL</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800;900&family=JetBrains+Mono:wght@400;700;800&display=swap');
+
   :root {
-    --abs-bg: #040506;
-    --abs-panel: #0a0c10;
+    --abs-bg: #030406;
+    --abs-panel: #0d1017;
+    --abs-panel-alt: #131720;
     --abs-accent: #ffc800;
     --abs-danger: #ff2a2a;
     --abs-text: #ffffff;
     --abs-muted: #6b7280;
-    --abs-border: #1f242d;
+    --abs-border: #242b38;
     --abs-glow: rgba(255, 200, 0, 0.4);
-    --abs-danger-glow: rgba(255, 42, 42, 0.5);
     
-    /* Endfield-style snappy, fluid transitions */
     --fluid-ease: cubic-bezier(0.16, 1, 0.3, 1);
     --fast-ease: cubic-bezier(0.22, 1, 0.36, 1);
   }
 
   * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    cursor: none !important; /* Global custom cursor override */
+    box-sizing: border-box; margin: 0; padding: 0;
+    cursor: none !important; /* Strict global cursor override */
   }
 
-  /* Custom Highlight & Scrollbar */
-  ::selection {
-    background: var(--abs-accent);
-    color: #000;
-  }
+  ::selection { background: var(--abs-accent); color: #000; }
   
-  ::-webkit-scrollbar {
-    width: 4px;
-    height: 4px;
-  }
-  ::-webkit-scrollbar-track {
-    background: var(--abs-bg);
-  }
-  ::-webkit-scrollbar-thumb {
-    background: var(--abs-border);
-    border-radius: 0;
-  }
-  ::-webkit-scrollbar-thumb:hover {
-    background: var(--abs-accent);
-  }
+  ::-webkit-scrollbar { width: 4px; height: 4px; }
+  ::-webkit-scrollbar-track { background: var(--abs-bg); }
+  ::-webkit-scrollbar-thumb { background: var(--abs-border); }
+  ::-webkit-scrollbar-thumb:hover { background: var(--abs-accent); }
 
   body {
-    background-color: var(--abs-bg);
-    color: var(--abs-text);
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
-    min-height: 100vh;
-    overflow: hidden;
-    display: flex;
-    justify-content: center;
-    align-items: center;
+    background-color: var(--abs-bg); color: var(--abs-text);
+    font-family: 'Inter', sans-serif;
+    min-height: 100vh; overflow: hidden;
+    display: flex; justify-content: center; align-items: center;
     user-select: none;
   }
 
-  input, .selectable {
-    user-select: text;
-  }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  input, .selectable { user-select: text; }
 
+  /* NO transition on transform to prevent lag/bugging */
   #custom-cursor {
-    position: fixed;
-    top: 0; left: 0;
-    width: 40px; height: 40px;
+    position: fixed; top: 0; left: 0;
+    width: 32px; height: 32px;
     border: 1px solid var(--abs-accent);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    pointer-events: none;
-    z-index: 99999;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    transition: width 0.3s var(--fluid-ease), height 0.3s var(--fluid-ease), border-color 0.3s var(--fluid-ease), background-color 0.3s var(--fluid-ease);
+    pointer-events: none; z-index: 99999;
+    display: flex; justify-content: center; align-items: center;
+    transform: translate3d(-50%, -50%, 0); /* Initial state */
+    will-change: transform;
+    transition: width 0.3s var(--fluid-ease), height 0.3s var(--fluid-ease), 
+                border-color 0.3s var(--fluid-ease), background-color 0.3s var(--fluid-ease),
+                border-radius 0.3s var(--fluid-ease);
   }
   #custom-cursor::before, #custom-cursor::after {
     content: ''; position: absolute; background: var(--abs-accent);
-    transition: background-color 0.3s var(--fluid-ease);
+    transition: background-color 0.3s var(--fluid-ease), transform 0.3s var(--fluid-ease);
   }
-  #custom-cursor::before { width: 12px; height: 1px; }
-  #custom-cursor::after { width: 1px; height: 12px; }
+  #custom-cursor::before { width: 10px; height: 1px; }
+  #custom-cursor::after { width: 1px; height: 10px; }
 
-  /* Mousedown Shrink/Recoil State */
+  /* Interactive Cursor States */
   body.cursor-active #custom-cursor {
-    width: 15px; height: 15px;
-    background-color: rgba(255, 200, 0, 0.2);
+    width: 12px; height: 12px;
+    background-color: rgba(255, 200, 0, 0.4);
     border-color: var(--abs-text);
   }
   body.cursor-active #custom-cursor::before, 
-  body.cursor-active #custom-cursor::after {
-    background: var(--abs-text);
-  }
+  body.cursor-active #custom-cursor::after { background: var(--abs-text); }
 
-  /* Hover State over interactive elements */
   body.cursor-hover #custom-cursor {
-    width: 50px; height: 50px;
-    border-radius: 0;
-    border-color: rgba(255, 255, 255, 0.3);
-    background-color: rgba(255, 255, 255, 0.05);
+    width: 48px; height: 48px;
+    border-color: rgba(255, 255, 255, 0.4);
+    background-color: rgba(255, 255, 255, 0.03);
+    border-radius: 50%; /* Smooth circular hover */
   }
 
-  .bg-layer {
-    position: fixed; inset: 0; z-index: 0; pointer-events: none;
-  }
+  .bg-layer { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
   .bg-topo {
-    position: absolute; bottom: 0; left: 0; width: 100%; height: 65vh; opacity: 0.15;
-    display: flex; align-items: flex-end;
+    position: absolute; bottom: -5vh; left: 0; width: 100vw; height: 70vh; opacity: 0.12;
   }
   .scanlines {
     position: absolute; inset: 0;
-    background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
-    background-size: 100% 2px, 3px 100%;
-    z-index: 1;
-    opacity: 0.6;
+    background: repeating-linear-gradient(0deg, rgba(0,0,0,0.15) 0px, rgba(0,0,0,0.15) 1px, transparent 1px, transparent 2px);
+    z-index: 1; opacity: 0.5;
+  }
+  .vignette {
+    position: absolute; inset: 0;
+    background: radial-gradient(circle at center, transparent 30%, var(--abs-bg) 100%);
+    z-index: 2;
   }
 
   .app-window {
     position: relative; z-index: 10;
-    width: 90vw; max-width: 1100px; height: 85vh; min-height: 650px;
-    background: rgba(10, 12, 16, 0.9);
-    backdrop-filter: blur(20px);
+    width: 90vw; max-width: 1200px; height: 85vh; min-height: 700px;
+    background: rgba(13, 16, 23, 0.85); backdrop-filter: blur(24px);
     border: 1px solid var(--abs-border);
     display: flex; flex-direction: column;
-    box-shadow: 0 40px 80px rgba(0,0,0,0.9);
+    box-shadow: 0 50px 100px rgba(0,0,0,0.9), inset 0 1px 0 rgba(255,255,255,0.05);
   }
-  /* Industrial Brackets */
-  .app-window::before, .app-window::after {
-    content: ''; position: absolute; width: 20px; height: 20px; border-style: solid; border-color: var(--abs-accent); pointer-events: none; z-index: 20;
+  
+  /* Precision Corner Brackets */
+  .app-window::before, .app-window::after, 
+  .corner-tr, .corner-bl {
+    content: ''; position: absolute; width: 16px; height: 16px; border-style: solid; border-color: var(--abs-accent); pointer-events: none; z-index: 20;
   }
   .app-window::before { top: -1px; left: -1px; border-width: 2px 0 0 2px; }
   .app-window::after { bottom: -1px; right: -1px; border-width: 0 2px 2px 0; }
+  .corner-tr { top: -1px; right: -1px; border-width: 2px 2px 0 0; }
+  .corner-bl { bottom: -1px; left: -1px; border-width: 0 0 2px 2px; }
 
   header {
     display: flex; justify-content: space-between; align-items: flex-end;
-    padding: 35px 50px; border-bottom: 1px solid var(--abs-border);
-    background: linear-gradient(to bottom, rgba(255,255,255,0.03), transparent);
+    padding: 40px 60px; border-bottom: 1px solid var(--abs-border);
+    background: linear-gradient(to bottom, rgba(255,255,255,0.02), transparent);
   }
   .brand-title {
-    font-size: 2.5rem; font-weight: 900; letter-spacing: -1px; line-height: 1; margin-bottom: 5px;
+    font-size: 2.8rem; font-weight: 900; letter-spacing: -1.5px; line-height: 1; margin-bottom: 8px; text-transform: uppercase;
   }
   .brand-sub {
-    font-size: 0.75rem; color: var(--abs-muted); letter-spacing: 5px; text-transform: uppercase;
+    font-size: 0.8rem; color: var(--abs-muted); letter-spacing: 6px; text-transform: uppercase; font-weight: 600;
   }
 
-  /* Telemetry Alignment Fix */
+  /* Rigid Telemetry Box */
   .telemetry-box {
-    font-family: 'Consolas', monospace; font-size: 0.9rem; color: var(--abs-accent);
-    width: 200px; /* Fixed width to prevent jumping */
-    text-align: left; /* Keep text anchored to the left */
-    display: flex; align-items: flex-end;
-    height: 100%;
-    overflow: hidden;
-    white-space: nowrap;
+    font-size: 0.85rem; color: var(--abs-accent); font-weight: 700;
+    width: 280px; text-align: left;
+    display: flex; align-items: flex-end; height: 100%;
+    overflow: hidden; white-space: nowrap; border-left: 2px solid var(--abs-border); padding-left: 20px;
   }
 
-  .wizard-progress {
-    display: flex; padding: 0 50px; height: 3px; background: #000;
-  }
+  .wizard-progress { display: flex; height: 4px; background: #000; }
   .pip {
     flex: 1; background: transparent; border-right: 1px solid #111;
-    transition: background 0.5s var(--fluid-ease), box-shadow 0.5s var(--fluid-ease);
+    transition: background 0.6s var(--fluid-ease), box-shadow 0.6s var(--fluid-ease);
   }
   .pip.completed { background: var(--abs-text); }
-  .pip.active { background: var(--abs-accent); box-shadow: 0 0 15px var(--abs-glow); }
+  .pip.active { background: var(--abs-accent); box-shadow: 0 0 20px var(--abs-glow); }
 
-  .viewport {
-    flex: 1; position: relative; overflow: hidden;
-  }
+  .viewport { flex: 1; position: relative; overflow: hidden; }
   .track {
     display: flex; width: 500%; height: 100%;
     transition: transform 0.8s var(--fluid-ease);
+    will-change: transform;
   }
   .step-card {
-    width: 20%; height: 100%; padding: 50px;
+    width: 20%; height: 100%; padding: 60px;
     display: flex; flex-direction: column; justify-content: center;
-    overflow-y: auto;
+    overflow-y: auto; opacity: 0; transform: translateY(20px);
+    transition: opacity 0.6s var(--fluid-ease), transform 0.6s var(--fluid-ease);
   }
+  .step-card.active-card { opacity: 1; transform: translateY(0); transition-delay: 0.2s; }
 
-  .step-label { font-family: 'Consolas', monospace; color: var(--abs-accent); font-size: 0.9rem; margin-bottom: 10px; letter-spacing: 2px; }
-  .step-heading { font-size: 3.5rem; font-weight: 800; line-height: 1; letter-spacing: -2px; margin-bottom: 20px; }
-  .step-desc { font-family: 'Consolas', monospace; font-size: 0.95rem; color: var(--abs-muted); max-width: 650px; line-height: 1.6; margin-bottom: 40px; }
+  .step-label { color: var(--abs-accent); font-size: 0.95rem; margin-bottom: 15px; letter-spacing: 3px; font-weight: 700; }
+  .step-heading { font-size: 4rem; font-weight: 900; line-height: 1; letter-spacing: -2px; margin-bottom: 25px; text-transform: uppercase; }
+  .step-desc { font-size: 1rem; color: var(--abs-muted); max-width: 650px; line-height: 1.7; margin-bottom: 40px; }
 
   .input-group {
     display: flex; max-width: 650px; border-bottom: 2px solid var(--abs-border);
     transition: border-color 0.4s var(--fluid-ease), box-shadow 0.4s var(--fluid-ease);
-    background: rgba(0,0,0,0.2);
+    background: rgba(0,0,0,0.3); position: relative;
   }
-  .input-group:focus-within {
-    border-color: var(--abs-accent); box-shadow: 0 10px 30px rgba(255, 200, 0, 0.05);
+  .input-group::after {
+    content: ''; position: absolute; bottom: -2px; left: 0; width: 0%; height: 2px;
+    background: var(--abs-accent); transition: width 0.5s var(--fluid-ease);
   }
+  .input-group:focus-within::after { width: 100%; }
+  
   .addon {
-    background: var(--abs-accent); color: #000; font-weight: 900; font-size: 1.5rem;
-    padding: 0 25px; display: flex; align-items: center; justify-content: center;
+    background: var(--abs-text); color: #000; font-weight: 900; font-size: 1.5rem;
+    padding: 0 30px; display: flex; align-items: center; justify-content: center;
   }
   input[type="text"], input[type="email"] {
     flex: 1; background: transparent; border: none; color: var(--abs-text);
-    font-size: 1.5rem; font-weight: 600; padding: 20px 25px; outline: none;
-    font-family: inherit;
+    font-size: 1.5rem; font-weight: 600; padding: 25px 30px; outline: none; font-family: inherit;
   }
-  input::placeholder { color: #333c4a; font-weight: 500; }
+  input::placeholder { color: #3b4455; font-weight: 500; }
 
-  /* Custom Select */
   .dropdown {
     position: relative; max-width: 650px; border: 2px solid var(--abs-border); background: rgba(0,0,0,0.3);
   }
   .dropdown-trigger {
-    padding: 22px 25px; display: flex; justify-content: space-between; align-items: center;
+    padding: 25px 30px; display: flex; justify-content: space-between; align-items: center;
     font-size: 1.2rem; font-weight: bold; color: var(--abs-muted); transition: color 0.3s;
   }
-  .dropdown-trigger.selected { color: var(--abs-text); border-left: 4px solid var(--abs-accent); }
+  .dropdown-trigger.selected { color: var(--abs-text); }
   .dropdown-menu {
     position: absolute; top: 100%; left: -2px; width: calc(100% + 4px);
-    background: #0b0d12; border: 2px solid transparent; border-top: none; z-index: 50;
+    background: var(--abs-panel-alt); border: 2px solid transparent; border-top: none; z-index: 50;
     max-height: 0; overflow: hidden; transition: max-height 0.6s var(--fluid-ease);
   }
   .dropdown.open .dropdown-menu {
-    max-height: 400px; border-color: var(--abs-accent); box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+    max-height: 400px; border-color: var(--abs-accent); box-shadow: 0 20px 50px rgba(0,0,0,0.9);
   }
   .dropdown-item {
-    padding: 18px 25px; font-size: 1.1rem; font-weight: 600; color: var(--abs-muted); border-bottom: 1px solid var(--abs-border); transition: all 0.2s var(--fast-ease);
+    padding: 20px 30px; font-size: 1.1rem; font-weight: 700; color: var(--abs-muted); border-bottom: 1px solid var(--abs-border); transition: all 0.2s var(--fast-ease);
   }
-  .dropdown-item:hover { background: var(--abs-accent); color: #000; padding-left: 35px; }
+  .dropdown-item:hover { background: var(--abs-text); color: #000; padding-left: 45px; }
 
-  .directive-list {
-    display: flex; flex-direction: column; gap: 15px; max-width: 800px; padding-bottom: 20px;
-  }
+  .directive-list { display: flex; flex-direction: column; gap: 12px; max-width: 850px; padding-bottom: 20px; }
   .directive-item {
     display: flex; justify-content: space-between; align-items: center;
-    background: rgba(7, 9, 13, 0.8); border: 1px solid var(--abs-border);
+    background: rgba(0,0,0,0.4); border: 1px solid var(--abs-border);
     padding: 22px 30px; transition: all 0.4s var(--fluid-ease);
   }
-  .directive-item:hover { background: #0d1118; border-color: #3b4657; }
+  .directive-item:hover { background: var(--abs-panel-alt); border-color: #3b4657; transform: translateX(5px); }
   .directive-item.active {
-    border-color: var(--abs-accent); background: rgba(255, 200, 0, 0.05);
-    box-shadow: 0 0 20px rgba(255, 200, 0, 0.15), inset 0 0 10px rgba(255, 200, 0, 0.05);
+    border-color: var(--abs-accent); background: rgba(255, 200, 0, 0.08);
+    box-shadow: inset 4px 0 0 var(--abs-accent); transform: translateX(10px);
   }
-  .dir-text {
-    font-family: 'Consolas', monospace; font-size: 0.95rem; color: var(--abs-muted); line-height: 1.5; padding-right: 30px; transition: color 0.3s;
-  }
-  .directive-item.active .dir-text { color: var(--abs-text); font-weight: bold; }
+  .dir-text { font-size: 0.95rem; color: var(--abs-muted); line-height: 1.6; padding-right: 30px; transition: color 0.3s; }
+  .directive-item.active .dir-text { color: var(--abs-text); font-weight: 600; }
+  
   .dir-box {
-    width: 28px; height: 28px; border: 2px solid var(--abs-muted); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s;
+    width: 24px; height: 24px; border: 2px solid var(--abs-border); display: flex; align-items: center; justify-content: center; flex-shrink: 0; transition: all 0.3s;
   }
-  .directive-item.active .dir-box { border-color: var(--abs-accent); background: var(--abs-accent); box-shadow: 0 0 15px var(--abs-accent); }
-  .dir-box::after { content: ''; width: 14px; height: 14px; background: #000; opacity: 0; transition: opacity 0.2s; }
-  .directive-item.active .dir-box::after { opacity: 1; }
+  .directive-item.active .dir-box { border-color: var(--abs-accent); background: transparent; }
+  .dir-box::after { content: ''; width: 12px; height: 12px; background: var(--abs-accent); transform: scale(0); transition: transform 0.4s var(--fluid-ease); }
+  .directive-item.active .dir-box::after { transform: scale(1); }
 
   .nav-footer {
-    padding: 30px 50px; border-top: 1px solid var(--abs-border); background: var(--abs-panel);
+    padding: 35px 60px; border-top: 1px solid var(--abs-border); background: var(--abs-panel);
     display: flex; justify-content: space-between; align-items: center; flex-shrink: 0;
   }
   .btn {
-    background: transparent; border: 1px solid var(--abs-muted); color: var(--abs-muted);
-    padding: 16px 40px; font-size: 1rem; font-weight: bold; letter-spacing: 2px;
+    background: transparent; border: 1px solid var(--abs-muted); color: var(--abs-text);
+    padding: 18px 45px; font-size: 1rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase;
     position: relative; overflow: hidden; transition: color 0.4s, border-color 0.4s;
   }
   .btn::before {
     content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%;
-    background: var(--abs-accent); transition: left 0.4s var(--fluid-ease); z-index: -1;
+    background: var(--abs-text); transition: left 0.5s var(--fluid-ease); z-index: -1;
   }
-  .btn:hover:not(:disabled) { color: #000; border-color: var(--abs-accent); }
+  .btn:hover:not(:disabled) { color: #000; border-color: var(--abs-text); }
   .btn:hover:not(:disabled)::before { left: 0; }
-  .btn:disabled { opacity: 0.3; pointer-events: none; }
+  .btn:disabled { opacity: 0.2; pointer-events: none; border-color: var(--abs-border); }
   
-  .btn-primary { background: var(--abs-text); color: #000; border-color: var(--abs-text); box-shadow: 0 0 20px rgba(255,255,255,0.2); }
+  .btn-primary { border-color: var(--abs-accent); color: var(--abs-accent); }
   .btn-primary::before { background: var(--abs-accent); }
 
   .modal-wrapper {
     position: fixed; inset: 0; z-index: 9000; display: none; justify-content: center; align-items: center;
-    background: rgba(4, 1, 1, 0.95); opacity: 0; transition: opacity 0.5s var(--fluid-ease); overflow: hidden;
+    background: rgba(3, 1, 1, 0.96); opacity: 0; transition: opacity 0.5s var(--fluid-ease); overflow: hidden;
+    backdrop-filter: blur(10px);
   }
   .modal-wrapper.show { display: flex; opacity: 1; }
 
-  /* Animated Arrow Streams Background */
   .stream-bg {
     position: absolute; inset: 0; display: flex; flex-direction: column; justify-content: space-evenly;
-    pointer-events: none; overflow: hidden; z-index: 9001; opacity: 0.6;
+    pointer-events: none; overflow: hidden; z-index: 9001; opacity: 0.8;
   }
   .stream-text {
-    font-size: 35vw; font-weight: 900; color: rgba(255, 42, 42, 0.08);
-    white-space: nowrap; letter-spacing: -3vw; filter: blur(12px); line-height: 0.8;
+    font-size: 30vw; font-weight: 900; color: rgba(255, 42, 42, 0.05);
+    white-space: nowrap; letter-spacing: -3vw; filter: blur(8px); line-height: 0.8;
   }
-  .stream-right { animation: scrollRight 12s linear infinite; }
-  .stream-left { animation: scrollLeft 12s linear infinite; }
-  @keyframes scrollRight { 0% { transform: translateX(-50%); } 100% { transform: translateX(0%); } }
-  @keyframes scrollLeft { 0% { transform: translateX(0%); } 100% { transform: translateX(-50%); } }
+  .stream-right { animation: scrollRight 10s linear infinite; }
+  .stream-left { animation: scrollLeft 10s linear infinite; }
+  @keyframes scrollRight { 0% { transform: translate3d(-50%,0,0); } 100% { transform: translate3d(0%,0,0); } }
+  @keyframes scrollLeft { 0% { transform: translate3d(0%,0,0); } 100% { transform: translate3d(-50%,0,0); } }
 
-  /* Tactical Dialog Box */
   .dialog-panel {
-    position: relative; z-index: 9005; max-width: 800px; width: 90%;
-    background: rgba(15, 2, 2, 0.85); backdrop-filter: blur(25px);
-    border: 2px solid var(--abs-danger); padding: 60px; text-align: center;
-    box-shadow: 0 0 150px rgba(255, 42, 42, 0.4);
-    clip-path: polygon(0 30px, 30px 0, 100% 0, 100% calc(100% - 30px), calc(100% - 30px) 100%, 0 100%);
+    position: relative; z-index: 9005; max-width: 850px; width: 90%;
+    background: rgba(15, 2, 2, 0.95);
+    border: 1px solid var(--abs-danger); padding: 70px; text-align: center;
+    box-shadow: 0 0 100px rgba(255, 42, 42, 0.2);
+    clip-path: polygon(0 20px, 20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%);
   }
-  .dialog-head { color: var(--abs-danger); font-size: 4rem; font-weight: 900; letter-spacing: -2px; text-shadow: 0 0 30px rgba(255, 42, 42, 0.8); line-height: 1; margin-bottom: 10px; }
-  .dialog-subhead { font-family: 'Consolas', monospace; color: #ff8888; font-size: 1.1rem; letter-spacing: 8px; border-bottom: 1px solid rgba(255,42,42,0.4); padding-bottom: 25px; margin-bottom: 40px; }
-  .dialog-msg { font-size: 1.25rem; color: #ffcccc; line-height: 1.8; text-align: left; margin-bottom: 50px; }
+  .dialog-head { color: var(--abs-danger); font-size: 4.5rem; font-weight: 900; letter-spacing: -2px; line-height: 1; margin-bottom: 15px; }
+  .dialog-subhead { color: #ff8888; font-size: 1.2rem; letter-spacing: 10px; border-bottom: 1px solid rgba(255,42,42,0.3); padding-bottom: 25px; margin-bottom: 40px; font-weight: 700; }
+  .dialog-msg { font-size: 1.2rem; color: #ffcccc; line-height: 1.8; text-align: left; margin-bottom: 50px; }
   
   .btn-danger {
-    background: var(--abs-danger); color: #fff; border: none; padding: 22px 50px; font-size: 1.3rem; font-weight: 900; letter-spacing: 2px;
-    box-shadow: 0 0 40px rgba(255, 42, 42, 0.6); transition: all 0.2s;
+    background: var(--abs-danger); color: #fff; border: none; padding: 22px 60px; font-size: 1.2rem; font-weight: 900; letter-spacing: 3px;
+    box-shadow: 0 0 30px rgba(255, 42, 42, 0.4); transition: all 0.2s;
   }
   .btn-danger:hover { background: #ff4444; transform: scale(1.02); }
   .btn-danger:active { transform: scale(0.98); }
   
-  .btn-abort { background: transparent; color: var(--abs-danger); border: 1px solid var(--abs-danger); padding: 15px 40px; font-weight: bold; margin-top: 20px; transition: background 0.3s; }
-  .btn-abort:hover { background: rgba(255, 42, 42, 0.15); }
+  .btn-abort { background: transparent; color: var(--abs-muted); border: 1px solid var(--abs-border); padding: 18px 50px; font-weight: bold; margin-top: 25px; transition: all 0.3s; letter-spacing: 2px; }
+  .btn-abort:hover { color: var(--abs-text); border-color: var(--abs-text); background: rgba(255,255,255,0.05); }
+
 </style>
 </head>
 <body>
 
 <div class="bg-layer">
   <div class="bg-topo">
-    <svg viewBox="0 0 1200 500" preserveAspectRatio="none" style="width:100%; height:100%;">
-      <g fill="none" stroke="rgba(255,255,255,0.3)" stroke-width="2">
-        <path d="M-100,500 L250,200 L450,350 L750,100 L1050,400 L1300,500" />
-        <path d="M50,500 L300,300 L550,420 L850,250 L1150,500" />
-        <!-- Tactical Grid Accents -->
-        <line x1="250" y1="200" x2="250" y2="500" stroke-dasharray="6,6" />
-        <line x1="750" y1="100" x2="750" y2="500" stroke-dasharray="6,6" />
+    <svg viewBox="0 0 1400 600" preserveAspectRatio="none" style="width:100%; height:100%;">
+      <g fill="none" stroke="rgba(255,255,255,0.2)" stroke-width="1.5">
+        <path d="M-100,600 L250,250 L450,400 L800,100 L1100,350 L1500,600" />
+        <path d="M50,600 L350,350 L600,450 L900,200 L1200,600" opacity="0.5" />
+        <path d="M-50,600 L200,400 L400,500 L700,250 L1000,450 L1400,600" opacity="0.3" />
+        <line x1="250" y1="250" x2="250" y2="600" stroke-dasharray="4,4" />
+        <line x1="800" y1="100" x2="800" y2="600" stroke-dasharray="4,4" />
       </g>
-      <text x="30" y="470" font-family="Consolas" font-size="16" fill="rgba(255,255,255,0.4)" letter-spacing="2">ABSOLUTE INDUSTRIES // TOPOGRAPHY ALIGNMENT</text>
+      <text x="40" y="560" font-family="'JetBrains Mono', monospace" font-weight="700" font-size="14" fill="rgba(255,255,255,0.3)" letter-spacing="4">TOPOGRAPHY // SECTOR NULL</text>
     </svg>
   </div>
   <div class="scanlines"></div>
+  <div class="vignette"></div>
 </div>
 
 <div id="custom-cursor"></div>
 
 <div class="app-window">
+  <div class="corner-tr"></div>
+  <div class="corner-bl"></div>
+
   <header>
     <div>
-      <div class="brand-title">ABSOLUTE INDUSTRIES</div>
+      <div class="brand-title decrypt-target" data-value="ABSOLUTE INDUSTRIES">ABSOLUTE INDUSTRIES</div>
       <div class="brand-sub">Clearance Application Terminal</div>
     </div>
-    <!-- Strict Left-Aligned Fixed-Width Telemetry Box -->
-    <div class="telemetry-box">
+    <div class="telemetry-box mono">
       <span id="telemetry-seq">/</span>
     </div>
   </header>
@@ -354,15 +330,15 @@
     <div class="pip" id="pip-4"></div>
   </div>
 
-  <form id="app-form" action="https://formspree.io/f/xvkgrbar" method="POST" style="display:flex; flex-direction:column; flex:1; overflow:hidden;">
+  <form id="app-form" action="https://formspree.io/f/placeholder" method="POST" style="display:flex; flex-direction:column; flex:1; overflow:hidden;">
     <div class="viewport">
       <div class="track" id="wizard-track">
         
-        <!-- Step 1: ID -->
-        <div class="step-card">
-          <div class="step-label">01 // IDENTIFICATION</div>
-          <h1 class="step-heading">OPERATOR<br>IDENTIFICATION</h1>
-          <div class="step-desc">Enter your exact Discord handle. This unique signature will be permanently appended to the transmission packet for absolute audit tracing and verification.</div>
+        <!-- Step 1 -->
+        <div class="step-card active-card">
+          <div class="step-label mono decrypt-target" data-value="01 // IDENTIFICATION">01 // IDENTIFICATION</div>
+          <h1 class="step-heading decrypt-target" data-value="OPERATOR IDENTIFICATION">OPERATOR<br>IDENTIFICATION</h1>
+          <div class="step-desc mono">Enter your exact Discord handle. This unique signature will be permanently appended to the transmission packet for absolute audit tracing and verification.</div>
           
           <div class="input-group interactable">
             <div class="addon">@</div>
@@ -370,30 +346,30 @@
           </div>
         </div>
 
-        <!-- Step 2: Email -->
+        <!-- Step 2 -->
         <div class="step-card">
-          <div class="step-label">02 // DISPATCH</div>
-          <h1 class="step-heading">COMMUNICATION<br>DISPATCH</h1>
-          <div class="step-desc">Provide your primary contact address for application status updates. External domains will be routed through the Absolute Network firewall protocols.</div>
+          <div class="step-label mono decrypt-target" data-value="02 // DISPATCH">02 // DISPATCH</div>
+          <h1 class="step-heading decrypt-target" data-value="COMMUNICATION DISPATCH">COMMUNICATION<br>DISPATCH</h1>
+          <div class="step-desc mono">Provide your primary contact address for application status updates. External domains will be routed through the Absolute Network firewall protocols.</div>
           
           <div class="input-group interactable" style="border: 2px solid var(--abs-border); background:rgba(0,0,0,0.4); padding-left:5px;">
             <input type="email" id="in-email" name="email" placeholder="operator@domain.com" autocomplete="off" spellcheck="false">
           </div>
         </div>
 
-        <!-- Step 3: Role -->
+        <!-- Step 3 -->
         <div class="step-card">
-          <div class="step-label">03 // PROTOCOL</div>
-          <h1 class="step-heading">CLEARANCE<br>PROTOCOL</h1>
-          <div class="step-desc">Select the operational role corresponding to your current deployment request. Choose carefully between Administrative, Management, or Support structures.</div>
+          <div class="step-label mono decrypt-target" data-value="03 // PROTOCOL">03 // PROTOCOL</div>
+          <h1 class="step-heading decrypt-target" data-value="CLEARANCE PROTOCOL">CLEARANCE<br>PROTOCOL</h1>
+          <div class="step-desc mono">Select the operational role corresponding to your current deployment request. Choose carefully between Administrative, Management, or Support structures.</div>
           
           <input type="hidden" id="in-role" name="requested_role">
           <div class="dropdown interactable" id="role-select">
             <div class="dropdown-trigger">
-              <span id="role-label">SELECT ASSIGNMENT SECTOR</span>
+              <span id="role-label" class="mono">SELECT ASSIGNMENT SECTOR</span>
               <span>+</span>
             </div>
-            <div class="dropdown-menu">
+            <div class="dropdown-menu mono">
               <div class="dropdown-item" data-val="ADMIN">SECTOR A // ADMIN CLEARANCE</div>
               <div class="dropdown-item" data-val="MOD">SECTOR M // MANAGEMENT [MOD]</div>
               <div class="dropdown-item" data-val="SUPPORT">SECTOR S // TACTICAL SUPPORT</div>
@@ -401,48 +377,48 @@
           </div>
         </div>
 
-        <!-- Step 4: Directives -->
+        <!-- Step 4 -->
         <div class="step-card">
-          <div class="step-label">04 // COMPLIANCE</div>
-          <h1 class="step-heading">MANDATORY<br>DIRECTIVES</h1>
-          <div class="step-desc">All directives must be actively verified and acknowledged to unlock the final transmission relay. Read carefully and verify each block manually.</div>
+          <div class="step-label mono decrypt-target" data-value="04 // COMPLIANCE">04 // COMPLIANCE</div>
+          <h1 class="step-heading decrypt-target" data-value="MANDATORY DIRECTIVES">MANDATORY<br>DIRECTIVES</h1>
+          <div class="step-desc mono">All directives must be actively verified and acknowledged to unlock the final transmission relay. Read carefully and verify each block manually.</div>
           
           <div class="directive-list">
             <label class="directive-item interactable">
-              <div class="dir-text">1. I confirm I meet the minimum operational age requirement to process network traffic.</div>
+              <div class="dir-text mono">1. I confirm I meet the minimum operational age requirement to process network traffic.</div>
               <div class="dir-box"></div>
-              <input type="checkbox" name="dir_1" class="check-req" hidden>
+              <input type="checkbox" class="check-req" hidden>
             </label>
             <label class="directive-item interactable">
-              <div class="dir-text">2. I acknowledge that any abuse of designated clearance powers will result in termination.</div>
+              <div class="dir-text mono">2. I acknowledge that any abuse of designated clearance powers will result in termination.</div>
               <div class="dir-box"></div>
-              <input type="checkbox" name="dir_2" class="check-req" hidden>
+              <input type="checkbox" class="check-req" hidden>
             </label>
             <label class="directive-item interactable">
-              <div class="dir-text">3. I agree to maintain strict confidentiality regarding internal staff telemetry and archives.</div>
+              <div class="dir-text mono">3. I agree to maintain strict confidentiality regarding internal staff telemetry and archives.</div>
               <div class="dir-box"></div>
-              <input type="checkbox" name="dir_3" class="check-req" hidden>
+              <input type="checkbox" class="check-req" hidden>
             </label>
             <label class="directive-item interactable">
-              <div class="dir-text">4. I verify that my provided Discord Operator ID is accurate and actively monitored.</div>
+              <div class="dir-text mono">4. I verify that my provided Discord Operator ID is accurate and actively monitored.</div>
               <div class="dir-box"></div>
-              <input type="checkbox" name="dir_4" class="check-req" hidden>
+              <input type="checkbox" class="check-req" hidden>
             </label>
             <label class="directive-item interactable">
-              <div class="dir-text">5. I accept that submitting falsified application data triggers an instant network blacklist.</div>
+              <div class="dir-text mono">5. I accept that submitting falsified application data triggers an instant network blacklist.</div>
               <div class="dir-box"></div>
-              <input type="checkbox" name="dir_5" class="check-req" hidden>
+              <input type="checkbox" class="check-req" hidden>
             </label>
           </div>
         </div>
 
-        <!-- Step 5: Final Review -->
+        <!-- Step 5 -->
         <div class="step-card">
-          <div class="step-label">05 // VERIFICATION</div>
-          <h1 class="step-heading">SYSTEM<br>READY</h1>
-          <div class="step-desc">Pre-flight checks completed. You are about to invoke a permanent record entry via the Formspree gateway. Acknowledge and initiate request transmission.</div>
+          <div class="step-label mono decrypt-target" data-value="05 // VERIFICATION">05 // VERIFICATION</div>
+          <h1 class="step-heading decrypt-target" data-value="SYSTEM READY">SYSTEM<br>READY</h1>
+          <div class="step-desc mono">Pre-flight checks completed. You are about to invoke a permanent record entry via the gateway. Acknowledge and initiate request transmission.</div>
           
-          <div style="font-family: 'Consolas', monospace; color: var(--abs-accent); border-left: 3px solid var(--abs-accent); padding-left: 20px; font-size: 1.1rem; line-height: 2;">
+          <div class="mono" style="color: var(--abs-accent); border-left: 2px solid var(--abs-accent); padding-left: 25px; font-size: 1.1rem; line-height: 2.2;">
             > IDENTITY SIGNATURE LOGGED<br>
             > DISPATCH ROUTE CONFIRMED<br>
             > CLEARANCE PROTOCOL LOCKED<br>
@@ -456,22 +432,22 @@
     <div class="nav-footer">
       <button type="button" class="btn interactable" id="btn-back" disabled>PREVIOUS</button>
       <button type="button" class="btn interactable" id="btn-next">NEXT PHASE</button>
-      <button type="button" class="btn btn-primary interactable" id="btn-submit" style="display:none;">INITIATE REQUEST TRANSMISSION</button>
+      <button type="button" class="btn btn-primary interactable" id="btn-submit" style="display:none;">INITIATE TRANSMISSION</button>
     </div>
   </form>
 </div>
 
 <div class="modal-wrapper" id="red-modal">
   <div class="stream-bg">
-    <div class="stream-text stream-right">&gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt;</div>
-    <div class="stream-text stream-left">&lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt;</div>
+    <div class="stream-text stream-right">&gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt;</div>
+    <div class="stream-text stream-left">&lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt;</div>
   </div>
   
   <div class="dialog-panel">
     <div class="dialog-head">CRITICAL INTERCEPT</div>
-    <div class="dialog-subhead">>>> ABSOLUTE CLEARANCE PROTOCOL <<<</div>
+    <div class="dialog-subhead mono">>>> ABSOLUTE CLEARANCE PROTOCOL <<<</div>
     
-    <div class="dialog-msg">
+    <div class="dialog-msg mono">
       <strong>WARNING: SECURITY CLEARANCE CHECK ENGAGED.</strong><br><br>
       Transmitting fake application data or fraudulent history logs triggers an instant, permanent clearance signature blacklist penalty across all Absolute Industries servers.<br><br>
       Do you absolutely confirm this application transmission is genuine?
@@ -485,72 +461,94 @@
 </div>
 
 <script>
-  // Global Custom Cursor Tracking
   const cursor = document.getElementById('custom-cursor');
-  let mX = window.innerWidth / 2;
-  let mY = window.innerHeight / 2;
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
 
+  // Track raw position
   window.addEventListener('mousemove', (e) => {
-    mX = e.clientX; mY = e.clientY;
-    cursor.style.left = mX + 'px';
-    cursor.style.top = mY + 'px';
+    mouseX = e.clientX;
+    mouseY = e.clientY;
   });
 
-  // Shrink/Recoil Effect on ANY click
+  // Render loop using requestAnimationFrame guarantees zero lag/jitter
+  function renderCursor() {
+    cursor.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+    requestAnimationFrame(renderCursor);
+  }
+  requestAnimationFrame(renderCursor); // Start loop
+
+  // Cursor state modifiers
   window.addEventListener('mousedown', () => document.body.classList.add('cursor-active'));
   window.addEventListener('mouseup', () => document.body.classList.remove('cursor-active'));
 
-  // Hover effect over specific interactive elements
-  document.querySelectorAll('.interactable, input').forEach(el => {
+  document.querySelectorAll('.interactable, input, .dropdown-item').forEach(el => {
     el.addEventListener('mouseenter', () => document.body.classList.add('cursor-hover'));
     el.addEventListener('mouseleave', () => document.body.classList.remove('cursor-hover'));
   });
 
-  // Left-Aligned Telemetry Sequencer (1.8s loop / 600ms per state)
+  const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*';
+  function scrambleText(element) {
+    const originalText = element.getAttribute('data-value');
+    if (!originalText) return;
+    
+    let iterations = 0;
+    const interval = setInterval(() => {
+      element.innerText = originalText.split('').map((char, index) => {
+        if(char === ' ' || char === '\n') return char;
+        if(index < iterations) return char;
+        return chars[Math.floor(Math.random() * chars.length)];
+      }).join('');
+      
+      if(iterations >= originalText.length) clearInterval(interval);
+      iterations += 1/3; // Speed control
+    }, 20);
+  }
+
   const telBox = document.getElementById('telemetry-seq');
-  const seqText = ["/", "//", "// HYPR NETWORK ONLINE"];
+  const seqText = ["/", "//", "///", "// HYPR NETWORK ONLINE_"];
   let telIndex = 0;
-  
   setInterval(() => {
     telBox.innerText = seqText[telIndex];
     telIndex = (telIndex + 1) % seqText.length;
-  }, 600);
+  }, 500);
 
-  // Wizard Logic Variables
   let step = 0;
   const maxSteps = 5;
   const track = document.getElementById('wizard-track');
+  const cards = document.querySelectorAll('.step-card');
   const btnNext = document.getElementById('btn-next');
   const btnBack = document.getElementById('btn-back');
   const btnSubmit = document.getElementById('btn-submit');
   const pips = document.querySelectorAll('.pip');
 
-  // Validation Check per Step
   function validate() {
     let valid = false;
-    if (step === 0) {
-      valid = document.getElementById('in-discord').value.trim().length >= 2;
-    } else if (step === 1) {
-      valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('in-email').value.trim());
-    } else if (step === 2) {
-      valid = document.getElementById('in-role').value !== '';
-    } else if (step === 3) {
-      const checks = document.querySelectorAll('.check-req');
-      valid = Array.from(checks).every(c => c.checked);
-    } else {
-      valid = true;
-    }
+    if (step === 0) valid = document.getElementById('in-discord').value.trim().length >= 2;
+    else if (step === 1) valid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(document.getElementById('in-email').value.trim());
+    else if (step === 2) valid = document.getElementById('in-role').value !== '';
+    else if (step === 3) valid = Array.from(document.querySelectorAll('.check-req')).every(c => c.checked);
+    else valid = true;
     btnNext.disabled = !valid;
   }
 
-  // Update Viewport Position
   function renderStep() {
-    track.style.transform = `translateX(-${step * 20}%)`;
+    track.style.transform = `translate3d(-${step * 20}%, 0, 0)`;
     
     pips.forEach((p, i) => {
-      p.classList.remove('active', 'completed');
+      p.className = 'pip';
       if (i < step) p.classList.add('completed');
       if (i === step) p.classList.add('active');
+    });
+
+    cards.forEach((card, i) => {
+      if (i === step) {
+        card.classList.add('active-card');
+        // Trigger decryption effect on new step elements
+        card.querySelectorAll('.decrypt-target').forEach(scrambleText);
+      } else {
+        card.classList.remove('active-card');
+      }
     });
 
     btnBack.disabled = (step === 0);
@@ -565,26 +563,17 @@
     validate();
   }
 
-  // Next / Back Actions
-  btnNext.addEventListener('click', () => {
-    if (!btnNext.disabled && step < maxSteps - 1) { step++; renderStep(); }
-  });
-  btnBack.addEventListener('click', () => {
-    if (step > 0) { step--; renderStep(); }
-  });
-
-  // Listeners for live validation
+  btnNext.addEventListener('click', () => { if (!btnNext.disabled && step < maxSteps - 1) { step++; renderStep(); }});
+  btnBack.addEventListener('click', () => { if (step > 0) { step--; renderStep(); }});
+  
   document.getElementById('in-discord').addEventListener('input', validate);
   document.getElementById('in-email').addEventListener('input', validate);
 
-  // Custom Select Dropdown Logic
   const dropdown = document.getElementById('role-select');
   const roleInput = document.getElementById('in-role');
   const roleLabel = document.getElementById('role-label');
 
-  dropdown.querySelector('.dropdown-trigger').addEventListener('click', () => {
-    dropdown.classList.toggle('open');
-  });
+  dropdown.querySelector('.dropdown-trigger').addEventListener('click', () => dropdown.classList.toggle('open'));
 
   document.querySelectorAll('.dropdown-item').forEach(item => {
     item.addEventListener('click', () => {
@@ -596,7 +585,6 @@
     });
   });
 
-  // Mandatory Directives Checkbox Logic
   document.querySelectorAll('.directive-item').forEach(item => {
     item.addEventListener('click', (e) => {
       e.preventDefault();
@@ -607,24 +595,19 @@
     });
   });
 
-  // Massive Red Modal Logic
   const modal = document.getElementById('red-modal');
   const finalForm = document.getElementById('app-form');
 
-  btnSubmit.addEventListener('click', () => {
-    modal.classList.add('show');
-  });
-
-  document.getElementById('btn-cancel').addEventListener('click', () => {
-    modal.classList.remove('show');
-  });
-
+  btnSubmit.addEventListener('click', () => modal.classList.add('show'));
+  document.getElementById('btn-cancel').addEventListener('click', () => modal.classList.remove('show'));
   document.getElementById('btn-final-confirm').addEventListener('click', () => {
-    finalForm.submit(); // Submit to Formspree
+    document.getElementById('btn-final-confirm').innerText = 'TRANSMITTING...';
+    setTimeout(() => finalForm.submit(), 800); // Small delay for effect
   });
 
-  // Initialize First Step
+  // Init
   renderStep();
+  document.querySelectorAll('.step-card')[0].querySelectorAll('.decrypt-target').forEach(scrambleText);
 
 </script>
 </body>
