@@ -1,0 +1,865 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ABSOLUTE INDUSTRIES // CLEARANCE TERMINAL</title>
+<style>
+  :root {
+    --abs-bg: #040506;
+    --abs-panel: #0b0d10;
+    --abs-accent: #ffc800;
+    --abs-accent-hover: #e6b400;
+    --abs-danger: #ff2a2a;
+    --abs-text: #f5f7f8;
+    --abs-muted: #5a6472;
+    --abs-border: #1c222c;
+    --ease-out-expo: cubic-bezier(0.19, 1, 0.22, 1);
+    --ease-in-out-circ: cubic-bezier(0.785, 0.135, 0.15, 0.86);
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    cursor: none; /* Custom cursor implementation */
+  }
+
+  body {
+    background-color: var(--abs-bg);
+    color: var(--abs-text);
+    font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+    min-height: 100vh;
+    overflow: hidden;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+
+  .swiss-bg {
+    position: fixed;
+    top: 0; left: 0; width: 100vw; height: 100vh;
+    z-index: 0;
+    pointer-events: none;
+    opacity: 0.6;
+  }
+  
+  /* Grid lines overlay */
+  .swiss-grid {
+    position: fixed;
+    inset: 0;
+    background-image: 
+      linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+    background-size: 5vw 5vw;
+    z-index: 1;
+    pointer-events: none;
+  }
+
+  #cursor-dot {
+    width: 6px; height: 6px;
+    background: var(--abs-accent);
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9999;
+    transform: translate(-50%, -50%);
+  }
+  #cursor-ring {
+    width: 30px; height: 30px;
+    border: 1px solid rgba(255, 200, 0, 0.5);
+    position: fixed;
+    top: 0; left: 0;
+    pointer-events: none;
+    z-index: 9998;
+    transform: translate(-50%, -50%);
+    transition: width 0.2s, height 0.2s, border-color 0.2s;
+  }
+  body:hover #cursor-ring.active {
+    width: 45px; height: 45px;
+    border-color: var(--abs-text);
+    background: rgba(255,255,255,0.05);
+  }
+
+  .app-container {
+    position: relative;
+    z-index: 10;
+    width: 90vw;
+    max-width: 1000px;
+    height: 80vh;
+    min-height: 600px;
+    background: rgba(11, 13, 16, 0.85);
+    backdrop-filter: blur(12px);
+    border: 1px solid var(--abs-border);
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+  }
+
+  /* Framing corners */
+  .app-container::before, .app-container::after {
+    content: ''; position: absolute; width: 15px; height: 15px; border-style: solid; border-color: var(--abs-accent); pointer-events: none;
+  }
+  .app-container::before { top: -1px; left: -1px; border-width: 3px 0 0 3px; }
+  .app-container::after { bottom: -1px; right: -1px; border-width: 0 3px 3px 0; }
+
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    padding: 30px 40px;
+    border-bottom: 2px solid var(--abs-border);
+  }
+  .header-left {
+    display: flex;
+    flex-direction: column;
+  }
+  .sys-title {
+    font-size: 2.5rem;
+    font-weight: 900;
+    letter-spacing: -1px;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  .sys-sub {
+    font-size: 0.8rem;
+    color: var(--abs-muted);
+    letter-spacing: 4px;
+    margin-top: 8px;
+    text-transform: uppercase;
+  }
+  .telemetry-tag {
+    font-family: 'Consolas', monospace;
+    font-size: 0.85rem;
+    color: var(--abs-accent);
+    animation: flicker1s 1s infinite steps(1);
+  }
+  @keyframes flicker1s {
+    0%, 49% { opacity: 1; visibility: visible; }
+    50%, 100% { opacity: 0; visibility: hidden; }
+  }
+
+  .wizard-indicator {
+    display: flex;
+    padding: 0 40px;
+    height: 4px;
+    background: #080a0d;
+  }
+  .step-pip {
+    flex: 1;
+    background: transparent;
+    border-right: 1px solid var(--abs-bg);
+    transition: background 0.4s var(--ease-out-expo);
+  }
+  .step-pip.active {
+    background: var(--abs-accent);
+    box-shadow: 0 0 10px rgba(255, 200, 0, 0.5);
+  }
+  .step-pip.completed {
+    background: var(--abs-text);
+  }
+
+  .viewport {
+    flex: 1;
+    position: relative;
+    overflow: hidden;
+  }
+  .wizard-track {
+    display: flex;
+    width: 500%; /* 5 steps */
+    height: 100%;
+    transition: transform 0.8s var(--ease-in-out-circ);
+  }
+  .step-view {
+    width: 20%;
+    height: 100%;
+    padding: 40px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+  }
+
+  /* Content typography & layout within steps */
+  .step-num {
+    font-family: 'Consolas', monospace;
+    color: var(--abs-accent);
+    font-size: 1rem;
+    margin-bottom: 10px;
+  }
+  .step-title {
+    font-size: 3rem;
+    font-weight: 800;
+    line-height: 1.1;
+    letter-spacing: -1.5px;
+    margin-bottom: 20px;
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 0% 100%);
+  }
+  .scramble-text {
+    font-family: 'Consolas', monospace;
+    font-size: 0.9rem;
+    color: var(--abs-muted);
+    line-height: 1.6;
+    margin-bottom: 40px;
+    max-width: 600px;
+    min-height: 60px;
+  }
+
+  .input-wrapper {
+    position: relative;
+    width: 100%;
+    max-width: 600px;
+  }
+  input[type="text"], input[type="email"] {
+    width: 100%;
+    background: transparent;
+    border: none;
+    border-bottom: 2px solid var(--abs-border);
+    color: var(--abs-text);
+    font-size: 1.5rem;
+    font-weight: 700;
+    padding: 15px 0;
+    outline: none;
+    transition: border-color 0.3s;
+    font-family: 'Helvetica Neue', sans-serif;
+  }
+  input:focus {
+    border-bottom-color: var(--abs-accent);
+  }
+  
+  /* The stylized @ email block */
+  .email-group {
+    display: flex;
+    align-items: stretch;
+    border: 2px solid var(--abs-border);
+    background: rgba(0,0,0,0.3);
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  .email-group:focus-within {
+    border-color: var(--abs-accent);
+    box-shadow: 0 0 15px rgba(255, 200, 0, 0.15);
+  }
+  .email-addon {
+    background: var(--abs-accent);
+    color: #000;
+    font-weight: 900;
+    font-size: 1.8rem;
+    padding: 0 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .email-group input {
+    border: none;
+    padding: 15px 20px;
+    flex: 1;
+  }
+
+  .custom-select {
+    position: relative;
+    max-width: 600px;
+    border: 2px solid var(--abs-border);
+    background: rgba(0,0,0,0.3);
+  }
+  .select-trigger {
+    padding: 20px;
+    display: flex;
+    justify-content: space-between;
+    font-size: 1.2rem;
+    font-weight: bold;
+    color: var(--abs-muted);
+    transition: color 0.3s;
+  }
+  .select-trigger.selected {
+    color: var(--abs-text);
+    border-left: 4px solid var(--abs-accent);
+  }
+  .select-options {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.5s var(--ease-out-expo);
+    background: #080a0c;
+  }
+  .custom-select.open .select-options {
+    max-height: 300px;
+    border-top: 1px solid var(--abs-border);
+  }
+  .select-option {
+    padding: 15px 20px;
+    font-size: 1rem;
+    font-weight: bold;
+    border-bottom: 1px solid var(--abs-border);
+    color: var(--abs-muted);
+    transition: all 0.2s;
+  }
+  .select-option:hover {
+    background: var(--abs-accent);
+    color: #000;
+    padding-left: 30px;
+  }
+
+  .directives-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-width: 700px;
+  }
+  .directive-block {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: #07090c;
+    border: 1px solid var(--abs-border);
+    padding: 18px 24px;
+    transition: all 0.3s var(--ease-out-expo);
+  }
+  .directive-block:hover {
+    background: #0a0e14;
+    border-color: #384556;
+  }
+  .directive-block.active {
+    border-color: var(--abs-accent);
+    background: rgba(255, 200, 0, 0.05);
+    box-shadow: 0 0 20px rgba(255, 200, 0, 0.3), inset 0 0 10px rgba(255, 200, 0, 0.1);
+  }
+  .directive-text {
+    font-family: 'Consolas', monospace;
+    font-size: 0.9rem;
+    color: var(--abs-muted);
+    transition: color 0.2s;
+  }
+  .directive-block.active .directive-text {
+    color: var(--abs-text);
+    font-weight: bold;
+  }
+  .status-box {
+    width: 20px; height: 20px;
+    border: 1px solid var(--abs-muted);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .directive-block.active .status-box {
+    border-color: var(--abs-accent);
+    background: var(--abs-accent);
+  }
+  .status-box::after {
+    content: '';
+    width: 10px; height: 10px;
+    background: #000;
+    opacity: 0;
+  }
+  .directive-block.active .status-box::after {
+    opacity: 1;
+  }
+
+  .nav-bar {
+    padding: 20px 40px;
+    border-top: 1px solid var(--abs-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--abs-panel);
+  }
+  .btn {
+    background: transparent;
+    border: 1px solid var(--abs-muted);
+    color: var(--abs-muted);
+    padding: 12px 30px;
+    font-size: 0.9rem;
+    font-weight: bold;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    transition: all 0.3s;
+    position: relative;
+    overflow: hidden;
+  }
+  .btn::before {
+    content: ''; position: absolute; top: 0; left: -100%; width: 100%; height: 100%; background: var(--abs-accent); transition: left 0.3s var(--ease-out-expo); z-index: -1;
+  }
+  .btn:hover:not(:disabled) {
+    color: #000;
+    border-color: var(--abs-accent);
+  }
+  .btn:hover:not(:disabled)::before { left: 0; }
+  .btn:disabled {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+  
+  .btn-submit {
+    background: var(--abs-text);
+    color: #000;
+    border-color: var(--abs-text);
+  }
+  .btn-submit::before { background: var(--abs-accent); }
+
+  .modal-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(4, 5, 6, 0.95);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 9000;
+    opacity: 0;
+    transition: opacity 0.5s;
+  }
+  .modal-overlay.active {
+    display: flex;
+    opacity: 1;
+  }
+  
+  /* Huge Blurred Arrows */
+  .arrow-stream-container {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-around;
+    z-index: 9001;
+  }
+  .arrow-stream {
+    font-size: 25vw;
+    font-weight: 900;
+    color: rgba(255, 42, 42, 0.4);
+    white-space: nowrap;
+    letter-spacing: -2vw;
+    filter: blur(12px);
+    text-shadow: 0 0 50px rgba(255, 42, 42, 0.8);
+    opacity: 0.7;
+  }
+  .stream-top { animation: slideRight 6s linear infinite; }
+  .stream-bottom { animation: slideLeft 6s linear infinite; }
+  
+  @keyframes slideRight {
+    0% { transform: translateX(-50%); }
+    100% { transform: translateX(0%); }
+  }
+  @keyframes slideLeft {
+    0% { transform: translateX(0%); }
+    100% { transform: translateX(-50%); }
+  }
+
+  .tactical-dialog {
+    position: relative;
+    z-index: 9005;
+    background: rgba(15, 2, 2, 0.85);
+    backdrop-filter: blur(20px);
+    border: 2px solid var(--abs-danger);
+    padding: 50px;
+    max-width: 650px;
+    text-align: center;
+    box-shadow: 0 0 100px rgba(255, 42, 42, 0.4);
+    clip-path: polygon(0 20px, 20px 0, 100% 0, 100% calc(100% - 20px), calc(100% - 20px) 100%, 0 100%);
+  }
+  .dialog-title {
+    color: var(--abs-danger);
+    font-size: 2.5rem;
+    font-weight: 900;
+    letter-spacing: -1px;
+    margin-bottom: 10px;
+    text-shadow: 0 0 20px rgba(255, 42, 42, 0.8);
+  }
+  .dialog-body {
+    font-size: 1.1rem;
+    color: #ffcccc;
+    line-height: 1.6;
+    margin: 30px 0;
+  }
+  .btn-danger {
+    background: var(--abs-danger);
+    color: #fff;
+    border: none;
+    padding: 20px 40px;
+    font-size: 1.2rem;
+    font-weight: 900;
+    letter-spacing: 2px;
+    box-shadow: 0 0 30px rgba(255, 42, 42, 0.6);
+    transition: background 0.3s, transform 0.1s;
+  }
+  .btn-danger:hover { background: #ff5555; }
+  .btn-danger:active { transform: scale(0.98); }
+  .btn-cancel {
+    background: transparent;
+    color: var(--abs-danger);
+    border: 1px solid var(--abs-danger);
+    padding: 15px 30px;
+    font-weight: bold;
+    margin-top: 15px;
+    transition: background 0.3s;
+  }
+  .btn-cancel:hover { background: rgba(255, 42, 42, 0.1); }
+
+</style>
+</head>
+<body>
+
+<svg class="swiss-bg" viewBox="0 0 1000 1000" preserveAspectRatio="xMidYMid slice">
+  <g fill="none" stroke="rgba(255,255,255,0.08)" stroke-width="2">
+    <path d="M0,800 L300,400 L600,900 L1000,200" />
+    <path d="M-100,1000 L400,600 L700,1000" fill="rgba(11, 13, 16, 0.5)"/>
+    <path d="M300,1000 L650,500 L1100,1000" fill="rgba(4, 5, 6, 0.8)"/>
+  </g>
+  <text x="-950" y="150" transform="rotate(-90)" font-family="Helvetica Neue" font-size="180" font-weight="900" fill="rgba(255,255,255,0.02)">ABSOLUTE</text>
+  <text x="100" y="900" font-family="Consolas" font-size="20" fill="rgba(255,255,255,0.1)">SEC-GRID-1A // TOPOGRAPHY ALIGNMENT</text>
+</svg>
+<div class="swiss-grid"></div>
+
+<div id="cursor-dot"></div>
+<div id="cursor-ring"></div>
+
+<div class="app-container">
+  
+  <header class="header">
+    <div class="header-left">
+      <div class="sys-title">ABSL // TERMINAL</div>
+      <div class="sys-sub">Core Entity Initialization Protocol</div>
+    </div>
+    <div class="telemetry-tag">// HYPR_NETWORK_ONLINE</div>
+  </header>
+
+  <div class="wizard-indicator">
+    <div class="step-pip active" id="pip-0"></div>
+    <div class="step-pip" id="pip-1"></div>
+    <div class="step-pip" id="pip-2"></div>
+    <div class="step-pip" id="pip-3"></div>
+    <div class="step-pip" id="pip-4"></div>
+  </div>
+
+  <form id="main-form" action="https://formspree.io/f/xvkgrbar" method="POST" style="display:flex; flex-direction:column; flex:1; overflow:hidden;">
+    
+    <div class="viewport">
+      <div class="wizard-track" id="wizard-track">
+        
+        <!-- STEP 0: Operator ID -->
+        <div class="step-view">
+          <div class="step-num">01 / IDENTIFIER</div>
+          <h1 class="step-title">OPERATOR<br>IDENTIFIER</h1>
+          <div class="scramble-text" data-target="Input your assigned alphanumeric operator designation. This signature will be permanently appended to the transmission packet for absolute audit tracing."></div>
+          <div class="input-wrapper">
+            <input type="text" id="input-op-id" name="operator_id" placeholder="e.g., OP-8821" autocomplete="off">
+          </div>
+        </div>
+
+        <!-- STEP 1: Email Group -->
+        <div class="step-view">
+          <div class="step-num">02 / DISPATCH</div>
+          <h1 class="step-title">COMMUNICATION<br>DISPATCH</h1>
+          <div class="scramble-text" data-target="Specify a secure internal routing address. External domains are strictly prohibited and will result in an immediate automated gateway rejection."></div>
+          <div class="email-group">
+            <div class="email-addon">@</div>
+            <input type="email" id="input-email" name="email" placeholder="operator@absolute.network" autocomplete="off">
+          </div>
+        </div>
+
+        <!-- STEP 2: Dropdown Sector -->
+        <div class="step-view">
+          <div class="step-num">03 / CLEARANCE</div>
+          <h1 class="step-title">PROTOCOL<br>ASSIGNMENT</h1>
+          <div class="scramble-text" data-target="Select the operational sector corresponding to your current deployment phase. Falsifying sector designation is a class-A corporate offense."></div>
+          
+          <input type="hidden" id="input-sector" name="clearance_level" value="">
+          <div class="custom-select" id="sector-select">
+            <div class="select-trigger">
+              <span id="select-label">SELECT ASSIGNMENT SECTOR</span>
+              <span>+</span>
+            </div>
+            <div class="select-options">
+              <div class="select-option" data-value="SECTOR_A">SECTOR A // RADIANCE TACTICAL FRONT</div>
+              <div class="select-option" data-value="SECTOR_B">SECTOR B // ENDFIELD LOGISTICS TELEMETRY</div>
+              <div class="select-option" data-value="SECTOR_C">SECTOR C // CORE INFRASTRUCTURE ARCHIVE</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- STEP 3: Mandatory Directives -->
+        <div class="step-view">
+          <div class="step-num">04 / COMPLIANCE</div>
+          <h1 class="step-title">MANDATORY<br>DIRECTIVES</h1>
+          <div class="scramble-text" data-target="All directives must be actively verified and acknowledged to unlock the final transmission relay. Read carefully."></div>
+          
+          <div class="directives-grid">
+            <!-- 5 blocks generated dynamically to keep HTML clean but fully functional -->
+            <label class="directive-block">
+              <div class="directive-text">1. VERIFY TELEMETRY INTEGRITY & GATEWAY HANDSHAKE</div>
+              <div class="status-box"></div>
+              <input type="checkbox" name="directive_1" class="dir-check" hidden>
+            </label>
+            <label class="directive-block">
+              <div class="directive-text">2. ACKNOWLEDGE ABSOLUTE DATA PROTECTION MANDATE</div>
+              <div class="status-box"></div>
+              <input type="checkbox" name="directive_2" class="dir-check" hidden>
+            </label>
+            <label class="directive-block">
+              <div class="directive-text">3. ACCEPT REAL-TIME LOG MONITORING PROTOCOLS</div>
+              <div class="status-box"></div>
+              <input type="checkbox" name="directive_3" class="dir-check" hidden>
+            </label>
+            <label class="directive-block">
+              <div class="directive-text">4. CONFIRM HARDWARE ENCRYPTION SIGNATURE MATCH</div>
+              <div class="status-box"></div>
+              <input type="checkbox" name="directive_4" class="dir-check" hidden>
+            </label>
+            <label class="directive-block">
+              <div class="directive-text">5. WAIVE APPEAL RIGHTS REGARDING SIGNATURE BLACKLISTS</div>
+              <div class="status-box"></div>
+              <input type="checkbox" name="directive_5" class="dir-check" hidden>
+            </label>
+          </div>
+        </div>
+
+        <!-- STEP 4: Review / Submit -->
+        <div class="step-view">
+          <div class="step-num">05 / VERIFICATION</div>
+          <h1 class="step-title">FINAL<br>REVIEW</h1>
+          <div class="scramble-text" data-target="System readiness verified. You are about to invoke a permanent record entry via the Formspree gateway. Acknowledge and transmit."></div>
+          <div style="font-family: 'Consolas', monospace; color: var(--abs-accent); border-left: 2px solid var(--abs-accent); padding-left: 15px; margin-bottom: 20px;">
+            > IDENTIFIER LOGGED<br>
+            > DISPATCH ROUTE CONFIRMED<br>
+            > SECTOR LOCKED<br>
+            > DIRECTIVES 5/5 ACKNOWLEDGED
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="nav-bar">
+      <button type="button" class="btn" id="btn-prev" disabled>PREVIOUS</button>
+      <button type="button" class="btn" id="btn-next">NEXT STEP</button>
+      <button type="button" class="btn btn-submit" id="btn-submit" style="display:none;">INITIATE TRANSMISSION</button>
+    </div>
+  </form>
+</div>
+
+<div class="modal-overlay" id="intercept-modal">
+  <div class="arrow-stream-container">
+    <div class="arrow-stream stream-top">&gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt;</div>
+    <div class="arrow-stream stream-bottom">&lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt;</div>
+  </div>
+  
+  <div class="tactical-dialog">
+    <div class="dialog-title">CRITICAL INTERCEPT</div>
+    <div style="font-family:'Consolas', monospace; color:#ff7777; letter-spacing:4px;">>>> ABSOLUTE CLEARANCE PROTOCOL <<<</div>
+    
+    <div class="dialog-body">
+      <strong>WARNING: SECURITY CLEARANCE CHECK ENGAGED.</strong><br><br>
+      Transmitting fake data or fraudulent history logs triggers an instant permanent ban clearance signature blacklist penalty across all Absolute Industries servers.<br><br>
+      Do you confirm this transmission log as genuine?
+    </div>
+
+    <div style="display:flex; flex-direction:column; align-items:center;">
+      <button type="button" class="btn-danger" id="btn-confirm-submit">CONFIRM TRANSMISSION</button>
+      <button type="button" class="btn-cancel" id="btn-abort">ABORT</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  // Cursor Logic
+  const cursorDot = document.getElementById('cursor-dot');
+  const cursorRing = document.getElementById('cursor-ring');
+  let mouseX = window.innerWidth / 2;
+  let mouseY = window.innerHeight / 2;
+  let ringX = mouseX;
+  let ringY = mouseY;
+
+  window.addEventListener('mousemove', (e) => {
+    mouseX = e.clientX;
+    mouseY = e.clientY;
+    cursorDot.style.left = `${mouseX}px`;
+    cursorDot.style.top = `${mouseY}px`;
+  });
+
+  function animateCursor() {
+    // Easing for ring trail
+    ringX += (mouseX - ringX) * 0.2;
+    ringY += (mouseY - ringY) * 0.2;
+    cursorRing.style.left = `${ringX}px`;
+    cursorRing.style.top = `${ringY}px`;
+    requestAnimationFrame(animateCursor);
+  }
+  animateCursor();
+
+  // Hover states for cursor ring
+  document.querySelectorAll('input, button, .select-trigger, .select-option, .directive-block').forEach(el => {
+    el.addEventListener('mouseenter', () => cursorRing.classList.add('active'));
+    el.addEventListener('mouseleave', () => cursorRing.classList.remove('active'));
+  });
+
+  // Zero-Shift Text Decryption Engine
+  const scrambleChars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%&*';
+  
+  function scrambleText(element) {
+    const target = element.getAttribute('data-target');
+    if (!target) return;
+    
+    let iteration = 0;
+    const totalFrames = 30; // Fast and snappy
+    
+    clearInterval(element.scrambleInterval);
+    
+    element.scrambleInterval = setInterval(() => {
+      element.innerText = target.split('').map((char, index) => {
+        if (char === ' ') return ' ';
+        // Reveal based on progress
+        if (index < (iteration / totalFrames) * target.length) {
+          return target[index];
+        }
+        return scrambleChars[Math.floor(Math.random() * scrambleChars.length)];
+      }).join('');
+      
+      if (iteration >= totalFrames) {
+        clearInterval(element.scrambleInterval);
+        element.innerText = target;
+      }
+      iteration++;
+    }, 20); // 20ms frame
+  }
+
+  // Wizard Navigation Logic
+  let currentStep = 0;
+  const totalSteps = 5;
+  const track = document.getElementById('wizard-track');
+  const btnPrev = document.getElementById('btn-prev');
+  const btnNext = document.getElementById('btn-next');
+  const btnSubmitInit = document.getElementById('btn-submit');
+  const pips = document.querySelectorAll('.step-pip');
+  const views = document.querySelectorAll('.step-view');
+
+  function validateStep(step) {
+    if (step === 0) {
+      const val = document.getElementById('input-op-id').value.trim();
+      return val.length >= 3;
+    }
+    if (step === 1) {
+      const val = document.getElementById('input-email').value.trim();
+      const re = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      return re.test(val);
+    }
+    if (step === 2) {
+      return document.getElementById('input-sector').value !== '';
+    }
+    if (step === 3) {
+      const checks = document.querySelectorAll('.dir-check');
+      let allChecked = true;
+      checks.forEach(c => { if(!c.checked) allChecked = false; });
+      return allChecked;
+    }
+    return true;
+  }
+
+  function updateWizard() {
+    track.style.transform = `translateX(-${currentStep * 20}%)`;
+    
+    // Update Pips
+    pips.forEach((pip, idx) => {
+      pip.classList.remove('active', 'completed');
+      if (idx < currentStep) pip.classList.add('completed');
+      if (idx === currentStep) pip.classList.add('active');
+    });
+
+    // Run Decryption on current view
+    const currentScramble = views[currentStep].querySelector('.scramble-text');
+    if (currentScramble) scrambleText(currentScramble);
+
+    // Button states
+    btnPrev.disabled = currentStep === 0;
+    
+    if (currentStep === totalSteps - 1) {
+      btnNext.style.display = 'none';
+      btnSubmitInit.style.display = 'block';
+    } else {
+      btnNext.style.display = 'block';
+      btnSubmitInit.style.display = 'none';
+    }
+
+    checkValidation();
+  }
+
+  function checkValidation() {
+    const isValid = validateStep(currentStep);
+    if (currentStep < totalSteps - 1) {
+      btnNext.disabled = !isValid;
+    }
+  }
+
+  btnNext.addEventListener('click', () => {
+    if (validateStep(currentStep) && currentStep < totalSteps - 1) {
+      currentStep++;
+      updateWizard();
+    }
+  });
+
+  btnPrev.addEventListener('click', () => {
+    if (currentStep > 0) {
+      currentStep--;
+      updateWizard();
+    }
+  });
+
+  // Re-validate on input
+  document.getElementById('input-op-id').addEventListener('input', checkValidation);
+  document.getElementById('input-email').addEventListener('input', checkValidation);
+
+  // Custom Select Logic
+  const selectTrigger = document.querySelector('.select-trigger');
+  const customSelect = document.getElementById('sector-select');
+  const sectorInput = document.getElementById('input-sector');
+  const selectLabel = document.getElementById('select-label');
+
+  selectTrigger.addEventListener('click', () => {
+    customSelect.classList.toggle('open');
+  });
+
+  document.querySelectorAll('.select-option').forEach(opt => {
+    opt.addEventListener('click', () => {
+      sectorInput.value = opt.getAttribute('data-value');
+      selectLabel.innerText = opt.innerText;
+      selectTrigger.classList.add('selected');
+      customSelect.classList.remove('open');
+      checkValidation();
+    });
+  });
+
+  // Checkbox Directives Logic
+  document.querySelectorAll('.directive-block').forEach(block => {
+    block.addEventListener('click', (e) => {
+      // Prevent default label click behavior to handle it manually for styles
+      e.preventDefault(); 
+      const checkbox = block.querySelector('.dir-check');
+      checkbox.checked = !checkbox.checked;
+      
+      if(checkbox.checked) {
+        block.classList.add('active');
+      } else {
+        block.classList.remove('active');
+      }
+      checkValidation();
+    });
+  });
+
+  // Intercept Modal Logic
+  const modal = document.getElementById('intercept-modal');
+  const form = document.getElementById('main-form');
+
+  btnSubmitInit.addEventListener('click', () => {
+    modal.classList.add('active');
+  });
+
+  document.getElementById('btn-abort').addEventListener('click', () => {
+    modal.classList.remove('active');
+  });
+
+  document.getElementById('btn-confirm-submit').addEventListener('click', () => {
+    form.submit();
+  });
+
+  // Init first view scramble
+  updateWizard();
+
+</script>
+</body>
+</html>
