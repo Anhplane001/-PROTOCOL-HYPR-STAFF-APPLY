@@ -58,25 +58,7 @@
   }
 
   /* CRT Overlay Scanlines */
-  .crt-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    background: linear-gradient(
-      rgba(18, 16, 16, 0) 50%, 
-      rgba(0, 0, 0, 0.35) 50%
-    ), linear-gradient(
-      90deg,
-      rgba(255, 0, 0, 0.03),
-      rgba(0, 255, 0, 0.01),
-      rgba(0, 0, 255, 0.03)
-    );
-    background-size: 100% 3px, 6px 100%;
-    z-index: 4000;
-    pointer-events: none;
-    opacity: 0.85;
-  }
-
-  .splash-screen {
+   .splash-screen {
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
     background: var(--abs-bg);
