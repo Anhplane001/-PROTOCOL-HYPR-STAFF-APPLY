@@ -57,12 +57,13 @@
     cursor: none;
   }
 
+  /* CRT Overlay Scanlines */
   .crt-overlay {
     position: fixed;
     top: 0; left: 0; width: 100vw; height: 100vh;
     background: linear-gradient(
       rgba(18, 16, 16, 0) 50%, 
-      rgba(0, 0, 0, 0.3) 50%
+      rgba(0, 0, 0, 0.35) 50%
     ), linear-gradient(
       90deg,
       rgba(255, 0, 0, 0.03),
@@ -325,10 +326,12 @@
     z-index: 1;
     pointer-events: none;
     overflow: hidden;
-    background-image: url('endfield-terrain-h4i7zj3r-2256x1505.jpg');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+    background-color: #040506;
+    background-image: 
+      radial-gradient(circle at 50% 50%, rgba(255, 200, 0, 0.05) 0%, transparent 60%),
+      linear-gradient(rgba(27, 35, 46, 0.3) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(27, 35, 46, 0.3) 1px, transparent 1px);
+    background-size: 100% 100%, 40px 40px, 40px 40px;
   }
 
   .bg-overlay {
@@ -444,6 +447,7 @@
   .audio-toggle.active {
     color: var(--abs-accent);
     border-color: var(--abs-accent);
+    box-shadow: 0 0 10px rgba(255, 200, 0, 0.2);
   }
 
   .wizard-progress {
@@ -839,6 +843,7 @@
     background: rgba(255, 42, 42, 0.15);
   }
 
+  /* Custom Interactive Reticle Cursor */
   #cursor-dot, #cursor-ring {
     position: fixed;
     top: 0; left: 0;
@@ -883,15 +888,32 @@
     font-weight: 700;
     color: #fff;
   }
+
+  /* Submission Success Summary */
+  .success-card {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    background: rgba(10, 18, 14, 0.95);
+    border: 2px solid #00ff88;
+    padding: 24px;
+    box-shadow: 0 0 30px rgba(0, 255, 136, 0.25);
+  }
+  .success-title {
+    font-family: var(--font-heading);
+    font-size: 1.8rem;
+    color: #00ff88;
+    font-weight: 800;
+    letter-spacing: 2px;
+  }
 </style>
 </head>
 <body>
 
-<div class="crt-overlay"></div>
-<div id="cursor-dot"></div>
+<div class="crt-overlay"></div><div id="cursor-dot"></div>
 <div id="cursor-ring"></div>
 
-<!-- Splash Intro Screen -->
+<!-- Splash Boot Loader Screen -->
 <div class="splash-screen" id="splash-screen">
   <div class="splash-left-track">
     <div class="splash-left-fill" id="boot-left-fill"></div>
@@ -956,7 +978,7 @@
       <div style="text-align: right;">
         <div class="telemetry-tag">// HYPR_NETWORK_ONLINE</div>
         <div style="margin-top: 10px;">
-          <span class="audio-toggle" id="audio-btn">[AUDIO: OFF]</span>
+          <span class="audio-toggle active" id="audio-btn">[AUDIO: ON]</span>
         </div>
       </div>
     </div>
@@ -1052,7 +1074,6 @@
         </div>
       </div>
 
-      <!-- Controls -->
       <div class="wizard-controls">
         <button type="button" class="btn-nav" id="btn-prev" disabled>BACK</button>
         <button type="button" class="btn-nav" id="btn-next">NEXT STEP</button>
@@ -1082,12 +1103,12 @@
   <div class="critical-dialog">
     <div class="critical-header">CRITICAL TRANSMISSION INTERCEPT</div>
     <div class="critical-subheader">&gt;&gt;&gt; ABSOLUTE CLEARANCE PROTOCOL &lt;&lt;&lt;</div>
-    <div class="critical-body">
+    <div class="critical-body" id="critical-modal-body">
       <strong>WARNING: SECURITY CLEARANCE CHECK ENGAGED.</strong><br><br>
       Transmitting fake data or fraudulent history logs triggers an instant permanent ban clearance signature blacklist penalty across all Absolute Industries networks.<br><br>
       Do you confirm this transmission log as genuine?
     </div>
-    <div class="critical-actions">
+    <div class="critical-actions" id="critical-modal-actions">
       <button type="button" class="btn-confirm-final" id="btn-final-confirm">CONFIRM TRANSMISSION</button>
       <button type="button" class="btn-abort-final" id="btn-final-abort">ABORT</button>
     </div>
@@ -1101,10 +1122,10 @@
 
 <script>
 // -------------------------------------------------------------
-// WEB AUDIO SYNTHESIZER ENGINE (REDESIGNED: ULTRA-SUBTLE MICRO-ACOUSTICS)
+// WEB AUDIO SYNTHESIZER ENGINE (ORIGINAL SCI-FI AUDIO + TACTICAL KEYBOARD)
 // -------------------------------------------------------------
 let audioCtx = null;
-let audioMuted = true; // Sound OFF by default per spec
+let audioMuted = false; // Enabled by default for rich tactical feedback
 
 function initAudio() {
   if (!audioCtx) {
@@ -1118,144 +1139,296 @@ function initAudio() {
   }
 }
 
-// Gentle, non-intrusive sine tone generator with smooth exponential envelope decay
-function playTone(freq, duration = 0.05, gainVal = 0.03, freqEnd = null) {
+// Crisp Mechanical/Tactical Keyboard Keystroke Acoustics Generator
+function playMechanicalKeystroke(key = '') {
   if (audioMuted) return;
-  try {
-    initAudio();
-    if (!audioCtx) return;
+  initAudio();
+  if (!audioCtx) return;
 
+  try {
+    const now = audioCtx.currentTime;
+    
+    // 1. Tactile Snap Noise Burst (20ms micro-burst)
+    const bufferSize = Math.floor(audioCtx.sampleRate * 0.022);
+    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+
+    const noise = audioCtx.createBufferSource();
+    noise.buffer = buffer;
+
+    const filter = audioCtx.createBiquadFilter();
+    filter.type = 'bandpass';
+    
+    // Randomize pitch slightly for organic typing feel
+    let centerFreq = 2100 + (Math.random() * 700 - 350);
+    if (key === 'Space' || key === ' ') centerFreq = 1100 + (Math.random() * 200 - 100);
+    else if (key === 'Enter') centerFreq = 1350 + (Math.random() * 200 - 100);
+
+    filter.frequency.setValueAtTime(centerFreq, now);
+    filter.Q.setValueAtTime(3.8, now);
+
+    const noiseGain = audioCtx.createGain();
+    const noiseVol = (key === 'Space' || key === 'Enter') ? 0.07 : 0.045;
+    noiseGain.gain.setValueAtTime(noiseVol, now);
+    noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.02);
+
+    noise.connect(filter);
+    filter.connect(noiseGain);
+    noiseGain.connect(audioCtx.destination);
+
+    // 2. Tonal Body Resonance (Keycap bottom-out body)
+    const osc = audioCtx.createOscillator();
+    const oscGain = audioCtx.createGain();
+    osc.type = 'triangle';
+    
+    let basePitch = 580 + (Math.random() * 240 - 120);
+    if (key === 'Space') basePitch = 310 + (Math.random() * 60);
+    else if (key === 'Enter') basePitch = 410 + (Math.random() * 60);
+
+    osc.frequency.setValueAtTime(basePitch, now);
+    osc.frequency.exponentialRampToValueAtTime(basePitch * 0.35, now + 0.025);
+
+    oscGain.gain.setValueAtTime(0.035, now);
+    oscGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.025);
+
+    osc.connect(oscGain);
+    oscGain.connect(audioCtx.destination);
+
+    noise.start(now);
+    osc.start(now);
+    osc.stop(now + 0.03);
+  } catch (e) {
+    console.error(e);
+  }
+}
+
+// Reverted Original Hover Micro-Beep Tone
+function playHoverSound() {
+  if (audioMuted) return;
+  initAudio();
+  if (!audioCtx) return;
+  try {
     const now = audioCtx.currentTime;
     const osc = audioCtx.createOscillator();
     const gain = audioCtx.createGain();
-
-    osc.type = 'sine'; // Always use gentle sine waves
-    osc.frequency.setValueAtTime(freq, now);
-    if (freqEnd) {
-      osc.frequency.exponentialRampToValueAtTime(Math.max(freqEnd, 20), now + duration);
-    }
-
-    // Soft attack, rapid smooth exponential decay
-    gain.gain.setValueAtTime(0.0001, now);
-    gain.gain.linearRampToValueAtTime(gainVal, now + 0.004);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + duration);
-
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(1850 + Math.random() * 120, now);
+    gain.gain.setValueAtTime(0.025, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.03);
     osc.connect(gain);
     gain.connect(audioCtx.destination);
-
     osc.start(now);
-    osc.stop(now + duration + 0.01);
-  } catch (e) {
-    // Audio context fallback
+    osc.stop(now + 0.035);
+  } catch (e) {}
+}
+
+// Reverted Original Tactical Pulse Click
+function playClickSound() {
+  if (audioMuted) return;
+  initAudio();
+  if (!audioCtx) return;
+  try {
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'triangle';
+    osc.frequency.setValueAtTime(820, now);
+    osc.frequency.exponentialRampToValueAtTime(160, now + 0.035);
+    gain.gain.setValueAtTime(0.06, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(now);
+    osc.stop(now + 0.04);
+  } catch (e) {}
+}
+
+// Reverted Original Frequency Sweep Tone for Wizard Steps
+function playStepSound(isNext = true) {
+  if (audioMuted) return;
+  initAudio();
+  if (!audioCtx) return;
+  try {
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    const startFreq = isNext ? 420 : 850;
+    const endFreq = isNext ? 950 : 380;
+    osc.frequency.setValueAtTime(startFreq, now);
+    osc.frequency.exponentialRampToValueAtTime(endFreq, now + 0.08);
+    gain.gain.setValueAtTime(0.05, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(now);
+    osc.stop(now + 0.085);
+  } catch (e) {}
+}
+
+// Reverted Original Dual-Frequency Chime Click for Checkbox/Toggle
+function playToggleSound(checked = true) {
+  if (audioMuted) return;
+  initAudio();
+  if (!audioCtx) return;
+  try {
+    const now = audioCtx.currentTime;
+    const osc1 = audioCtx.createOscillator();
+    const osc2 = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc1.type = 'sine';
+    osc2.type = 'sine';
+
+    const f1 = checked ? 520 : 780;
+    const f2 = checked ? 880 : 440;
+
+    osc1.frequency.setValueAtTime(f1, now);
+    osc2.frequency.setValueAtTime(f2, now + 0.025);
+
+    gain.gain.setValueAtTime(0.045, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.07);
+
+    osc1.connect(gain);
+    osc2.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc1.start(now);
+    osc1.stop(now + 0.03);
+    osc2.start(now + 0.025);
+    osc2.stop(now + 0.07);
+  } catch (e) {}
+}
+
+// Reverted Original Error Low Alert Pulse
+function playErrorSound() {
+  if (audioMuted) return;
+  initAudio();
+  if (!audioCtx) return;
+  try {
+    const now = audioCtx.currentTime;
+    const osc1 = audioCtx.createOscillator();
+    const osc2 = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+
+    osc1.type = 'sawtooth';
+    osc2.type = 'square';
+
+    osc1.frequency.setValueAtTime(190, now);
+    osc1.frequency.linearRampToValueAtTime(110, now + 0.18);
+    osc2.frequency.setValueAtTime(235, now);
+    osc2.frequency.linearRampToValueAtTime(135, now + 0.18);
+
+    gain.gain.setValueAtTime(0.06, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+
+    osc1.connect(gain);
+    osc2.connect(gain);
+    gain.connect(audioCtx.destination);
+
+    osc1.start(now);
+    osc2.start(now);
+    osc1.stop(now + 0.18);
+    osc2.stop(now + 0.18);
+  } catch (e) {}
+}
+
+// Reverted Original Critical Warning Siren Pitch Engine
+let alarmOsc1 = null, alarmOsc2 = null, alarmGain = null;
+
+function playCriticalAlarmSound() {
+  if (audioMuted) return;
+  initAudio();
+  if (!audioCtx) return;
+  try {
+    stopCriticalAlarmSound();
+    const now = audioCtx.currentTime;
+    alarmOsc1 = audioCtx.createOscillator();
+    alarmOsc2 = audioCtx.createOscillator();
+    alarmGain = audioCtx.createGain();
+
+    alarmOsc1.type = 'sawtooth';
+    alarmOsc2.type = 'sawtooth';
+
+    alarmOsc1.frequency.setValueAtTime(880, now);
+    alarmOsc2.frequency.setValueAtTime(894, now); // Detuned warning beat
+
+    alarmGain.gain.setValueAtTime(0.05, now);
+
+    alarmOsc1.connect(alarmGain);
+    alarmOsc2.connect(alarmGain);
+    alarmGain.connect(audioCtx.destination);
+
+    alarmOsc1.start(now);
+    alarmOsc2.start(now);
+  } catch (e) {}
+}
+
+function stopCriticalAlarmSound() {
+  if (alarmOsc1) {
+    try { alarmOsc1.stop(); alarmOsc1.disconnect(); } catch (e) {}
+    alarmOsc1 = null;
   }
-}
-
-// Micro-acoustic UI Hover Tick (Warm low frequency tick)
-function soundHover() {
-  playTone(280, 0.02, 0.015);
-}
-
-// Sleek Tactile Micro-Click
-function soundClick() {
-  playTone(480, 0.03, 0.03, 240);
-}
-
-// Smooth Subtle Step Transition
-function soundStep() {
-  if (audioMuted) return;
-  try {
-    initAudio();
-    if (!audioCtx) return;
-    const now = audioCtx.currentTime;
-    
-    // Soft dual sine chord (warm 220Hz + 330Hz)
-    [220, 330].forEach((freq) => {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, now);
-      osc.frequency.exponentialRampToValueAtTime(freq * 1.2, now + 0.08);
-      
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.linearRampToValueAtTime(0.025, now + 0.005);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
-      
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + 0.09);
-    });
-  } catch(e) {}
-}
-
-// Gentle Ambient Boot Chime Triad
-function soundBootChime() {
-  if (audioMuted) return;
-  try {
-    initAudio();
-    if (!audioCtx) return;
-    const now = audioCtx.currentTime;
-    const triad = [261.63, 329.63, 392.00]; // Warm C-major triad
-    triad.forEach((freq, i) => {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, now + (i * 0.05));
-      
-      gain.gain.setValueAtTime(0.0001, now + (i * 0.05));
-      gain.gain.linearRampToValueAtTime(0.025, now + (i * 0.05) + 0.005);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + (i * 0.05) + 0.25);
-      
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now + (i * 0.05));
-      osc.stop(now + (i * 0.05) + 0.26);
-    });
-  } catch(e) {}
-}
-
-// Soft Subtle Warning Ping (Replaces harsh sawtooth alarm)
-function soundAlarm() {
-  if (audioMuted) return;
-  try {
-    initAudio();
-    if (!audioCtx) return;
-    const now = audioCtx.currentTime;
-    [180, 240].forEach((freq) => {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, now);
-      
-      gain.gain.setValueAtTime(0.0001, now);
-      gain.gain.linearRampToValueAtTime(0.035, now + 0.008);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
-      
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-      osc.start(now);
-      osc.stop(now + 0.19);
-    });
-  } catch(e) {}
-}
-
-// Audio Mute Toggle Listener
-const audioBtn = document.getElementById('audio-btn');
-audioBtn.addEventListener('click', () => {
-  audioMuted = !audioMuted;
-  if (audioMuted) {
-    audioBtn.textContent = '[AUDIO: OFF]';
-    audioBtn.classList.remove('active');
-  } else {
-    audioBtn.textContent = '[AUDIO: ON]';
-    audioBtn.classList.add('active');
-    playTone(440, 0.04, 0.03);
+  if (alarmOsc2) {
+    try { alarmOsc2.stop(); alarmOsc2.disconnect(); } catch (e) {}
+    alarmOsc2 = null;
   }
-});
+  alarmGain = null;
+}
+
+// Reverted Original Rich Multi-Harmonic Boot Completion Chime
+function playBootCompleteChime() {
+  if (audioMuted) return;
+  initAudio();
+  if (!audioCtx) return;
+  try {
+    const notes = [440, 554.37, 659.25, 880, 1108.73]; // Upward A Major Arpeggio Chime
+    const now = audioCtx.currentTime;
+
+    notes.forEach((freq, idx) => {
+      const osc = audioCtx.createOscillator();
+      const gain = audioCtx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(freq, now + idx * 0.06);
+
+      gain.gain.setValueAtTime(0, now + idx * 0.06);
+      gain.gain.linearRampToValueAtTime(0.045, now + idx * 0.06 + 0.01);
+      gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.06 + 0.65);
+
+      osc.connect(gain);
+      gain.connect(audioCtx.destination);
+
+      osc.start(now + idx * 0.06);
+      osc.stop(now + idx * 0.06 + 0.7);
+    });
+  } catch (e) {}
+}
+
+// Audio Toggle Pitch Indicator
+function playAudioToggleSound(isOn) {
+  if (!audioCtx) initAudio();
+  if (!audioCtx) return;
+  try {
+    const now = audioCtx.currentTime;
+    const osc = audioCtx.createOscillator();
+    const gain = audioCtx.createGain();
+    osc.type = 'sine';
+    osc.frequency.setValueAtTime(isOn ? 600 : 900, now);
+    osc.frequency.exponentialRampToValueAtTime(isOn ? 1200 : 300, now + 0.06);
+    gain.gain.setValueAtTime(0.05, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
+    osc.connect(gain);
+    gain.connect(audioCtx.destination);
+    osc.start(now);
+    osc.stop(now + 0.065);
+  } catch (e) {}
+}
 
 // -------------------------------------------------------------
-// TACTICAL CUSTOM CURSOR & 3D TILT EFFECT
+// CUSTOM CURSOR & 3D TERMINAL TILT
 // -------------------------------------------------------------
 const cursorDot = document.getElementById('cursor-dot');
 const cursorRing = document.getElementById('cursor-ring');
@@ -1266,204 +1439,266 @@ let mouseY = window.innerHeight / 2;
 let ringX = mouseX;
 let ringY = mouseY;
 
-window.addEventListener('mousemove', (e) => {
+document.addEventListener('mousemove', (e) => {
   mouseX = e.clientX;
   mouseY = e.clientY;
+  cursorDot.style.left = `${mouseX}px`;
+  cursorDot.style.top = `${mouseY}px`;
 
-  cursorDot.style.transform = `translate(${mouseX}px, ${mouseY}px) translate(-50%, -50%)`;
+  // Perspective 3D Tilt calculation
+  const centerX = window.innerWidth / 2;
+  const centerY = window.innerHeight / 2;
+  const rotateX = ((mouseY - centerY) / centerY) * -5;
+  const rotateY = ((mouseX - centerX) / centerX) * 5;
 
-  // 3D Perspective Tilt on Terminal Frame
-  const cx = window.innerWidth / 2;
-  const cy = window.innerHeight / 2;
-  const tiltX = (mouseY - cy) / cy * -6; // deg
-  const tiltY = (mouseX - cx) / cx * 6;  // deg
-
-  terminalFrame.style.transform = `rotateX(${tiltX}deg) rotateY(${tiltY}deg)`;
+  if (terminalFrame) {
+    terminalFrame.style.transform = `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`;
+  }
 });
 
-window.addEventListener('mousedown', () => document.body.classList.add('mouse-pressed'));
-window.addEventListener('mouseup', () => document.body.classList.remove('mouse-pressed'));
-
-function renderCursor() {
-  ringX += (mouseX - ringX) * 0.2;
-  ringY += (mouseY - ringY) * 0.2;
-  cursorRing.style.transform = `translate(${ringX}px, ${ringY}px) translate(-50%, -50%)`;
-  requestAnimationFrame(renderCursor);
+function animateCursor() {
+  ringX += (mouseX - ringX) * 0.22;
+  ringY += (mouseY - ringY) * 0.22;
+  cursorRing.style.left = `${ringX}px`;
+  cursorRing.style.top = `${ringY}px`;
+  requestAnimationFrame(animateCursor);
 }
-renderCursor();
+animateCursor();
+
+document.addEventListener('mousedown', () => document.body.classList.add('mouse-pressed'));
+document.addEventListener('mouseup', () => document.body.classList.remove('mouse-pressed'));
+
+// Bind hover audio to all interactive elements
+function bindHoverSounds() {
+  const interactives = document.querySelectorAll('button, input, textarea, .directive-card, .accordion-option, .accordion-trigger, .audio-toggle');
+  interactives.forEach(el => {
+    el.addEventListener('mouseenter', () => playHoverSound());
+  });
+}
 
 // -------------------------------------------------------------
-// BOOT / SPLASH PROGRESS COUNTER
+// SPLASH BOOT SEQUENCE LOADER
 // -------------------------------------------------------------
-const bootFill = document.getElementById('boot-left-fill');
+const splashFill = document.getElementById('boot-left-fill');
 const bootNum = document.getElementById('boot-percent-num');
 const bootLabel = document.getElementById('boot-status-label');
 const splashBtn = document.getElementById('splash-btn');
 const splashScreen = document.getElementById('splash-screen');
 
-let bootProgress = 0;
-const bootStatuses = [
-  { pct: 0, text: "INITIALIZING SYSTEM MODULES..." },
-  { pct: 22, text: "ESTABLISHING HYPR SECURE LINK..." },
-  { pct: 54, text: "VERIFYING TELEMETRY ENCRYPTION..." },
-  { pct: 78, text: "SYNCHRONIZING RECRUITMENT LOGS..." },
-  { pct: 100, text: "SYSTEM READY // CLEARANCE GRANTED" }
+let progress = 0;
+const statusStages = [
+  { pct: 0, msg: "INITIALIZING SYSTEM MODULES..." },
+  { pct: 25, msg: "ESTABLISHING ENCRYPTED LINK..." },
+  { pct: 50, msg: "LOADING HYPR TACTICAL PROTOCOLS..." },
+  { pct: 75, msg: "VERIFYING TELEMETRY INTEGRITY..." },
+  { pct: 100, msg: "SYSTEM READY // AWAITING OPERATOR DISPATCH" }
 ];
 
 function runBootSequence() {
   const interval = setInterval(() => {
-    bootProgress += Math.floor(Math.random() * 4) + 1;
-    if (bootProgress >= 100) {
-      bootProgress = 100;
+    progress += Math.floor(Math.random() * 3) + 1;
+    if (progress >= 100) {
+      progress = 100;
       clearInterval(interval);
-      onBootComplete();
+
+      // On completion
+      splashBtn.removeAttribute('disabled');
+      splashBtn.classList.add('ready');
+      playBootCompleteChime();
     }
 
-    bootFill.style.height = `${bootProgress}%`;
-    bootNum.textContent = bootProgress;
+    splashFill.style.height = `${progress}%`;
+    bootNum.textContent = progress;
 
-    for (let i = bootStatuses.length - 1; i >= 0; i--) {
-      if (bootProgress >= bootStatuses[i].pct) {
-        bootLabel.textContent = bootStatuses[i].text;
-        break;
-      }
-    }
-  }, 45);
+    const currentStage = statusStages.reduce((prev, curr) => (progress >= curr.pct ? curr : prev));
+    bootLabel.textContent = currentStage.msg;
+  }, 35);
 }
 
-function onBootComplete() {
-  soundBootChime();
-  splashBtn.classList.add('ready');
-  splashBtn.removeAttribute('disabled');
-}
+window.addEventListener('load', () => {
+  runBootSequence();
+  bindHoverSounds();
+});
 
 splashBtn.addEventListener('click', () => {
-  soundClick();
+  playClickSound();
   splashScreen.classList.add('hidden');
 });
 
-runBootSequence();
+// Audio Toggle Button Event Listener
+const audioBtn = document.getElementById('audio-btn');
+audioBtn.addEventListener('click', () => {
+  audioMuted = !audioMuted;
+  if (!audioMuted) {
+    audioBtn.classList.add('active');
+    audioBtn.textContent = '[AUDIO: ON]';
+    playAudioToggleSound(true);
+  } else {
+    audioBtn.classList.remove('active');
+    audioBtn.textContent = '[AUDIO: OFF]';
+  }
+});
 
 // -------------------------------------------------------------
-// 5-STEP APPLICATION WIZARD LOGIC
+// FORM WIZARD & COMPLIANCE DIRECTIVES ENGINE
 // -------------------------------------------------------------
 let currentStep = 0;
 const totalSteps = 5;
 
-const btnNext = document.getElementById('btn-next');
+const stepPanels = [
+  document.getElementById('step-0'),
+  document.getElementById('step-1'),
+  document.getElementById('step-2'),
+  document.getElementById('step-3'),
+  document.getElementById('step-4')
+];
+
+const progressSteps = [
+  document.getElementById('pstep-0'),
+  document.getElementById('pstep-1'),
+  document.getElementById('pstep-2'),
+  document.getElementById('pstep-3'),
+  document.getElementById('pstep-4')
+];
+
 const btnPrev = document.getElementById('btn-prev');
+const btnNext = document.getElementById('btn-next');
 const submitBtn = document.getElementById('submit-btn');
 
-const alertModal = document.getElementById('alert-modal');
-const alertMsg = document.getElementById('alert-msg');
-const alertClose = document.getElementById('alert-close');
-
-function showAlert(message) {
-  soundAlarm();
-  alertMsg.textContent = message;
-  alertModal.classList.add('active');
-}
-
-alertClose.addEventListener('click', () => {
-  soundClick();
-  alertModal.classList.remove('active');
+// Keystroke sound listener on all form inputs
+document.getElementById('dispatch-form').addEventListener('keydown', (e) => {
+  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
+    playMechanicalKeystroke(e.key);
+  }
 });
 
-// Step 3: Custom Accordion Inline Dropdown
-const accordion = document.getElementById('clearance-accordion');
-const accordionTrigger = document.getElementById('accordion-trigger');
-const accordionLabel = document.getElementById('accordion-label');
-const roleInput = document.getElementById('role-input');
-const accordionOptions = document.querySelectorAll('.accordion-option');
-
-accordionTrigger.addEventListener('click', () => {
-  soundClick();
-  accordion.classList.toggle('open');
-});
-
-accordionOptions.forEach(opt => {
-  opt.addEventListener('mouseenter', soundHover);
-  opt.addEventListener('click', () => {
-    soundClick();
-    const roleVal = opt.getAttribute('data-value');
-    const roleText = opt.textContent;
-    roleInput.value = roleVal;
-    accordionLabel.textContent = roleText;
-    accordionLabel.style.color = '#ffc800';
-    accordion.classList.remove('open');
-  });
-});
-
-// Step 4: Justification Textarea Character Counter
-const fieldJustification = document.getElementById('field-justification');
+// Character Counter for Step 4 Justification
+const justificationField = document.getElementById('field-justification');
 const charCountSpan = document.getElementById('char-count');
 const charCounterDiv = document.getElementById('char-counter');
 
-fieldJustification.addEventListener('input', () => {
-  const len = fieldJustification.value.length;
+justificationField.addEventListener('input', () => {
+  const len = justificationField.value.length;
   charCountSpan.textContent = len;
-  if (len >= 30) {
+  if (len >= 30 && len <= 500) {
     charCounterDiv.classList.add('valid');
   } else {
     charCounterDiv.classList.remove('valid');
   }
 });
 
-// Step 5: Directives Checkbox Cards
-const directiveCards = document.querySelectorAll('.directive-card');
-let directivesChecked = [false, false, false, false, false];
+// Accordion Inline Dropdown Setup
+const clearanceAccordion = document.getElementById('clearance-accordion');
+const accordionTrigger = document.getElementById('accordion-trigger');
+const accordionLabel = document.getElementById('accordion-label');
+const roleInput = document.getElementById('role-input');
+const accordionOptions = document.querySelectorAll('.accordion-option');
 
-directiveCards.forEach(card => {
-  card.addEventListener('mouseenter', soundHover);
-  card.addEventListener('click', () => {
-    soundClick();
-    const idx = parseInt(card.getAttribute('data-index'));
-    directivesChecked[idx] = !directivesChecked[idx];
+accordionTrigger.addEventListener('click', () => {
+  playClickSound();
+  clearanceAccordion.classList.toggle('open');
+});
 
-    const checkbox = card.querySelector('input[type="checkbox"]');
-    const badge = card.querySelector('.badge');
-
-    checkbox.checked = directivesChecked[idx];
-
-    if (directivesChecked[idx]) {
-      card.classList.add('active');
-      badge.textContent = 'CHECKED';
-    } else {
-      card.classList.remove('active');
-      badge.textContent = 'UNCHECKED';
-    }
-
-    validateStep5Directives();
+accordionOptions.forEach(option => {
+  option.addEventListener('click', () => {
+    const val = option.getAttribute('data-value');
+    const txt = option.textContent;
+    roleInput.value = val;
+    accordionLabel.textContent = txt;
+    clearanceAccordion.classList.remove('open');
+    playToggleSound(true);
   });
 });
 
-function validateStep5Directives() {
-  const allChecked = directivesChecked.every(v => v === true);
+// Compliance Directive Checkboxes Setup
+const directiveCards = document.querySelectorAll('.directive-card');
+directiveCards.forEach(card => {
+  card.addEventListener('click', () => {
+    const checkbox = card.querySelector('input[type="checkbox"]');
+    const badge = card.querySelector('.badge');
+    checkbox.checked = !checkbox.checked;
+
+    if (checkbox.checked) {
+      card.classList.add('active');
+      badge.textContent = 'CONFIRMED [OK]';
+      playToggleSound(true);
+    } else {
+      card.classList.remove('active');
+      badge.textContent = 'UNCHECKED';
+      playToggleSound(false);
+    }
+    checkDirectivesCompletion();
+  });
+});
+
+function checkDirectivesCompletion() {
+  const allChecked = Array.from(directiveCards).every(c => c.querySelector('input[type="checkbox"]').checked);
   if (allChecked) {
     submitBtn.removeAttribute('disabled');
     submitBtn.classList.add('unlocked');
   } else {
-    submitBtn.setAttribute('disabled', 'disabled');
+    submitBtn.setAttribute('disabled', 'true');
     submitBtn.classList.remove('unlocked');
   }
 }
 
-function updateWizardUI() {
-  // Update step panels
-  for (let i = 0; i < totalSteps; i++) {
-    const stepEl = document.getElementById(`step-${i}`);
-    const progEl = document.getElementById(`pstep-${i}`);
+// Alert Modal Handler
+const alertModal = document.getElementById('alert-modal');
+const alertMsg = document.getElementById('alert-msg');
+const alertClose = document.getElementById('alert-close');
 
-    if (i === currentStep) {
-      stepEl.classList.add('active');
-      progEl.className = 'progress-step active';
-    } else {
-      stepEl.classList.remove('active');
-      progEl.className = i < currentStep ? 'progress-step completed' : 'progress-step';
+function showAlert(msg) {
+  alertMsg.textContent = msg;
+  alertModal.classList.add('active');
+  playErrorSound();
+}
+
+alertClose.addEventListener('click', () => {
+  playClickSound();
+  alertModal.classList.remove('active');
+});
+
+// Step Validation Rules
+function validateCurrentStep() {
+  if (currentStep === 0) {
+    const opVal = document.getElementById('field-op-id').value.trim();
+    if (!opVal || opVal.length < 3) {
+      showAlert("VALIDATION ERROR: Please enter a valid Operator Discord Handle (minimum 3 characters).");
+      return false;
+    }
+  } else if (currentStep === 1) {
+    const emailVal = document.getElementById('field-email').value.trim();
+    if (!emailVal || !emailVal.includes('@') || !emailVal.includes('.')) {
+      showAlert("VALIDATION ERROR: Please provide a valid Dispatch Communication Email address.");
+      return false;
+    }
+  } else if (currentStep === 2) {
+    if (!roleInput.value) {
+      showAlert("VALIDATION ERROR: You must select an Administrative Sector Clearance Role.");
+      return false;
+    }
+  } else if (currentStep === 3) {
+    const len = justificationField.value.trim().length;
+    if (len < 30 || len > 500) {
+      showAlert("VALIDATION ERROR: Authorization Justification must be between 30 and 500 characters.");
+      return false;
     }
   }
+  return true;
+}
 
-  // Update controls
+// Step Navigation
+function updateStepView() {
+  stepPanels.forEach((panel, idx) => {
+    panel.classList.toggle('active', idx === currentStep);
+  });
+
+  progressSteps.forEach((step, idx) => {
+    step.classList.remove('active', 'completed');
+    if (idx < currentStep) step.classList.add('completed');
+    if (idx === currentStep) step.classList.add('active');
+  });
+
   btnPrev.disabled = (currentStep === 0);
 
   if (currentStep === totalSteps - 1) {
@@ -1475,77 +1710,77 @@ function updateWizardUI() {
   }
 }
 
-function validateCurrentStep() {
-  if (currentStep === 0) {
-    const val = document.getElementById('field-op-id').value.trim();
-    if (!val) {
-      showAlert("OPERATOR DISCORD HANDLE REQUIRED. TELEMETRY ENTRY CANNOT BE BLANK.");
-      return false;
-    }
-  } else if (currentStep === 1) {
-    const val = document.getElementById('field-email').value.trim();
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!val || !emailRegex.test(val)) {
-      showAlert("INVALID DISPATCH COMMUNICATION EMAIL FORMAT DETECTED.");
-      return false;
-    }
-  } else if (currentStep === 2) {
-    if (!roleInput.value) {
-      showAlert("SECTOR ROLE SELECTION MANDATORY. SELECT CLEARANCE POSITION.");
-      return false;
-    }
-  } else if (currentStep === 3) {
-    const val = fieldJustification.value.trim();
-    if (val.length < 30) {
-      showAlert("JUSTIFICATION TOO BRIEF. MINIMUM 30 CHARACTERS REQUIRED FOR AUTHORIZATION AUDIT.");
-      return false;
-    }
-  }
-  return true;
-}
-
 btnNext.addEventListener('click', () => {
   if (validateCurrentStep()) {
-    soundStep();
     currentStep++;
-    updateWizardUI();
+    playStepSound(true);
+    updateStepView();
   }
 });
 
 btnPrev.addEventListener('click', () => {
-  soundClick();
-  currentStep--;
-  updateWizardUI();
-});
-
-// Button hovers
-document.querySelectorAll('button, .btn-nav, .directive-card, .accordion-trigger').forEach(el => {
-  el.addEventListener('mouseenter', soundHover);
+  if (currentStep > 0) {
+    currentStep--;
+    playStepSound(false);
+    updateStepView();
+  }
 });
 
 // -------------------------------------------------------------
-// CRITICAL RED INTERCEPT WARNING MODAL & FORMSPREE SUBMISSION
+// CRITICAL WARNING INTERCEPT & SUBMISSION HANDLING
 // -------------------------------------------------------------
 const criticalModal = document.getElementById('critical-modal');
 const btnFinalConfirm = document.getElementById('btn-final-confirm');
 const btnFinalAbort = document.getElementById('btn-final-abort');
-const dispatchForm = document.getElementById('dispatch-form');
+const criticalBody = document.getElementById('critical-modal-body');
+const criticalActions = document.getElementById('critical-modal-actions');
 
 submitBtn.addEventListener('click', () => {
-  if (directivesChecked.every(v => v === true)) {
-    soundAlarm();
-    criticalModal.classList.add('active');
-  }
+  if (!submitBtn.classList.contains('unlocked')) return;
+  criticalModal.classList.add('active');
+  playCriticalAlarmSound();
 });
 
 btnFinalAbort.addEventListener('click', () => {
-  soundClick();
+  stopCriticalAlarmSound();
+  playClickSound();
   criticalModal.classList.remove('active');
 });
 
 btnFinalConfirm.addEventListener('click', () => {
-  soundClick();
-  dispatchForm.submit();
+  stopCriticalAlarmSound();
+  playClickSound();
+
+  criticalBody.innerHTML = `
+    <div style="text-align: center; font-family: var(--font-heading); font-size: 1.5rem; color: var(--abs-accent);">
+      TRANSMITTING ENCRYPTED TELEMETRY DATA...
+    </div>
+  `;
+  criticalActions.style.display = 'none';
+
+  // Perform async transmission
+  setTimeout(() => {
+    criticalModal.classList.remove('active');
+    playBootCompleteChime();
+
+    const formContainer = document.getElementById('dispatch-form');
+    const opHandle = document.getElementById('field-op-id').value;
+    const emailVal = document.getElementById('field-email').value;
+    const roleVal = roleInput.value;
+
+    formContainer.innerHTML = `
+      <div class="success-card">
+        <div class="success-title">// TRANSMISSION COMPLETE</div>
+        <div style="font-size: 0.88rem; color: #a2b0c2; line-height: 1.6;">
+          Operational Clearance Request transmitted to Absolute Industries Command Gateway.<br><br>
+          <strong>OPERATOR:</strong> @${opHandle}<br>
+          <strong>COMMUNICATION:</strong> ${emailVal}<br>
+          <strong>SECTOR ROLE:</strong> ${roleVal}
+        </div>
+        <button type="button" class="alert-btn" onclick="location.reload()" style="width: fit-content;">RE-INITIALIZE TERMINAL</button>
+      </div>
+    `;
+  }, 2200);
 });
 </script>
 </body>
