@@ -3,1767 +3,5186 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>ABSOLUTE INDUSTRIES // MODULE: ABSOLUTE RADIANCE</title>
 
-<!-- Modern Sci-Fi Industrial Typography via Google Fonts -->
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&family=Rajdhani:wght@600;700;800;900&display=swap" rel="stylesheet">
+
+<link
+  href="https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=JetBrains+Mono:ital,wght@0,400;0,700;1,400&family=Rajdhani:wght@600;700;800;900&display=swap"
+  rel="stylesheet"
+>
 
 <style>
-  :root {
-    --abs-bg: #040506;
-    --abs-panel: #0b0d10;
-    --abs-panel-translucent: rgba(11, 13, 16, 0.94);
-    --abs-panel-light: #131922;
-    --abs-accent: #ffc800; /* Tactical High-Vis Yellow */
-    --abs-accent-bright: #fff266;
-    --abs-accent-glow: rgba(255, 200, 0, 0.45);
-    --abs-danger: #ff2a2a;
-    --abs-danger-glow: rgba(255, 42, 42, 0.55);
-    --abs-text-main: #f5f7f8;
-    --abs-text-sub: #8e9cb0;
-    --abs-border: #1b232e;
-    --abs-border-light: #2b384a;
 
-    --font-heading: 'Rajdhani', sans-serif;
-    --font-ui: 'Chakra Petch', sans-serif;
-    --font-mono: 'JetBrains Mono', monospace;
+/* =========================================================
+   ABSOLUTE INDUSTRIES
+   CORE VARIABLES
+   ========================================================= */
+
+:root {
+  --abs-bg: #040506;
+  --abs-panel: #0b0d10;
+  --abs-panel-translucent: rgba(11, 13, 16, 0.94);
+  --abs-panel-light: #131922;
+
+  --abs-accent: #ffc800;
+  --abs-accent-bright: #fff266;
+  --abs-accent-glow: rgba(255, 200, 0, 0.45);
+
+  --abs-danger: #ff2a2a;
+  --abs-danger-glow: rgba(255, 42, 42, 0.55);
+
+  --abs-text-main: #f5f7f8;
+  --abs-text-sub: #8e9cb0;
+
+  --abs-border: #1b232e;
+  --abs-border-light: #2b384a;
+
+  --font-heading: 'Rajdhani', sans-serif;
+  --font-ui: 'Chakra Petch', sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+}
+
+
+/* =========================================================
+   RESET
+   ========================================================= */
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+
+  font-family: var(--font-mono);
+
+  user-select: none;
+}
+
+html,
+body {
+  min-height: 100%;
+}
+
+body {
+  background: var(--abs-bg);
+  color: var(--abs-text-main);
+
+  min-height: 100vh;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  padding: 20px;
+
+  position: relative;
+
+  overflow-x: hidden;
+
+  cursor: none;
+}
+
+::selection {
+  background: var(--abs-accent);
+  color: #000;
+}
+
+
+/* =========================================================
+   CRT / SCREEN EFFECT
+   ========================================================= */
+
+.crt-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  width: 100vw;
+  height: 100vh;
+
+  background:
+    linear-gradient(
+      rgba(18,16,16,0) 50%,
+      rgba(0,0,0,0.3) 50%
+    ),
+    linear-gradient(
+      90deg,
+      rgba(255,0,0,0.03),
+      rgba(0,255,0,0.01),
+      rgba(0,0,255,0.03)
+    );
+
+  background-size:
+    100% 3px,
+    6px 100%;
+
+  z-index: 4000;
+
+  pointer-events: none;
+
+  opacity: 0.72;
+}
+
+
+/* =========================================================
+   SPLASH SCREEN
+   ========================================================= */
+
+.splash-screen {
+  position: fixed;
+
+  inset: 0;
+
+  width: 100vw;
+  height: 100vh;
+
+  background: #040506;
+
+  z-index: 5000;
+
+  display: flex;
+
+  overflow: hidden;
+
+  transition:
+    opacity 0.8s cubic-bezier(0.16,1,0.3,1),
+    visibility 0.8s ease;
+}
+
+.splash-screen.hidden {
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+}
+
+
+/* =========================================================
+   LOADING TRACK
+   ========================================================= */
+
+.splash-left-track {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 10px;
+  height: 100%;
+
+  background:
+    rgba(255,255,255,0.045);
+
+  border-right:
+    1px solid rgba(255,255,255,0.1);
+
+  z-index: 20;
+}
+
+.splash-left-fill {
+  position: absolute;
+
+  top: 0;
+  left: 0;
+
+  width: 100%;
+  height: 0%;
+
+  background: var(--abs-accent);
+
+  box-shadow:
+    0 0 20px var(--abs-accent-glow),
+    0 0 10px var(--abs-accent);
+
+  transition:
+    height 0.04s linear;
+}
+
+
+/* =========================================================
+   PERCENTAGE TRACKER
+   ========================================================= */
+
+.splash-percent-tracker {
+  position: absolute;
+
+  left: 28px;
+  top: 20px;
+
+  display: flex;
+  flex-direction: column;
+
+  gap: 6px;
+
+  z-index: 30;
+
+  pointer-events: none;
+
+  white-space: nowrap;
+
+  transition:
+    top 0.04s linear;
+}
+
+.percent-row {
+  display: flex;
+
+  align-items: center;
+
+  gap: 12px;
+}
+
+.tip-connector {
+  width: 22px;
+  height: 2px;
+
+  background: var(--abs-accent);
+
+  box-shadow:
+    0 0 8px var(--abs-accent);
+}
+
+.percent-val {
+  font-family: var(--font-heading);
+
+  font-size: 5.2rem;
+
+  font-weight: 900;
+
+  line-height: 0.82;
+
+  color: var(--abs-accent);
+
+  text-shadow:
+    0 0 25px var(--abs-accent-glow);
+
+  letter-spacing: -2px;
+}
+
+.percent-symbol {
+  font-family: var(--font-ui);
+
+  font-size: 2.2rem;
+
+  font-weight: 800;
+
+  color: var(--abs-accent);
+}
+
+.splash-status-text {
+  font-family: var(--font-mono);
+
+  font-size: 0.8rem;
+
+  color: #a2b0c2;
+
+  letter-spacing: 2px;
+
+  display: flex;
+
+  align-items: center;
+
+  gap: 10px;
+
+  font-weight: 700;
+
+  text-transform: uppercase;
+
+  background:
+    rgba(11,13,16,0.9);
+
+  padding: 6px 14px;
+
+  border:
+    1px solid rgba(255,200,0,0.25);
+
+  border-left:
+    3px solid var(--abs-accent);
+
+  width: fit-content;
+}
+
+.square-icon {
+  color: var(--abs-accent);
+  font-size: 0.65rem;
+}
+
+
+/* =========================================================
+   SPLASH BRANDING
+   ========================================================= */
+
+.splash-right-content {
+  position: absolute;
+
+  right: 8%;
+  top: 50%;
+
+  transform:
+    translateY(-50%);
+
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 28px;
+
+  z-index: 10;
+
+  width: min(700px, 75vw);
+}
+
+.absl-logo-block {
+  display: flex;
+  flex-direction: column;
+}
+
+.logo-top-sub {
+  font-family: var(--font-ui);
+
+  font-size: 0.85rem;
+
+  font-weight: 700;
+
+  letter-spacing: 6px;
+
+  color: var(--abs-accent);
+
+  margin-bottom: 6px;
+}
+
+.logo-title {
+  font-family: var(--font-heading);
+
+  font-size: 5rem;
+
+  font-weight: 900;
+
+  line-height: 0.85;
+
+  color: #fff;
+
+  letter-spacing: 1px;
+
+  text-transform: uppercase;
+}
+
+.module-tag {
+  display: inline-block;
+
+  margin-top: 12px;
+
+  background:
+    var(--abs-accent);
+
+  color: #000;
+
+  font-family: var(--font-ui);
+
+  font-weight: 800;
+
+  font-size: 0.82rem;
+
+  padding: 4px 10px;
+
+  letter-spacing: 2px;
+
+  width: fit-content;
+}
+
+
+/* =========================================================
+   SPLASH TACTICAL INFO
+   ========================================================= */
+
+.splash-tactical-block {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 12px;
+}
+
+.tactical-meta-row {
+  display: flex;
+
+  align-items: flex-start;
+
+  gap: 12px;
+}
+
+.yellow-arrow {
+  color: var(--abs-accent);
+
+  font-size: 0.9rem;
+
+  margin-top: 2px;
+}
+
+.meta-details {
+  display: flex;
+
+  flex-direction: column;
+
+  gap: 4px;
+}
+
+.plus-tag {
+  font-size: 0.7rem;
+
+  color: var(--abs-text-sub);
+
+  border:
+    1px solid var(--abs-border-light);
+
+  padding: 0 4px;
+
+  width: fit-content;
+}
+
+.meta-label {
+  font-family: var(--font-ui);
+
+  font-size: 0.78rem;
+
+  color: #929faf;
+
+  letter-spacing: 2px;
+
+  line-height: 1.4;
+
+  font-weight: 600;
+}
+
+.dot-grid {
+  color: #3b4654;
+
+  font-size: 0.6rem;
+
+  letter-spacing: 3px;
+}
+
+.tactical-divider {
+  width: 100%;
+
+  height: 1px;
+
+  background:
+    var(--abs-border);
+
+  margin: 4px 0;
+}
+
+.tactical-tagline {
+  font-family: var(--font-ui);
+
+  font-size: 0.85rem;
+
+  font-weight: 700;
+
+  color: #fff;
+
+  letter-spacing: 3px;
+
+  text-transform: uppercase;
+}
+
+
+/* =========================================================
+   SPLASH BUTTON
+   ========================================================= */
+
+.splash-enter-btn {
+  margin-top: 10px;
+
+  background: transparent;
+
+  border:
+    1px solid var(--abs-accent);
+
+  color: var(--abs-accent);
+
+  font-family: var(--font-ui);
+
+  padding: 16px 30px;
+
+  font-size: 0.9rem;
+
+  font-weight: 700;
+
+  letter-spacing: 3px;
+
+  cursor: none;
+
+  transition: all 0.3s ease;
+
+  text-transform: uppercase;
+
+  opacity: 0.2;
+
+  pointer-events: none;
+}
+
+.splash-enter-btn.ready {
+  opacity: 1;
+
+  pointer-events: auto;
+
+  background:
+    rgba(255,200,0,0.08);
+
+  box-shadow:
+    0 0 22px rgba(255,200,0,0.25);
+
+  animation:
+    pulseYellow 2s infinite ease-in-out;
+}
+
+.splash-enter-btn.ready:hover {
+  background:
+    var(--abs-accent);
+
+  color: #000;
+
+  box-shadow:
+    0 0 40px var(--abs-accent-glow);
+}
+
+@keyframes pulseYellow {
+  0%,100% {
+    box-shadow:
+      0 0 15px rgba(255,200,0,0.2);
   }
 
-  * {
-    box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-    font-family: var(--font-mono);
-    user-select: none;
+  50% {
+    box-shadow:
+      0 0 32px rgba(255,200,0,0.55);
+  }
+}
+
+
+/* =========================================================
+   BACKGROUND
+   ========================================================= */
+
+.bg-geometry {
+  position: fixed;
+
+  inset: 0;
+
+  width: 100vw;
+  height: 100vh;
+
+  z-index: 1;
+
+  pointer-events: none;
+
+  overflow: hidden;
+}
+
+#terrain-canvas {
+  position: absolute;
+
+  inset: 0;
+
+  width: 100%;
+  height: 100%;
+
+  opacity: 0.4;
+}
+
+
+/* =========================================================
+   MAIN TERMINAL
+   ========================================================= */
+
+.perspective-wrapper {
+  perspective: 1200px;
+
+  z-index: 10;
+
+  width: 100%;
+
+  max-width: 860px;
+}
+
+.terminal-frame {
+  width: 100%;
+
+  background:
+    var(--abs-panel-translucent);
+
+  backdrop-filter:
+    blur(14px);
+
+  border:
+    1px solid var(--abs-border);
+
+  padding: 38px;
+
+  position: relative;
+
+  box-shadow:
+    0 30px 70px rgba(0,0,0,0.9);
+
+  transform-style:
+    preserve-3d;
+
+  transition:
+    transform 0.12s ease-out;
+
+  will-change:
+    transform;
+}
+
+
+/* =========================================================
+   TERMINAL CORNERS
+   ========================================================= */
+
+.bracket-tl,
+.bracket-tr,
+.bracket-bl,
+.bracket-br {
+  position: absolute;
+
+  width: 20px;
+  height: 20px;
+
+  border-color:
+    var(--abs-accent);
+
+  border-style: solid;
+
+  pointer-events: none;
+
+  transform:
+    translateZ(20px);
+}
+
+.bracket-tl {
+  top: -2px;
+  left: -2px;
+
+  border-width:
+    3px 0 0 3px;
+}
+
+.bracket-tr {
+  top: -2px;
+  right: -2px;
+
+  border-width:
+    3px 3px 0 0;
+}
+
+.bracket-bl {
+  bottom: -2px;
+  left: -2px;
+
+  border-width:
+    0 0 3px 3px;
+}
+
+.bracket-br {
+  bottom: -2px;
+  right: -2px;
+
+  border-width:
+    0 3px 3px 0;
+}
+
+
+/* =========================================================
+   HEADER
+   ========================================================= */
+
+.terminal-header {
+  border-bottom:
+    2px solid var(--abs-accent);
+
+  padding-bottom: 18px;
+
+  margin-bottom: 22px;
+
+  display: flex;
+
+  justify-content: space-between;
+
+  align-items: flex-start;
+
+  transform:
+    translateZ(30px);
+}
+
+.protocol-tag {
+  font-family: var(--font-ui);
+
+  font-size: 0.82rem;
+
+  font-weight: 700;
+
+  color: var(--abs-accent);
+
+  letter-spacing: 3px;
+
+  margin-bottom: 4px;
+}
+
+.main-title {
+  font-family: var(--font-heading);
+
+  font-size: 2.2rem;
+
+  font-weight: 800;
+
+  color: var(--abs-text-main);
+
+  letter-spacing: 1.5px;
+
+  line-height: 1;
+
+  text-transform: uppercase;
+}
+
+.sub-tagline {
+  font-size: 0.75rem;
+
+  color: #728296;
+
+  letter-spacing: 2px;
+
+  margin-top: 6px;
+}
+
+.telemetry-tag {
+  font-family: var(--font-mono);
+
+  color: var(--abs-accent);
+
+  font-weight: 700;
+
+  font-size: 0.82rem;
+
+  letter-spacing: 1px;
+
+  animation:
+    sharpFlicker 1s infinite steps(1);
+
+  background:
+    rgba(255,200,0,0.08);
+
+  padding: 5px 10px;
+
+  border:
+    1px solid rgba(255,200,0,0.35);
+
+  display: inline-block;
+}
+
+@keyframes sharpFlicker {
+  0%,49% {
+    opacity: 1;
   }
 
-  ::selection {
-    background: var(--abs-accent);
-    color: #000;
+  50%,100% {
+    opacity: 0;
   }
+}
+
+
+/* =========================================================
+   AUDIO BUTTON
+   ========================================================= */
+
+.audio-toggle {
+  margin-top: 8px;
+
+  font-family: var(--font-ui);
+
+  font-size: 0.75rem;
+
+  font-weight: 600;
+
+  color: var(--abs-text-sub);
+
+  cursor: none;
+
+  display: inline-flex;
+
+  align-items: center;
+
+  gap: 6px;
+
+  border:
+    1px solid var(--abs-border-light);
+
+  padding: 5px 10px;
+
+  background: #070a0e;
+
+  transition: all 0.2s;
+}
+
+.audio-toggle.active {
+  color: var(--abs-accent);
+
+  border-color:
+    var(--abs-accent);
+
+  box-shadow:
+    0 0 12px rgba(255,200,0,0.15);
+}
+
+
+/* =========================================================
+   BRIEFING
+   ========================================================= */
+
+.briefing-card {
+  background:
+    rgba(6,8,12,0.85);
+
+  border-left:
+    3px solid var(--abs-accent);
+
+  padding: 16px;
+
+  margin-bottom: 24px;
+
+  font-size: 0.86rem;
+
+  line-height: 1.6;
+
+  color: #c4d0df;
+
+  min-height: 76px;
+
+  position: relative;
+
+  transform:
+    translateZ(15px);
+}
+
+
+/* =========================================================
+   PROGRESS
+   ========================================================= */
+
+.wizard-progress {
+  display: flex;
+
+  gap: 8px;
+
+  margin-bottom: 24px;
+
+  transform:
+    translateZ(20px);
+}
+
+.progress-step {
+  flex: 1;
+
+  height: 4px;
+
+  background:
+    #18202c;
+
+  transition:
+    background 0.3s ease,
+    box-shadow 0.3s ease;
+}
+
+.progress-step.active {
+  background:
+    var(--abs-accent);
+
+  box-shadow:
+    0 0 12px var(--abs-accent-glow);
+}
+
+.progress-step.completed {
+  background:
+    #4a586d;
+}
+
+
+/* =========================================================
+   FORM
+   ========================================================= */
+
+.step-panel {
+  display: none;
+
+  animation:
+    fadeInStep 0.3s ease-out forwards;
+
+  transform:
+    translateZ(25px);
+}
+
+.step-panel.active {
+  display: block;
+}
+
+@keyframes fadeInStep {
+  from {
+    opacity: 0;
+
+    transform:
+      translateY(6px)
+      translateZ(25px);
+  }
+
+  to {
+    opacity: 1;
+
+    transform:
+      translateY(0)
+      translateZ(25px);
+  }
+}
+
+.form-label {
+  display: block;
+
+  font-family: var(--font-ui);
+
+  font-size: 0.85rem;
+
+  color: var(--abs-accent);
+
+  letter-spacing: 1.5px;
+
+  margin-bottom: 8px;
+
+  text-transform: uppercase;
+
+  font-weight: 700;
+}
+
+.form-desc {
+  font-size: 0.8rem;
+
+  color: var(--abs-text-sub);
+
+  margin-bottom: 14px;
+
+  line-height: 1.4;
+}
+
+input[type="text"],
+input[type="email"],
+textarea {
+  width: 100%;
+
+  background:
+    rgba(6,8,12,0.85);
+
+  border:
+    1px solid var(--abs-border-light);
+
+  color:
+    var(--abs-text-main);
+
+  padding:
+    13px 14px;
+
+  font-size:
+    0.92rem;
+
+  outline:
+    none;
+
+  transition:
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+
+  cursor: none;
+  user-select: text;
+}
+
+input[type="text"]:focus,
+input[type="email"]:focus,
+textarea:focus {
+  border-color:
+    var(--abs-accent);
+
+  box-shadow:
+    0 0 14px rgba(255,200,0,0.25);
+}
+
+textarea {
+  min-height: 150px;
+
+  resize: vertical;
+
+  line-height: 1.5;
+}
+
+
+/* =========================================================
+   DISCORD HANDLE
+   ========================================================= */
+
+.input-addon-group {
+  display: flex;
+
+  align-items: center;
+
+  background:
+    rgba(6,8,12,0.85);
+
+  border:
+    1px solid var(--abs-border-light);
+
+  transition:
+    border-color 0.25s ease;
+}
+
+.input-addon-group:focus-within {
+  border-color:
+    var(--abs-accent);
+
+  box-shadow:
+    0 0 14px rgba(255,200,0,0.25);
+}
+
+.addon-symbol {
+  padding:
+    12px 0 12px 14px;
+
+  color:
+    var(--abs-accent);
+
+  font-weight:
+    bold;
+
+  font-size:
+    1rem;
+}
+
+.input-addon-group input {
+  border: none !important;
+
+  background: transparent !important;
+
+  padding-left: 8px !important;
+}
+
+
+/* =========================================================
+   ROLE DROPDOWN
+   ========================================================= */
+
+.custom-accordion-dropdown {
+  width: 100%;
+
+  background:
+    rgba(6,8,12,0.85);
+
+  border:
+    1px solid var(--abs-border-light);
+
+  transition:
+    border-color 0.25s ease;
+}
+
+.custom-accordion-dropdown.open {
+  border-color:
+    var(--abs-accent);
+}
+
+.accordion-trigger {
+  padding: 14px;
+
+  display: flex;
+
+  justify-content:
+    space-between;
+
+  align-items:
+    center;
+
+  cursor: none;
+
+  font-size: 0.9rem;
+
+  color:
+    var(--abs-text-main);
+
+  font-family:
+    var(--font-ui);
+}
+
+.accordion-trigger .chevron {
+  font-size: 0.75rem;
+
+  color:
+    var(--abs-accent);
+
+  transition:
+    transform 0.25s ease;
+}
+
+.custom-accordion-dropdown.open
+.accordion-trigger
+.chevron {
+  transform:
+    rotate(180deg);
+}
+
+.accordion-content {
+  display: none;
+
+  border-top:
+    1px solid var(--abs-border);
+
+  flex-direction:
+    column;
+
+  background:
+    #090c10;
+}
+
+.custom-accordion-dropdown.open
+.accordion-content {
+  display: flex;
+}
+
+.accordion-option {
+  padding:
+    12px 16px;
+
+  cursor: none;
+
+  font-size:
+    0.85rem;
+
+  color:
+    #9cb0c7;
+
+  border-bottom:
+    1px solid #141a24;
+
+  font-family:
+    var(--font-ui);
+
+  transition:
+    background 0.2s,
+    color 0.2s;
+}
+
+.accordion-option:hover {
+  background:
+    var(--abs-accent);
+
+  color: #000;
+
+  font-weight: 700;
+}
+
+
+/* =========================================================
+   DIRECTIVES
+   ========================================================= */
+
+.directive-list {
+  display: flex;
+
+  flex-direction:
+    column;
+
+  gap: 10px;
+
+  max-height:
+    380px;
+
+  overflow-y:
+    auto;
+
+  padding-right:
+    4px;
+}
+
+.directive-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.directive-list::-webkit-scrollbar-thumb {
+  background:
+    var(--abs-border-light);
+}
+
+.directive-card {
+  background:
+    rgba(8,11,16,0.85);
+
+  border:
+    1px solid var(--abs-border);
+
+  padding:
+    15px 18px;
+
+  cursor: none;
+
+  display: flex;
+
+  align-items:
+    center;
+
+  justify-content:
+    space-between;
+
+  gap: 15px;
+
+  transition:
+    border-color 0.25s,
+    box-shadow 0.25s,
+    background-color 0.25s,
+    transform 0.2s;
+}
+
+.directive-card:hover {
+  border-color:
+    #3b485a;
+
+  transform:
+    translateX(4px);
+}
+
+.directive-card.active {
+  border-color:
+    var(--abs-accent);
+
+  background:
+    #0e131b;
+
+  box-shadow:
+    0 0 18px rgba(255,200,0,0.4),
+    inset 0 0 12px rgba(255,200,0,0.15);
+}
+
+.directive-card .badge {
+  font-family:
+    var(--font-ui);
+
+  font-size:
+    0.72rem;
+
+  font-weight:
+    700;
+
+  padding:
+    4px 8px;
+
+  border:
+    1px solid var(--abs-border-light);
+
+  color:
+    #6a788a;
+
+  transition:
+    all 0.25s ease;
+
+  flex-shrink: 0;
+}
+
+.directive-card.active .badge {
+  border-color:
+    var(--abs-accent);
+
+  color:
+    var(--abs-accent);
+
+  background:
+    rgba(255,200,0,0.12);
+}
+
+
+/* =========================================================
+   NAVIGATION
+   ========================================================= */
+
+.wizard-controls {
+  display: flex;
+
+  gap: 12px;
+
+  margin-top: 25px;
+
+  transform:
+    translateZ(30px);
+}
+
+.btn-nav,
+.submit-btn {
+  padding:
+    14px;
+
+  background:
+    rgba(18,24,32,0.8);
+
+  color:
+    var(--abs-text-sub);
+
+  border:
+    1px solid var(--abs-border);
+
+  font-family:
+    var(--font-ui);
+
+  font-weight:
+    700;
+
+  letter-spacing:
+    1.5px;
+
+  cursor: none;
+
+  transition:
+    all 0.25s ease;
+
+  text-align:
+    center;
+}
+
+.btn-nav {
+  flex: 1;
+}
+
+.btn-nav:hover:not(:disabled) {
+  background:
+    #182230;
+
+  color:
+    var(--abs-text-main);
+
+  border-color:
+    var(--abs-border-light);
+}
+
+.btn-nav:disabled {
+  opacity:
+    0.35;
+}
+
+.submit-btn {
+  flex: 2;
+
+  background:
+    #12161f;
+
+  color:
+    #4b5768;
+
+  border:
+    1px solid #202733;
+
+  text-transform:
+    uppercase;
+}
+
+.submit-btn.unlocked {
+  background:
+    var(--abs-accent);
+
+  color:
+    #000;
+
+  border:
+    1px solid var(--abs-accent);
+
+  box-shadow:
+    0 0 22px rgba(255,200,0,0.5);
+}
+
+.submit-btn.unlocked:hover {
+  background:
+    #ffe359;
+
+  box-shadow:
+    0 0 32px rgba(255,200,0,0.75);
+}
+
+
+/* =========================================================
+   NORMAL ALERT
+   ========================================================= */
+
+.modal-overlay {
+  position: fixed;
+
+  inset: 0;
+
+  background:
+    rgba(4,5,6,0.92);
+
+  display:
+    none;
+
+  justify-content:
+    center;
+
+  align-items:
+    center;
+
+  z-index:
+    1000;
+
+  backdrop-filter:
+    blur(6px);
+}
+
+.modal-overlay.active {
+  display:
+    flex;
+}
+
+.alert-box {
+  background:
+    var(--abs-panel);
+
+  border:
+    2px solid var(--abs-accent);
+
+  padding:
+    26px;
+
+  max-width:
+    450px;
+
+  width:
+    90%;
+
+  box-shadow:
+    0 0 35px rgba(255,200,0,0.35);
+}
+
+.alert-title {
+  font-family:
+    var(--font-ui);
+
+  color:
+    var(--abs-accent);
+
+  font-size:
+    1.05rem;
+
+  margin-bottom:
+    12px;
+
+  letter-spacing:
+    1px;
+
+  font-weight:
+    700;
+}
+
+#alert-msg {
+  color:
+    #c4d0df;
+
+  font-size:
+    0.8rem;
+
+  line-height:
+    1.5;
+}
+
+.alert-btn {
+  margin-top:
+    18px;
+
+  background:
+    var(--abs-accent);
+
+  color:
+    #000;
+
+  font-family:
+    var(--font-ui);
+
+  border:
+    none;
+
+  padding:
+    10px 24px;
+
+  font-weight:
+    700;
+
+  cursor:
+    none;
+}
+
+
+/* =========================================================
+   CRITICAL SUBMISSION MODAL
+   ========================================================= */
+
+.critical-modal-wrapper {
+  position: fixed;
+
+  inset: 0;
+
+  background:
+    rgba(14,2,2,0.96);
+
+  display:
+    none;
+
+  justify-content:
+    center;
+
+  align-items:
+    center;
+
+  z-index:
+    6000;
+
+  overflow:
+    hidden;
+}
+
+.critical-modal-wrapper.active {
+  display:
+    flex;
+}
+
+.arrow-stream-container {
+  position: absolute;
+
+  width:
+    100%;
+
+  height:
+    100%;
+
+  pointer-events:
+    none;
+
+  display:
+    flex;
+
+  flex-direction:
+    column;
+
+  justify-content:
+    center;
+
+  gap:
+    30px;
+
+  opacity:
+    0.22;
+
+  filter:
+    blur(2px);
+}
+
+.arrow-row {
+  font-family:
+    var(--font-heading);
+
+  font-size:
+    7.5rem;
+
+  font-weight:
+    900;
+
+  color:
+    var(--abs-danger);
+
+  white-space:
+    nowrap;
+
+  letter-spacing:
+    18px;
+}
+
+.arrow-row.move-right {
+  animation:
+    streamRight 10s linear infinite;
+}
+
+.arrow-row.move-left {
+  animation:
+    streamLeft 10s linear infinite;
+}
+
+@keyframes streamRight {
+  from {
+    transform:
+      translateX(-50%);
+  }
+
+  to {
+    transform:
+      translateX(0%);
+  }
+}
+
+@keyframes streamLeft {
+  from {
+    transform:
+      translateX(0%);
+  }
+
+  to {
+    transform:
+      translateX(-50%);
+  }
+}
+
+.critical-dialog {
+  background:
+    rgba(22,4,4,0.94);
+
+  border:
+    3px solid var(--abs-danger);
+
+  width:
+    90vw;
+
+  max-width:
+    780px;
+
+  padding:
+    36px;
+
+  box-shadow:
+    0 0 70px rgba(255,42,42,0.55);
+
+  position:
+    relative;
+
+  z-index:
+    10;
+}
+
+.critical-header {
+  font-family:
+    var(--font-heading);
+
+  color:
+    var(--abs-danger);
+
+  font-size:
+    2.2rem;
+
+  font-weight:
+    900;
+
+  letter-spacing:
+    2px;
+
+  text-align:
+    center;
+
+  margin-bottom:
+    6px;
+
+  text-shadow:
+    0 0 18px var(--abs-danger-glow);
+}
+
+.critical-subheader {
+  font-family:
+    var(--font-ui);
+
+  font-size:
+    0.9rem;
+
+  color:
+    #ffb3b3;
+
+  text-align:
+    center;
+
+  letter-spacing:
+    4px;
+
+  margin-bottom:
+    25px;
+
+  font-weight:
+    700;
+}
+
+.critical-body {
+  border:
+    1px solid var(--abs-danger);
+
+  background:
+    rgba(55,6,6,0.45);
+
+  padding:
+    24px;
+
+  font-size:
+    0.92rem;
+
+  line-height:
+    1.7;
+
+  color:
+    #ffe6e6;
+
+  margin-bottom:
+    30px;
+}
+
+.critical-actions {
+  display:
+    flex;
+
+  gap:
+    15px;
+}
+
+.btn-confirm-final,
+.btn-abort-final {
+  flex:
+    1;
+
+  padding:
+    16px;
+
+  font-weight:
+    700;
+
+  letter-spacing:
+    2px;
+
+  cursor:
+    none;
+
+  font-family:
+    var(--font-ui);
+
+  text-transform:
+    uppercase;
+}
+
+.btn-confirm-final {
+  background:
+    var(--abs-danger);
+
+  color:
+    #fff;
+
+  border:
+    none;
+
+  box-shadow:
+    0 0 22px var(--abs-danger-glow);
+}
+
+.btn-confirm-final:hover {
+  background:
+    #ff5252;
+}
+
+.btn-abort-final {
+  background:
+    transparent;
+
+  color:
+    var(--abs-danger);
+
+  border:
+    1px solid var(--abs-danger);
+}
+
+.btn-abort-final:hover {
+  background:
+    rgba(255,42,42,0.15);
+}
+
+
+
+/* =========================================================
+   GLOBAL INTERACTION / HOVER SYSTEM
+   ========================================================= */
+
+button,
+.accordion-trigger,
+.accordion-option,
+.directive-card {
+  position: relative;
+  overflow: hidden;
+}
+
+button:not(:disabled),
+.accordion-trigger,
+.accordion-option,
+.directive-card {
+  transition:
+    transform 0.2s cubic-bezier(0.16,1,0.3,1),
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease,
+    opacity 0.2s ease;
+}
+
+button:not(:disabled)::after,
+.accordion-trigger::after,
+.accordion-option::after,
+.directive-card::after {
+  content: "";
+  position: absolute;
+  left: -110%;
+  top: 0;
+  width: 55%;
+  height: 100%;
+  pointer-events: none;
+  background: linear-gradient(
+    100deg,
+    transparent 0%,
+    rgba(255,255,255,0.03) 45%,
+    rgba(255,200,0,0.12) 50%,
+    rgba(255,255,255,0.03) 55%,
+    transparent 100%
+  );
+  transform: skewX(-18deg);
+  transition: left 0.45s cubic-bezier(0.16,1,0.3,1);
+}
+
+button:not(:disabled):hover::after,
+.accordion-trigger:hover::after,
+.accordion-option:hover::after,
+.directive-card:hover::after {
+  left: 130%;
+}
+
+button:not(:disabled):hover {
+  transform: translateY(-2px);
+  border-color: var(--abs-accent);
+  box-shadow:
+    0 0 16px rgba(255,200,0,0.22),
+    inset 0 0 10px rgba(255,200,0,0.06);
+}
+
+button:not(:disabled):active {
+  transform: translateY(0) scale(0.985);
+}
+
+/* Individual controls get stronger hover identities. */
+.audio-toggle:not(:disabled):hover {
+  color: var(--abs-accent-bright);
+  background: rgba(255,200,0,0.08);
+  border-color: var(--abs-accent);
+  box-shadow: 0 0 18px rgba(255,200,0,0.22);
+}
+
+.splash-enter-btn.ready:hover {
+  transform: translateY(-3px);
+  letter-spacing: 3.5px;
+}
+
+.btn-nav:not(:disabled):hover {
+  background: #101821;
+  color: #fff;
+}
+
+.submit-btn.unlocked:hover {
+  transform: translateY(-3px);
+}
+
+.alert-btn:hover {
+  background: var(--abs-accent-bright);
+  box-shadow: 0 0 24px rgba(255,200,0,0.55);
+  transform: translateY(-2px);
+}
+
+.btn-confirm-final:hover {
+  transform: translateY(-3px);
+  box-shadow:
+    0 0 28px var(--abs-danger-glow),
+    0 0 60px rgba(255,42,42,0.22);
+}
+
+.btn-abort-final:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 22px rgba(255,42,42,0.2);
+}
+
+.accordion-trigger:hover {
+  background: rgba(255,200,0,0.055);
+  color: #fff;
+  border-color: var(--abs-accent);
+  box-shadow: inset 0 0 14px rgba(255,200,0,0.05);
+}
+
+.accordion-option:hover {
+  transform: translateX(3px);
+  box-shadow: inset 3px 0 0 #000;
+}
+
+.directive-card:hover {
+  border-color: var(--abs-accent);
+  background: #0d1219;
+  transform: translateX(5px);
+  box-shadow:
+    0 0 18px rgba(255,200,0,0.16),
+    inset 3px 0 0 rgba(255,200,0,0.55);
+}
+
+.directive-card.active:hover {
+  box-shadow:
+    0 0 24px rgba(255,200,0,0.42),
+    inset 0 0 14px rgba(255,200,0,0.16);
+}
+
+/* =========================================================
+   CUSTOM CURSOR
+   ========================================================= */
+
+#cursor-dot,
+#cursor-ring,
+#cursor-triangle,
+#cursor-text {
+  position: fixed;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  z-index: 9999;
+  will-change: transform, opacity;
+  opacity: 1;
+}
+
+#cursor-dot,
+#cursor-ring {
+  transition:
+    opacity 0.18s ease,
+    width 0.15s ease,
+    height 0.15s ease,
+    background-color 0.15s ease,
+    border-color 0.15s ease;
+}
+
+#cursor-dot {
+  width: 6px;
+  height: 6px;
+  background: var(--abs-accent);
+  border-radius: 50%;
+  transform: translate(-50%,-50%);
+  box-shadow: 0 0 9px rgba(255,200,0,0.5);
+}
+
+#cursor-ring {
+  width: 28px;
+  height: 28px;
+  border: 1.5px solid var(--abs-accent);
+  border-radius: 50%;
+  box-shadow: 0 0 10px rgba(255,200,0,0.25);
+  transform: translate(-50%,-50%);
+}
+
+/* Yellow triangular pointer used on interactive elements. */
+#cursor-triangle {
+  width: 22px;
+  height: 22px;
+  background: var(--abs-accent);
+  clip-path: polygon(
+    0 0,
+    100% 43%,
+    64% 57%,
+    84% 100%,
+    70% 100%,
+    50% 62%,
+    24% 78%
+  );
+  filter:
+    drop-shadow(0 0 5px rgba(255,200,0,0.8));
+  transform: translate3d(-1px,-1px,0);
+  opacity: 0;
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease,
+    filter 0.12s ease;
+}
+
+/* Custom text/I-beam cursor for fields and text-designated regions. */
+#cursor-text {
+  width: 14px;
+  height: 24px;
+  opacity: 0;
+  transform: translate(-50%,-50%);
+  transition:
+    opacity 0.12s ease,
+    transform 0.12s ease;
+}
+
+#cursor-text::before {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 0;
+  width: 2px;
+  height: 24px;
+  background: var(--abs-accent);
+  box-shadow: 0 0 8px rgba(255,200,0,0.65);
+}
+
+#cursor-text::after {
+  content: "";
+  position: absolute;
+  left: 2px;
+  top: 0;
+  width: 10px;
+  height: 24px;
+  border-top: 2px solid var(--abs-accent);
+  border-bottom: 2px solid var(--abs-accent);
+  box-shadow:
+    0 -1px 7px rgba(255,200,0,0.35),
+    0 1px 7px rgba(255,200,0,0.35);
+}
+
+/* Cursor modes. */
+body.cursor-interactive #cursor-dot,
+body.cursor-interactive #cursor-ring,
+body.cursor-text #cursor-dot,
+body.cursor-text #cursor-ring {
+  opacity: 0;
+}
+
+body.cursor-hidden #cursor-dot,
+body.cursor-hidden #cursor-ring,
+body.cursor-hidden #cursor-triangle,
+body.cursor-hidden #cursor-text {
+  opacity: 0 !important;
+}
+
+body.cursor-interactive #cursor-triangle {
+  opacity: 1;
+  transform: translate3d(-1px,-1px,0) scale(1.08);
+}
+
+body.cursor-text #cursor-text {
+  opacity: 1;
+}
+
+body.mouse-pressed #cursor-dot {
+  width: 10px;
+  height: 10px;
+  background: #fff;
+}
+
+body.mouse-pressed #cursor-ring {
+  width: 18px;
+  height: 18px;
+  border-color: #fff;
+  background: rgba(255,200,0,0.3);
+}
+
+body.mouse-pressed.cursor-interactive #cursor-triangle {
+  transform: translate3d(0,0,0) scale(0.92);
+  filter: drop-shadow(0 0 10px rgba(255,200,0,1));
+}
+
+body.mouse-pressed.cursor-text #cursor-text {
+  transform: translate(-50%,-50%) scale(0.92);
+}
+
+@media (pointer: coarse) {
+  #cursor-dot,
+  #cursor-ring,
+  #cursor-triangle,
+  #cursor-text {
+    display: none;
+  }
+}
+
+
+/* =========================================================
+   FOOTER
+   ========================================================= */
+
+.footer-watermark {
+  position:
+    fixed;
+
+  bottom:
+    16px;
+
+  left:
+    24px;
+
+  font-size:
+    0.72rem;
+
+  color:
+    var(--abs-accent);
+
+  letter-spacing:
+    2.5px;
+
+  z-index:
+    10;
+
+  pointer-events:
+    none;
+
+  display:
+    flex;
+
+  gap:
+    18px;
+
+  align-items:
+    center;
+
+  opacity:
+    0.85;
+}
+
+.footer-watermark span:first-child {
+  font-weight:
+    700;
+
+  color:
+    #fff;
+}
+
+
+/* =========================================================
+   MOBILE
+   ========================================================= */
+
+@media (max-width: 600px) {
 
   body {
-    background-color: var(--abs-bg);
-    color: var(--abs-text-main);
-    min-height: 100vh;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    padding: 20px;
-    position: relative;
-    overflow-x: hidden;
-    cursor: none;
+    padding:
+      0;
+
+    min-height:
+      100svh;
+
+    align-items:
+      flex-start;
+
+    cursor:
+      auto;
   }
 
-  /* CRT Overlay Scanlines */
-   .splash-screen {
-    position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    background: var(--abs-bg);
-    z-index: 5000;
-    display: flex;
-    transition: opacity 0.8s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.8s ease;
-    overflow: hidden;
+  #cursor-dot,
+  #cursor-ring {
+    display:
+      none;
   }
-  .splash-screen.hidden {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
+
+  .splash-screen {
+    min-height:
+      100svh;
   }
 
   .splash-left-track {
-    position: absolute;
-    top: 0; left: 0;
-    width: 12px; height: 100%;
-    background: rgba(255, 255, 255, 0.05);
-    border-right: 1px solid rgba(255, 255, 255, 0.1);
-    z-index: 20;
-  }
-
-  .splash-left-fill {
-    position: absolute;
-    top: 0; left: 0;
-    width: 100%; height: 0%;
-    background-color: var(--abs-accent);
-    box-shadow: 0 0 20px var(--abs-accent-glow), 0 0 10px var(--abs-accent);
-    transition: height 0.04s linear;
+    width:
+      6px;
   }
 
   .splash-percent-tracker {
-    position: absolute;
-    left: 28px;
-    top: 20px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    z-index: 30;
-    pointer-events: none;
-    white-space: nowrap;
-  }
+    left:
+      22px;
 
-  .percent-row {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-  }
+    max-width:
+      calc(100vw - 44px);
 
-  .tip-connector {
-    width: 22px;
-    height: 2px;
-    background-color: var(--abs-accent);
-    box-shadow: 0 0 8px var(--abs-accent);
+    white-space:
+      normal;
   }
 
   .percent-val {
-    font-family: var(--font-heading);
-    font-size: 5.2rem;
-    font-weight: 900;
-    line-height: 0.82;
-    color: var(--abs-accent);
-    text-shadow: 0 0 25px var(--abs-accent-glow);
-    letter-spacing: -2px;
+    font-size:
+      4rem;
   }
 
   .percent-symbol {
-    font-family: var(--font-ui);
-    font-size: 2.2rem;
-    font-weight: 800;
-    color: var(--abs-accent);
+    font-size:
+      1.8rem;
   }
 
   .splash-status-text {
-    font-family: var(--font-mono);
-    font-size: 0.8rem;
-    color: #a2b0c2;
-    letter-spacing: 2px;
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    font-weight: 700;
-    text-transform: uppercase;
-    background: rgba(11, 13, 16, 0.9);
-    padding: 6px 14px;
-    border: 1px solid rgba(255, 200, 0, 0.25);
-    border-left: 3px solid var(--abs-accent);
-    width: fit-content;
-  }
+    max-width:
+      calc(100vw - 48px);
 
-  .square-icon {
-    color: var(--abs-accent);
-    font-size: 0.65rem;
+    font-size:
+      0.68rem;
+
+    letter-spacing:
+      1.2px;
+
+    line-height:
+      1.35;
   }
 
   .splash-right-content {
-    position: absolute;
-    right: 8%;
-    top: 50%;
-    transform: translateY(-50%);
-    display: flex;
-    flex-direction: column;
-    gap: 28px;
-    z-index: 10;
-  }
+    left:
+      34px;
 
-  .absl-logo-block {
-    display: flex;
-    flex-direction: column;
+    right:
+      24px;
+
+    top:
+      auto;
+
+    bottom:
+      58px;
+
+    transform:
+      none;
+
+    width:
+      auto;
+
+    gap:
+      22px;
   }
 
   .logo-top-sub {
-    font-family: var(--font-ui);
-    font-size: 0.85rem;
-    font-weight: 700;
-    letter-spacing: 6px;
-    color: var(--abs-accent);
-    margin-bottom: 6px;
+    font-size:
+      0.68rem;
+
+    letter-spacing:
+      3px;
   }
 
   .logo-title {
-    font-family: var(--font-heading);
-    font-size: 5rem;
-    font-weight: 900;
-    line-height: 0.85;
-    color: #ffffff;
-    letter-spacing: 1px;
-    text-transform: uppercase;
+    font-size:
+      clamp(3.5rem,16vw,5rem);
+
+    line-height:
+      0.82;
   }
 
   .module-tag {
-    display: inline-block;
-    margin-top: 12px;
-    background: var(--abs-accent);
-    color: #000;
-    font-family: var(--font-ui);
-    font-weight: 800;
-    font-size: 0.82rem;
-    padding: 4px 10px;
-    letter-spacing: 2px;
-    width: fit-content;
-  }
+    font-size:
+      0.68rem;
 
-  .splash-tactical-block {
-    display: flex;
-    flex-direction: column;
-    gap: 12px;
-  }
+    letter-spacing:
+      1.5px;
 
-  .tactical-meta-row {
-    display: flex;
-    align-items: flex-start;
-    gap: 12px;
-  }
-
-  .yellow-arrow {
-    color: var(--abs-accent);
-    font-size: 0.9rem;
-    margin-top: 2px;
-  }
-
-  .meta-details {
-    display: flex;
-    flex-direction: column;
-    gap: 4px;
-  }
-
-  .plus-tag {
-    font-size: 0.7rem;
-    color: var(--abs-text-sub);
-    border: 1px solid var(--abs-border-light);
-    padding: 0 4px;
-    width: fit-content;
+    max-width:
+      100%;
   }
 
   .meta-label {
-    font-family: var(--font-ui);
-    font-size: 0.78rem;
-    color: #929faf;
-    letter-spacing: 2px;
-    line-height: 1.4;
-    font-weight: 600;
-  }
+    font-size:
+      0.67rem;
 
-  .dot-grid {
-    color: #3b4654;
-    font-size: 0.6rem;
-    letter-spacing: 3px;
-  }
-
-  .tactical-divider {
-    width: 100%;
-    height: 1px;
-    background-color: var(--abs-border);
-    margin: 4px 0;
+    letter-spacing:
+      1.2px;
   }
 
   .tactical-tagline {
-    font-family: var(--font-ui);
-    font-size: 0.85rem;
-    font-weight: 700;
-    color: #ffffff;
-    letter-spacing: 3px;
-    text-transform: uppercase;
+    font-size:
+      0.7rem;
+
+    letter-spacing:
+      1.5px;
   }
 
   .splash-enter-btn {
-    margin-top: 10px;
-    background: transparent;
-    border: 1px solid var(--abs-accent);
-    color: var(--abs-accent);
-    font-family: var(--font-ui);
-    padding: 16px 30px;
-    font-size: 0.9rem;
-    font-weight: 700;
-    letter-spacing: 3px;
-    cursor: none;
-    transition: all 0.3s ease;
-    text-transform: uppercase;
-    opacity: 0.2;
-    pointer-events: none;
-  }
+    width:
+      100%;
 
-  .splash-enter-btn.ready {
-    opacity: 1;
-    pointer-events: auto;
-    background: rgba(255, 200, 0, 0.08);
-    box-shadow: 0 0 22px rgba(255, 200, 0, 0.25);
-    animation: pulseYellow 2s infinite ease-in-out;
-  }
+    padding:
+      15px 18px;
 
-  .splash-enter-btn.ready:hover {
-    background: var(--abs-accent);
-    color: #000;
-    box-shadow: 0 0 40px var(--abs-accent-glow);
-  }
-
-  @keyframes pulseYellow {
-    0%, 100% { box-shadow: 0 0 15px rgba(255, 200, 0, 0.2); }
-    50% { box-shadow: 0 0 32px rgba(255, 200, 0, 0.55); }
-  }
-
-  .bg-geometry {
-    position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    z-index: 1;
-    pointer-events: none;
-    overflow: hidden;
-    background-color: #040506;
-    background-image: 
-      radial-gradient(circle at 50% 50%, rgba(255, 200, 0, 0.05) 0%, transparent 60%),
-      linear-gradient(rgba(27, 35, 46, 0.3) 1px, transparent 1px),
-      linear-gradient(90deg, rgba(27, 35, 46, 0.3) 1px, transparent 1px);
-    background-size: 100% 100%, 40px 40px, 40px 40px;
-  }
-
-  .bg-overlay {
-    position: absolute;
-    top: 0; left: 0; width: 100%; height: 100%;
-    background: radial-gradient(circle at center, rgba(4, 5, 6, 0.35) 0%, rgba(4, 5, 6, 0.85) 100%);
-    pointer-events: none;
+    font-size:
+      0.78rem;
   }
 
   .perspective-wrapper {
-    perspective: 1200px;
-    z-index: 10;
-    width: 100%;
-    max-width: 860px;
+    width:
+      100%;
+
+    max-width:
+      none;
+
+    min-height:
+      100svh;
+
+    display:
+      flex;
+
+    align-items:
+      stretch;
   }
 
   .terminal-frame {
-    width: 100%;
-    background-color: var(--abs-panel-translucent);
-    backdrop-filter: blur(14px);
-    border: 1px solid var(--abs-border);
-    padding: 38px;
-    position: relative;
-    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.9);
-    transform-style: preserve-3d;
-    transition: transform 0.12s ease-out;
-    will-change: transform;
-  }
+    width:
+      100%;
 
-  /* Tactical Corner Brackets */
-  .bracket-tl, .bracket-tr, .bracket-bl, .bracket-br {
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    border-color: var(--abs-accent);
-    border-style: solid;
-    pointer-events: none;
-    transform: translateZ(20px);
+    min-height:
+      100svh;
+
+    padding:
+      24px 18px 90px;
+
+    border-left:
+      none;
+
+    border-right:
+      none;
+
+    box-shadow:
+      none;
+
+    backdrop-filter:
+      blur(10px);
+
+    transform:
+      none !important;
   }
-  .bracket-tl { top: -2px; left: -2px; border-width: 3px 0 0 3px; }
-  .bracket-tr { top: -2px; right: -2px; border-width: 3px 3px 0 0; }
-  .bracket-bl { bottom: -2px; left: -2px; border-width: 0 0 3px 3px; }
-  .bracket-br { bottom: -2px; right: -2px; border-width: 0 3px 3px 0; }
 
   .terminal-header {
-    border-bottom: 2px solid var(--abs-accent);
-    padding-bottom: 18px;
-    margin-bottom: 22px;
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    transform: translateZ(30px);
+    display:
+      block;
+
+    padding-bottom:
+      16px;
+
+    margin-bottom:
+      18px;
   }
 
   .protocol-tag {
-    font-family: var(--font-ui);
-    font-size: 0.82rem;
-    font-weight: 700;
-    color: var(--abs-accent);
-    letter-spacing: 3px;
-    margin-bottom: 4px;
+    font-size:
+      0.68rem;
+
+    letter-spacing:
+      2px;
   }
 
   .main-title {
-    font-family: var(--font-heading);
-    font-size: 2.2rem;
-    font-weight: 800;
-    color: var(--abs-text-main);
-    letter-spacing: 1.5px;
-    line-height: 1;
-    text-transform: uppercase;
+    font-size:
+      clamp(1.55rem,7vw,2.2rem);
+
+    line-height:
+      0.95;
   }
 
   .sub-tagline {
-    font-size: 0.75rem;
-    color: #728296;
-    letter-spacing: 2px;
-    margin-top: 6px;
+    font-size:
+      0.62rem;
+
+    line-height:
+      1.4;
+
+    letter-spacing:
+      1.2px;
+  }
+
+  .terminal-header > div:last-child {
+    margin-top:
+      14px;
+
+    text-align:
+      left !important;
+
+    display:
+      flex;
+
+    justify-content:
+      space-between;
+
+    align-items:
+      center;
   }
 
   .telemetry-tag {
-    font-family: var(--font-mono);
-    color: var(--abs-accent);
-    font-weight: 700;
-    font-size: 0.82rem;
-    letter-spacing: 1px;
-    animation: sharpFlicker 1s infinite steps(1);
-    background: rgba(255, 200, 0, 0.08);
-    padding: 5px 10px;
-    border: 1px solid rgba(255, 200, 0, 0.35);
-    display: inline-block;
-  }
+    font-size:
+      0.65rem;
 
-  @keyframes sharpFlicker {
-    0%, 49% { opacity: 1; }
-    50%, 100% { opacity: 0; }
+    padding:
+      4px 7px;
   }
 
   .audio-toggle {
-    font-family: var(--font-ui);
-    font-size: 0.75rem;
-    font-weight: 600;
-    color: var(--abs-text-sub);
-    cursor: none;
-    display: inline-flex;
-    align-items: center;
-    gap: 6px;
-    border: 1px solid var(--abs-border-light);
-    padding: 5px 10px;
-    background: #070a0e;
-    transition: all 0.2s;
+    font-size:
+      0.68rem;
   }
-  .audio-toggle.active {
-    color: var(--abs-accent);
-    border-color: var(--abs-accent);
-    box-shadow: 0 0 10px rgba(255, 200, 0, 0.2);
+
+  .briefing-card {
+    font-size:
+      0.75rem;
+
+    line-height:
+      1.55;
+
+    padding:
+      13px;
+
+    min-height:
+      0;
+
+    margin-bottom:
+      18px;
   }
 
   .wizard-progress {
-    display: flex;
-    gap: 8px;
-    margin-bottom: 24px;
-    transform: translateZ(20px);
-  }
-  .progress-step {
-    flex: 1;
-    height: 4px;
-    background: #18202c;
-    transition: background 0.3s ease, box-shadow 0.3s ease;
-  }
-  .progress-step.active {
-    background: var(--abs-accent);
-    box-shadow: 0 0 12px var(--abs-accent-glow);
-  }
-  .progress-step.completed {
-    background: #4a586d;
+    gap:
+      5px;
+
+    margin-bottom:
+      22px;
   }
 
-  .step-panel {
-    display: none;
-    animation: fadeInStep 0.3s ease-out forwards;
-    transform: translateZ(25px);
-  }
-  .step-panel.active {
-    display: block;
-  }
-  @keyframes fadeInStep {
-    from { opacity: 0; transform: translateY(6px) translateZ(25px); }
-    to { opacity: 1; transform: translateY(0) translateZ(25px); }
+  .progress-step {
+    height:
+      3px;
   }
 
   .form-label {
-    display: block;
-    font-family: var(--font-ui);
-    font-size: 0.85rem;
-    color: var(--abs-accent);
-    letter-spacing: 1.5px;
-    margin-bottom: 8px;
-    text-transform: uppercase;
-    font-weight: 700;
+    font-size:
+      0.76rem;
+
+    line-height:
+      1.35;
+
+    letter-spacing:
+      1px;
   }
+
   .form-desc {
-    font-size: 0.8rem;
-    color: var(--abs-text-sub);
-    margin-bottom: 14px;
-    line-height: 1.4;
+    font-size:
+      0.72rem;
+
+    line-height:
+      1.5;
   }
 
-  .input-addon-group {
-    display: flex;
-    align-items: center;
-    background: rgba(6, 8, 12, 0.85);
-    border: 1px solid var(--abs-border-light);
-    transition: border-color 0.25s ease;
-  }
-  .input-addon-group:focus-within {
-    border-color: var(--abs-accent);
-    box-shadow: 0 0 14px rgba(255, 200, 0, 0.25);
-  }
-  .addon-symbol {
-    padding: 12px 0 12px 14px;
-    color: var(--abs-accent);
-    font-weight: bold;
-    font-size: 1rem;
-  }
-  .input-addon-group input {
-    border: none !important;
-    background: transparent !important;
-    padding-left: 8px !important;
-  }
-
-  input[type="text"], input[type="email"], textarea {
-    width: 100%;
-    background: rgba(6, 8, 12, 0.85);
-    border: 1px solid var(--abs-border-light);
-    color: var(--abs-text-main);
-    padding: 13px 14px;
-    font-size: 0.92rem;
-    outline: none;
-    transition: border-color 0.25s ease, box-shadow 0.25s ease;
-    cursor: none;
-  }
-  input[type="text"]:focus, input[type="email"]:focus, textarea:focus {
-    border-color: var(--abs-accent);
-    box-shadow: 0 0 14px rgba(255, 200, 0, 0.25);
-  }
-
+  input[type="text"],
+  input[type="email"],
   textarea {
-    resize: vertical;
-    min-height: 110px;
-    line-height: 1.5;
-  }
+    font-size:
+      16px;
 
-  .char-counter {
-    display: flex;
-    justify-content: flex-end;
-    font-size: 0.72rem;
-    color: var(--abs-text-sub);
-    margin-top: 6px;
-    letter-spacing: 1px;
-  }
-  .char-counter.valid {
-    color: var(--abs-accent);
-  }
-
-  .custom-accordion-dropdown {
-    width: 100%;
-    background: rgba(6, 8, 12, 0.85);
-    border: 1px solid var(--abs-border-light);
-    transition: border-color 0.25s ease;
-  }
-  .custom-accordion-dropdown.open {
-    border-color: var(--abs-accent);
+    padding:
+      14px 12px;
   }
 
   .accordion-trigger {
-    padding: 14px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    cursor: none;
-    font-size: 0.9rem;
-    color: var(--abs-text-main);
-    font-family: var(--font-ui);
-  }
+    min-height:
+      50px;
 
-  .accordion-trigger .chevron {
-    font-size: 0.75rem;
-    color: var(--abs-accent);
-    transition: transform 0.25s ease;
-  }
-  .custom-accordion-dropdown.open .accordion-trigger .chevron {
-    transform: rotate(180deg);
-  }
+    padding:
+      14px 12px;
 
-  .accordion-content {
-    display: none;
-    border-top: 1px solid var(--abs-border);
-    flex-direction: column;
-    background: #090c10;
-  }
-  .custom-accordion-dropdown.open .accordion-content {
-    display: flex;
+    font-size:
+      0.78rem;
   }
 
   .accordion-option {
-    padding: 12px 16px;
-    cursor: none;
-    font-size: 0.85rem;
-    color: #9cb0c7;
-    border-bottom: 1px solid #141a24;
-    font-family: var(--font-ui);
-    transition: background 0.2s, color 0.2s;
-  }
-  .accordion-option:last-child {
-    border-bottom: none;
-  }
-  .accordion-option:hover {
-    background: var(--abs-accent);
-    color: #000;
-    font-weight: 700;
+    padding:
+      15px 12px;
+
+    font-size:
+      0.72rem;
+
+    line-height:
+      1.4;
   }
 
   .directive-list {
-    display: flex;
-    flex-direction: column;
-    gap: 10px;
-    max-height: 380px;
-    overflow-y: auto;
-    padding-right: 4px;
+    max-height:
+      none;
+
+    overflow:
+      visible;
+
+    padding-right:
+      0;
+
+    gap:
+      8px;
   }
-  .directive-list::-webkit-scrollbar { width: 4px; }
-  .directive-list::-webkit-scrollbar-thumb { background: var(--abs-border-light); }
 
   .directive-card {
-    background: rgba(8, 11, 16, 0.85);
-    border: 1px solid var(--abs-border);
-    padding: 15px 18px;
-    cursor: none;
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    transition: border-color 0.25s, box-shadow 0.25s, background-color 0.25s, transform 0.2s;
+    padding:
+      13px 12px;
+
+    gap:
+      12px;
+
+    align-items:
+      flex-start;
   }
-  .directive-card:hover {
-    border-color: #3b485a;
-    transform: translateX(4px);
-  }
-  .directive-card.active {
-    border-color: var(--abs-accent);
-    background: #0e131b;
-    box-shadow: 0 0 18px rgba(255, 200, 0, 0.4), inset 0 0 12px rgba(255, 200, 0, 0.15);
+
+  .directive-card > div:first-child {
+    flex:
+      1;
+
+    font-size:
+      0.68rem !important;
+
+    line-height:
+      1.45;
   }
 
   .directive-card .badge {
-    font-family: var(--font-ui);
-    font-size: 0.72rem;
-    font-weight: 700;
-    padding: 4px 8px;
-    border: 1px solid var(--abs-border-light);
-    color: #6a788a;
-    transition: all 0.25s ease;
+    flex-shrink:
+      0;
+
+    font-size:
+      0.58rem;
+
+    padding:
+      4px 6px;
   }
-  .directive-card.active .badge {
-    border-color: var(--abs-accent);
-    color: var(--abs-accent);
-    background: rgba(255, 200, 0, 0.12);
+
+  .directive-card:hover {
+    transform:
+      none;
+  }
+
+  button:not(:disabled):hover,
+  .accordion-option:hover,
+  .splash-enter-btn.ready:hover,
+  .btn-confirm-final:hover,
+  .btn-abort-final:hover,
+  .alert-btn:hover {
+    transform: none;
   }
 
   .wizard-controls {
-    display: flex;
-    gap: 12px;
-    margin-top: 25px;
-    transform: translateZ(30px);
-  }
-  .btn-nav {
-    flex: 1;
-    padding: 14px;
-    background: rgba(18, 24, 32, 0.8);
-    color: var(--abs-text-sub);
-    border: 1px solid var(--abs-border);
-    font-family: var(--font-ui);
-    font-weight: 700;
-    letter-spacing: 1.5px;
-    cursor: none;
-    transition: all 0.25s ease;
-    text-align: center;
-  }
-  .btn-nav:hover:not(:disabled) {
-    background: #182230;
-    color: var(--abs-text-main);
-    border-color: var(--abs-border-light);
-  }
-  .btn-nav:disabled {
-    opacity: 0.35;
+    gap:
+      8px;
+
+    margin-top:
+      20px;
   }
 
+  .btn-nav,
   .submit-btn {
-    flex: 2;
-    padding: 14px;
-    background: #12161f;
-    color: #4b5768;
-    border: 1px solid #202733;
-    font-family: var(--font-ui);
-    font-weight: 700;
-    letter-spacing: 2px;
-    text-transform: uppercase;
-    cursor: none;
-    transition: all 0.3s ease;
-  }
-  .submit-btn.unlocked {
-    background: var(--abs-accent);
-    color: #000;
-    border: 1px solid var(--abs-accent);
-    box-shadow: 0 0 22px rgba(255, 200, 0, 0.5);
-  }
-  .submit-btn.unlocked:hover {
-    background: #ffe359;
-    box-shadow: 0 0 32px rgba(255, 200, 0, 0.75);
-  }
+    min-height:
+      50px;
 
-  .modal-overlay {
-    position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(4, 5, 6, 0.92);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 1000;
-    backdrop-filter: blur(6px);
-  }
-  .modal-overlay.active { display: flex; }
+    padding:
+      12px 8px;
 
-  .alert-box {
-    background: var(--abs-panel);
-    border: 2px solid var(--abs-accent);
-    padding: 26px;
-    max-width: 450px;
-    width: 90%;
-    box-shadow: 0 0 35px rgba(255, 200, 0, 0.35);
-  }
-  .alert-title {
-    font-family: var(--font-ui);
-    color: var(--abs-accent);
-    font-size: 1.05rem;
-    margin-bottom: 12px;
-    letter-spacing: 1px;
-    font-weight: 700;
-  }
-  .alert-btn {
-    margin-top: 18px;
-    background: var(--abs-accent);
-    color: #000;
-    font-family: var(--font-ui);
-    border: none;
-    padding: 10px 24px;
-    font-weight: 700;
-    cursor: none;
-  }
+    font-size:
+      0.68rem;
 
-  .critical-modal-wrapper {
-    position: fixed;
-    top: 0; left: 0; width: 100vw; height: 100vh;
-    background: rgba(14, 2, 2, 0.96);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    z-index: 6000;
-    overflow: hidden;
-  }
-  .critical-modal-wrapper.active { display: flex; }
-
-  .arrow-stream-container {
-    position: absolute;
-    width: 100%; height: 100%;
-    pointer-events: none;
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    gap: 30px;
-    opacity: 0.22;
-    filter: blur(2px);
-  }
-  .arrow-row {
-    font-family: var(--font-heading);
-    font-size: 7.5rem;
-    font-weight: 900;
-    color: var(--abs-danger);
-    white-space: nowrap;
-    letter-spacing: 18px;
-  }
-  .arrow-row.move-right { animation: streamRight 10s linear infinite; }
-  .arrow-row.move-left { animation: streamLeft 10s linear infinite; }
-  @keyframes streamRight { from { transform: translateX(-50%); } to { transform: translateX(0%); } }
-  @keyframes streamLeft { from { transform: translateX(0%); } to { transform: translateX(-50%); } }
-
-  .critical-dialog {
-    background: rgba(22, 4, 4, 0.94);
-    border: 3px solid var(--abs-danger);
-    width: 90vw; max-width: 780px;
-    padding: 36px;
-    box-shadow: 0 0 70px rgba(255, 42, 42, 0.55);
-    position: relative;
-    z-index: 10;
-  }
-  .critical-header {
-    font-family: var(--font-heading);
-    color: var(--abs-danger);
-    font-size: 2.2rem;
-    font-weight: 900;
-    letter-spacing: 2px;
-    text-align: center;
-    margin-bottom: 6px;
-    text-shadow: 0 0 18px var(--abs-danger-glow);
-  }
-  .critical-subheader {
-    font-family: var(--font-ui);
-    font-size: 0.9rem; color: #ffb3b3;
-    text-align: center; letter-spacing: 4px;
-    margin-bottom: 25px;
-    font-weight: 700;
-  }
-  .critical-body {
-    border: 1px solid var(--abs-danger);
-    background: rgba(55, 6, 6, 0.45);
-    padding: 24px; font-size: 0.92rem; line-height: 1.7; color: #ffe6e6;
-    margin-bottom: 30px;
-  }
-  .critical-actions { display: flex; gap: 15px; }
-  
-  .btn-confirm-final, .btn-abort-final {
-    flex: 1; padding: 16px; font-weight: 700; letter-spacing: 2px; cursor: none;
-    font-family: var(--font-ui);
-    text-transform: uppercase;
-  }
-  .btn-confirm-final {
-    background: var(--abs-danger); color: #fff; border: none;
-    box-shadow: 0 0 22px var(--abs-danger-glow);
-    transition: background 0.2s;
-  }
-  .btn-confirm-final:hover {
-    background: #ff5252;
-  }
-  .btn-abort-final {
-    background: transparent; color: var(--abs-danger); border: 1px solid var(--abs-danger);
-    transition: background 0.2s, color 0.2s;
-  }
-  .btn-abort-final:hover {
-    background: rgba(255, 42, 42, 0.15);
-  }
-
-  /* Custom Interactive Reticle Cursor */
-  #cursor-dot, #cursor-ring {
-    position: fixed;
-    top: 0; left: 0;
-    pointer-events: none;
-    z-index: 9999;
-    will-change: transform;
-    transition: opacity 0.25s ease, width 0.15s ease, height 0.15s ease, background-color 0.15s ease, border-color 0.15s ease;
-  }
-  #cursor-dot {
-    width: 6px; height: 6px;
-    background: var(--abs-accent);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-  }
-  #cursor-ring {
-    width: 28px; height: 28px;
-    border: 1.5px solid var(--abs-accent);
-    border-radius: 50%;
-    box-shadow: 0 0 10px rgba(255, 200, 0, 0.25);
-    transform: translate(-50%, -50%);
-  }
-
-  body.mouse-pressed #cursor-dot {
-    width: 10px; height: 10px;
-    background: #ffffff;
-  }
-  body.mouse-pressed #cursor-ring {
-    width: 18px; height: 18px;
-    border-color: #ffffff;
-    background: rgba(255, 200, 0, 0.3);
+    letter-spacing:
+      1px;
   }
 
   .footer-watermark {
-    position: fixed; bottom: 16px; left: 24px;
-    font-size: 0.72rem; color: var(--abs-accent); letter-spacing: 2.5px;
-    z-index: 10; pointer-events: none;
-    display: flex; gap: 18px;
-    align-items: center;
-    opacity: 0.85;
-  }
-  .footer-watermark span:first-child {
-    font-weight: 700;
-    color: #fff;
+    left:
+      14px;
+
+    right:
+      14px;
+
+    bottom:
+      10px;
+
+    font-size:
+      0.55rem;
+
+    letter-spacing:
+      1.2px;
+
+    gap:
+      8px;
+
+    justify-content:
+      space-between;
   }
 
-  /* Submission Success Summary */
-  .success-card {
-    display: flex;
-    flex-direction: column;
-    gap: 16px;
-    background: rgba(10, 18, 14, 0.95);
-    border: 2px solid #00ff88;
-    padding: 24px;
-    box-shadow: 0 0 30px rgba(0, 255, 136, 0.25);
+  .footer-watermark span:last-child {
+    display:
+      none;
   }
-  .success-title {
-    font-family: var(--font-heading);
-    font-size: 1.8rem;
-    color: #00ff88;
-    font-weight: 800;
-    letter-spacing: 2px;
+
+  .critical-dialog {
+    width:
+      calc(100vw - 24px);
+
+    padding:
+      22px 16px;
   }
+
+  .critical-header {
+    font-size:
+      clamp(1.45rem,8vw,2.2rem);
+
+    line-height:
+      0.95;
+
+    letter-spacing:
+      1px;
+  }
+
+  .critical-subheader {
+    font-size:
+      0.65rem;
+
+    letter-spacing:
+      1.5px;
+
+    line-height:
+      1.4;
+  }
+
+  .critical-body {
+    padding:
+      16px;
+
+    font-size:
+      0.72rem;
+
+    line-height:
+      1.6;
+
+    margin-bottom:
+      18px;
+  }
+
+  .critical-actions {
+    flex-direction:
+      column;
+
+    gap:
+      8px;
+  }
+
+  .btn-confirm-final,
+  .btn-abort-final {
+    min-height:
+      50px;
+
+    padding:
+      13px;
+
+    font-size:
+      0.7rem;
+  }
+
+  .arrow-row {
+    font-size:
+      4rem;
+
+    letter-spacing:
+      8px;
+  }
+
+  .alert-box {
+    width:
+      calc(100vw - 28px);
+
+    padding:
+      20px;
+  }
+
+  .alert-title {
+    font-size:
+      0.9rem;
+  }
+
+  #alert-msg {
+    font-size:
+      0.72rem !important;
+  }
+
+  #terrain-canvas {
+    opacity:
+      0.28;
+  }
+}
+
 </style>
 </head>
+
+
 <body>
 
-<div class="crt-overlay"></div><div id="cursor-dot"></div>
+
+<!-- =======================================================
+     CRT
+     ======================================================== -->
+
+<div class="crt-overlay"></div>
+
+
+<!-- =======================================================
+     CUSTOM CURSOR
+     ======================================================== -->
+
+<div id="cursor-dot"></div>
 <div id="cursor-ring"></div>
+<div id="cursor-triangle" aria-hidden="true"></div>
+<div id="cursor-text" aria-hidden="true"></div>
 
-<!-- Splash Boot Loader Screen -->
+
+<!-- =======================================================
+     SPLASH SCREEN
+     ======================================================== -->
+
 <div class="splash-screen" id="splash-screen">
+
   <div class="splash-left-track">
-    <div class="splash-left-fill" id="boot-left-fill"></div>
+
+    <div
+      class="splash-left-fill"
+      id="boot-left-fill"
+    ></div>
+
   </div>
 
-  <div class="splash-percent-tracker" id="boot-percent-tracker">
+
+  <div
+    class="splash-percent-tracker"
+    id="boot-percent-tracker"
+  >
+
     <div class="percent-row">
+
       <div class="tip-connector"></div>
-      <span class="percent-val" id="boot-percent-num">0</span>
-      <span class="percent-symbol">%</span>
+
+      <span
+        class="percent-val"
+        id="boot-percent-num"
+      >0</span>
+
+      <span class="percent-symbol">
+        %
+      </span>
+
     </div>
+
+
     <div class="splash-status-text">
-      <span class="square-icon">■ ■</span>
-      <span id="boot-status-label">INITIALIZING SYSTEM MODULES...</span>
+
+      <span class="square-icon">
+        ■ ■
+      </span>
+
+      <span id="boot-status-label">
+        INITIALIZING SYSTEM MODULES...
+      </span>
+
     </div>
+
   </div>
+
 
   <div class="splash-right-content">
+
     <div class="absl-logo-block">
-      <div class="logo-top-sub">//PROTOCOL /HYPR</div>
-      <div class="logo-title">ABSL<br>INDUSTRIES</div>
-      <div class="module-tag">MODULE: ABSOLUTE RADIANCE</div>
+
+      <div class="logo-top-sub">
+        //PROTOCOL /HYPR
+      </div>
+
+      <div class="logo-title">
+        ABSL<br>INDUSTRIES
+      </div>
+
+      <div class="module-tag">
+        MODULE: ABSOLUTE RADIANCE
+      </div>
+
     </div>
+
 
     <div class="splash-tactical-block">
+
       <div class="tactical-meta-row">
-        <span class="yellow-arrow">▼</span>
+
+        <span class="yellow-arrow">
+          ▼
+        </span>
+
         <div class="meta-details">
-          <span class="plus-tag">+</span>
-          <span class="meta-label">MISSION-DEPENDENT PAYLOAD<br>STAFF RECRUITMENT INTERFACE</span>
-          <div class="dot-grid">■ ■ ■ ■ ■ ■</div>
+
+          <span class="plus-tag">
+            +
+          </span>
+
+          <span class="meta-label">
+            MISSION-DEPENDENT PAYLOAD<br>
+            STAFF RECRUITMENT INTERFACE
+          </span>
+
+          <div class="dot-grid">
+            ■ ■ ■ ■ ■ ■
+          </div>
+
         </div>
+
       </div>
+
+
       <div class="tactical-divider"></div>
-      <div class="tactical-tagline">OVER THE FRONTIER / INTO THE FRONT</div>
+
+
+      <div class="tactical-tagline">
+        OVER THE FRONTIER / INTO THE FRONT
+      </div>
+
     </div>
 
-    <button class="splash-enter-btn" id="splash-btn" disabled>
+
+    <button
+      class="splash-enter-btn"
+      id="splash-btn"
+      disabled
+    >
       INITIALIZE SYSTEM
     </button>
+
   </div>
+
 </div>
 
-<!-- Static Tactical Terrain Background Container -->
+
+<!-- =======================================================
+     BACKGROUND
+     ======================================================== -->
+
 <div class="bg-geometry">
-  <div class="bg-overlay"></div>
+
+  <canvas
+    id="terrain-canvas"
+  ></canvas>
+
 </div>
+
+
+<!-- =======================================================
+     MAIN APPLICATION
+     ======================================================== -->
 
 <div class="perspective-wrapper">
-  <div class="terminal-frame" id="terminal-frame">
+
+  <div
+    class="terminal-frame"
+    id="terminal-frame"
+  >
+
     <div class="bracket-tl"></div>
     <div class="bracket-tr"></div>
     <div class="bracket-bl"></div>
     <div class="bracket-br"></div>
 
+
+    <!-- HEADER -->
+
     <div class="terminal-header">
+
       <div>
-        <div class="protocol-tag">//PROTOCOL /HYPR</div>
-        <div class="main-title">CORE ENTITY: HYPR // ABSOLUTE INDUSTRIES</div>
-        <div class="sub-tagline">MISSION-DEPENDENT PAYLOAD // ABSOLUTE RADIANCE</div>
-      </div>
-      <div style="text-align: right;">
-        <div class="telemetry-tag">// HYPR_NETWORK_ONLINE</div>
-        <div style="margin-top: 10px;">
-          <span class="audio-toggle active" id="audio-btn">[AUDIO: ON]</span>
+
+        <div class="protocol-tag">
+          // PROTOCOL / HYPR
         </div>
+
+        <div class="main-title">
+          STAFF RECRUITMENT
+        </div>
+
+        <div class="sub-tagline">
+          ABSOLUTE INDUSTRIES // OPERATOR CLEARANCE TERMINAL
+        </div>
+
       </div>
+
+
+      <div>
+
+        <div class="telemetry-tag">
+          [ TELEMETRY: ONLINE ]
+        </div>
+
+        <button
+          class="audio-toggle active"
+          id="audio-btn"
+        >
+          [ AUDIO: ON ]
+        </button>
+
+      </div>
+
     </div>
 
-    <!-- Step Progress Tracker (5 steps) -->
-    <div class="wizard-progress">
-      <div class="progress-step active" id="pstep-0"></div>
-      <div class="progress-step" id="pstep-1"></div>
-      <div class="progress-step" id="pstep-2"></div>
-      <div class="progress-step" id="pstep-3"></div>
-      <div class="progress-step" id="pstep-4"></div>
+
+    <!-- BRIEFING -->
+
+    <div class="briefing-card">
+
+      <strong style="color:#ffc800;">
+        [ DIRECTIVE COMMAND // MISSION BRIEFING ]
+      </strong>
+
+      <br><br>
+
+      Alright, gentlemen. Sorry for the short notice,
+      but this one's going to be quick. We're already
+      on the clock, so grab your pens and pay attention.
+
+      <br><br>
+
+      HYPR requires reliable operators to keep the network
+      stable, organized, and active. If you believe you can
+      contribute to the system, submit your application below.
+
     </div>
 
-    <!-- Application Formspree Form -->
-    <form id="dispatch-form" action="https://formspree.io/f/xvkgrbar" method="POST">
+
+    <!-- PROGRESS -->
+
+    <div
+      class="wizard-progress"
+      id="wizard-progress"
+    >
+
+      <div class="progress-step active"></div>
+      <div class="progress-step"></div>
+      <div class="progress-step"></div>
+      <div class="progress-step"></div>
+      <div class="progress-step"></div>
+
+    </div>
+
+
+    <!-- ===================================================
+         FORM
+         =================================================== -->
+
+    <form
+      id="staff-form"
+      action="https://formspree.io/f/xvkgrbar"
+      method="POST"
+    >
+
 
       <!-- STEP 1 -->
-      <div class="step-panel active" id="step-0">
-        <label class="form-label">01 // OPERATOR DISCORD HANDLE</label>
-        <div class="form-desc">Provide your exact Discord username for telemetry identity verification.</div>
-        <div class="input-addon-group">
-          <span class="addon-symbol">@</span>
-          <input type="text" name="operator_discord" id="field-op-id" placeholder="username" autocomplete="off">
+
+      <div
+        class="step-panel active"
+        data-step="0"
+      >
+
+        <label class="form-label">
+          01 // OPERATOR IDENTIFICATION
+        </label>
+
+        <div class="form-desc">
+          Provide your Discord handle so the recruitment
+          department can identify your operator profile.
         </div>
+
+        <div class="input-addon-group">
+
+          <span class="addon-symbol">
+            @
+          </span>
+
+          <input
+            type="text"
+            name="discord_handle"
+            id="field-discord"
+            placeholder="operator.username"
+            autocomplete="off"
+            required
+          >
+
+        </div>
+
       </div>
+
 
       <!-- STEP 2 -->
-      <div class="step-panel" id="step-1">
-        <label class="form-label">02 // DISPATCH COMMUNICATION EMAIL</label>
-        <div class="form-desc">Official communication address for dispatch alerts and clearance notices.</div>
-        <input type="email" name="email" id="field-email" placeholder="operator@absolute.network" autocomplete="off">
+
+      <div
+        class="step-panel"
+        data-step="1"
+      >
+
+        <label class="form-label">
+          02 // DISPATCH COMMUNICATION
+        </label>
+
+        <div class="form-desc">
+          Enter an active email address for recruitment
+          communication and application follow-up.
+        </div>
+
+        <input
+          type="email"
+          name="email"
+          id="field-email"
+          placeholder="operator@network.example"
+          autocomplete="email"
+          required
+        >
+
       </div>
+
 
       <!-- STEP 3 -->
-      <div class="step-panel" id="step-2">
-        <label class="form-label">03 // DISCORD ROLE ASSIGNMENT SECTOR</label>
-        <div class="form-desc">Select the primary administrative sector position you are applying for.</div>
-        <input type="hidden" name="assigned_role" id="role-input" value="">
-        
-        <!-- Custom Accordion Inline Dropdown -->
-        <div class="custom-accordion-dropdown" id="clearance-accordion">
-          <div class="accordion-trigger" id="accordion-trigger">
-            <span id="accordion-label">SELECT STAFF CLEARANCE ROLE...</span>
-            <span class="chevron">▼</span>
-          </div>
-          <div class="accordion-content" id="accordion-options">
-            <div class="accordion-option" data-value="ADMINISTRATOR">ADMINISTRATOR // CORE SYSTEM OVERSEER</div>
-            <div class="accordion-option" data-value="MANAGEMENT_MOD">MANAGEMENT [MOD] // SECTOR ENFORCEMENT</div>
-            <div class="accordion-option" data-value="SUPPORT_OPERATIVE">SUPPORT OPERATIVE // DISPATCH ASSIST</div>
-          </div>
+
+      <div
+        class="step-panel"
+        data-step="2"
+      >
+
+        <label class="form-label">
+          03 // ROLE ASSIGNMENT SECTOR
+        </label>
+
+        <div class="form-desc">
+          Select the staff sector you are applying for.
         </div>
+
+
+        <div
+          class="custom-accordion-dropdown"
+          id="role-dropdown"
+        >
+
+          <div
+            class="accordion-trigger"
+            id="role-trigger"
+          >
+
+            <span id="role-selected">
+              SELECT ASSIGNMENT SECTOR
+            </span>
+
+            <span class="chevron">
+              ▼
+            </span>
+
+          </div>
+
+
+          <div class="accordion-content">
+
+            <div
+              class="accordion-option"
+              data-value="Support Operative"
+            >
+              SUPPORT OPERATIVE
+            </div>
+
+            <div
+              class="accordion-option"
+              data-value="Moderator"
+            >
+              MANAGEMENT MODERATOR
+            </div>
+
+            <div
+              class="accordion-option"
+              data-value="Administrator"
+            >
+              ADMINISTRATOR
+            </div>
+
+          </div>
+
+        </div>
+
+
+        <input
+          type="hidden"
+          name="staff_role"
+          id="field-role"
+        >
+
       </div>
 
-      <!-- STEP 4: AUTHORIZATION JUSTIFICATION FIELD -->
-      <div class="step-panel" id="step-3">
-        <label class="form-label">04 // AUTHORIZATION JUSTIFICATION</label>
-        <div class="form-desc">WHY SHOULD WE AUTH YOU? State your operational qualifications, past experience, and core motivation for clearance.</div>
-        <textarea name="authorization_justification" id="field-justification" placeholder="State your qualifications, relevant sector experience, and tactical reason for clearance..." autocomplete="off"></textarea>
-        <div class="char-counter" id="char-counter"><span id="char-count">0</span> / 500 (MIN: 30 CHARS)</div>
+
+      <!-- STEP 4 -->
+
+      <div
+        class="step-panel"
+        data-step="3"
+      >
+
+        <label class="form-label">
+          04 // OPERATOR MOTIVATION REPORT
+        </label>
+
+        <div class="form-desc">
+          Explain why you want to join the staff team and
+          what you believe you can contribute to HYPR.
+        </div>
+
+        <textarea
+          name="application_reason"
+          id="field-reason"
+          placeholder="Enter your motivation report..."
+          minlength="20"
+          required
+        ></textarea>
+
       </div>
+
 
       <!-- STEP 5 -->
-      <div class="step-panel" id="step-4">
-        <label class="form-label">05 // COMPLIANCE DIRECTIVES (5/5 REQUIRED)</label>
-        <div class="form-desc">Acknowledge all protocol mandates to unlock request transmission.</div>
-        
-        <div class="directive-list">
-          <div class="directive-card" data-index="0">
-            <div style="font-size: 0.82rem;">1. VERIFY TELEMETRY INTEGRITY & GATEWAY HANDSHAKE</div>
-            <div class="badge">UNCHECKED</div>
-            <input type="checkbox" name="directive_1" hidden>
-          </div>
-          <div class="directive-card" data-index="1">
-            <div style="font-size: 0.82rem;">2. ACKNOWLEDGE ABSOLUTE DATA PROTECTION MANDATE</div>
-            <div class="badge">UNCHECKED</div>
-            <input type="checkbox" name="directive_2" hidden>
-          </div>
-          <div class="directive-card" data-index="2">
-            <div style="font-size: 0.82rem;">3. ACCEPT REAL-TIME STAFF LOG MONITORING PROTOCOLS</div>
-            <div class="badge">UNCHECKED</div>
-            <input type="checkbox" name="directive_3" hidden>
-          </div>
-          <div class="directive-card" data-index="3">
-            <div style="font-size: 0.82rem;">4. CONFIRM HARDWARE ENCRYPTION SIGNATURE MATCH</div>
-            <div class="badge">UNCHECKED</div>
-            <input type="checkbox" name="directive_4" hidden>
-          </div>
-          <div class="directive-card" data-index="4">
-            <div style="font-size: 0.82rem;">5. WAIVE APPEAL RIGHTS REGARDING SIGNATURE BLACKLISTS</div>
-            <div class="badge">UNCHECKED</div>
-            <input type="checkbox" name="directive_5" hidden>
-          </div>
+
+      <div
+        class="step-panel"
+        data-step="4"
+      >
+
+        <label class="form-label">
+          05 // COMPLIANCE DIRECTIVES
+        </label>
+
+        <div class="form-desc">
+          Review and acknowledge all five operational
+          directives before transmission.
         </div>
+
+
+        <div
+          class="directive-list"
+          id="directive-list"
+        >
+
+          <div
+            class="directive-card"
+            data-directive="1"
+          >
+
+            <div>
+              <strong style="color:#ffc800;">
+                DIRECTIVE_01
+              </strong>
+
+              <br>
+
+              Maintain zone integrity. No hostile behavior,
+              toxic interference, malicious speech, or
+              unnecessary server drama.
+            </div>
+
+            <span class="badge">
+              UNCONFIRMED
+            </span>
+
+          </div>
+
+
+          <div
+            class="directive-card"
+            data-directive="2"
+          >
+
+            <div>
+              <strong style="color:#ffc800;">
+                DIRECTIVE_02
+              </strong>
+
+              <br>
+
+              Keep public communication sectors readable
+              and follow the communication language rules
+              established by HYPR.
+            </div>
+
+            <span class="badge">
+              UNCONFIRMED
+            </span>
+
+          </div>
+
+
+          <div
+            class="directive-card"
+            data-directive="3"
+          >
+
+            <div>
+              <strong style="color:#ffc800;">
+                DIRECTIVE_03
+              </strong>
+
+              <br>
+
+              Keep discussions, files, artwork, projects,
+              and resources inside their designated channels.
+            </div>
+
+            <span class="badge">
+              UNCONFIRMED
+            </span>
+
+          </div>
+
+
+          <div
+            class="directive-card"
+            data-directive="4"
+          >
+
+            <div>
+              <strong style="color:#ffc800;">
+                DIRECTIVE_04
+              </strong>
+
+              <br>
+
+              No unsolicited recruitment, unauthorized
+              advertising, suspicious links, or external
+              campaign activity.
+            </div>
+
+            <span class="badge">
+              UNCONFIRMED
+            </span>
+
+          </div>
+
+
+          <div
+            class="directive-card"
+            data-directive="5"
+          >
+
+            <div>
+              <strong style="color:#ffc800;">
+                DIRECTIVE_05
+              </strong>
+
+              <br>
+
+              Malicious files, unsafe links, exploit attempts,
+              or unauthorized data leaks trigger immediate
+              removal from the network.
+            </div>
+
+            <span class="badge">
+              UNCONFIRMED
+            </span>
+
+          </div>
+
+        </div>
+
       </div>
+
+
+      <!-- CONTROLS -->
 
       <div class="wizard-controls">
-        <button type="button" class="btn-nav" id="btn-prev" disabled>BACK</button>
-        <button type="button" class="btn-nav" id="btn-next">NEXT STEP</button>
-        <button type="button" class="submit-btn" id="submit-btn" style="display: none;" disabled>
-          INITIATE REQUEST TRANSMISSION
+
+        <button
+          type="button"
+          class="btn-nav"
+          id="prev-btn"
+          disabled
+        >
+          ← BACK
         </button>
+
+        <button
+          type="button"
+          class="submit-btn"
+          id="next-btn"
+        >
+          CONTINUE →
+        </button>
+
       </div>
+
+
     </form>
+
   </div>
+
 </div>
 
-<div class="modal-overlay" id="alert-modal">
-  <div class="alert-box">
-    <div class="alert-title">// DATA EXCEPTION DETECTED</div>
-    <div id="alert-msg" style="font-size: 0.85rem; color: #a2b0c2; line-height: 1.5;"></div>
-    <button class="alert-btn" id="alert-close">ACKNOWLEDGE</button>
-  </div>
-</div>
 
-<!-- Critical Red Intercept Warning Modal -->
-<div class="critical-modal-wrapper" id="critical-modal">
-  <div class="arrow-stream-container">
-    <div class="arrow-row move-right">&gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt;</div>
-    <div class="arrow-row move-left">&lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt; &lt;&lt;&lt;</div>
-    <div class="arrow-row move-right">&gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt; &gt;&gt;&gt;</div>
-  </div>
-  <div class="critical-dialog">
-    <div class="critical-header">CRITICAL TRANSMISSION INTERCEPT</div>
-    <div class="critical-subheader">&gt;&gt;&gt; ABSOLUTE CLEARANCE PROTOCOL &lt;&lt;&lt;</div>
-    <div class="critical-body" id="critical-modal-body">
-      <strong>WARNING: SECURITY CLEARANCE CHECK ENGAGED.</strong><br><br>
-      Transmitting fake data or fraudulent history logs triggers an instant permanent ban clearance signature blacklist penalty across all Absolute Industries networks.<br><br>
-      Do you confirm this transmission log as genuine?
-    </div>
-    <div class="critical-actions" id="critical-modal-actions">
-      <button type="button" class="btn-confirm-final" id="btn-final-confirm">CONFIRM TRANSMISSION</button>
-      <button type="button" class="btn-abort-final" id="btn-final-abort">ABORT</button>
-    </div>
-  </div>
-</div>
+<!-- =======================================================
+     FOOTER
+     ======================================================== -->
 
 <div class="footer-watermark">
-  <span>MODULE: ABSOLUTE RADIANCE v4.9</span>
-  <span>// SYSTEM CLEARANCE ONLINE</span>
+
+  <span>
+    ABSOLUTE INDUSTRIES
+  </span>
+
+  <span>
+    HYPR // ABSOLUTE RADIANCE
+  </span>
+
 </div>
 
-<script>
-// -------------------------------------------------------------
-// WEB AUDIO SYNTHESIZER ENGINE (ORIGINAL SCI-FI AUDIO + TACTICAL KEYBOARD)
-// -------------------------------------------------------------
-let audioCtx = null;
-let audioMuted = false; // Enabled by default for rich tactical feedback
 
-function initAudio() {
+<!-- =======================================================
+     NORMAL ALERT
+     ======================================================== -->
+
+<div
+  class="modal-overlay"
+  id="alert-modal"
+>
+
+  <div class="alert-box">
+
+    <div class="alert-title">
+      SYSTEM MESSAGE
+    </div>
+
+    <div id="alert-msg">
+      MESSAGE
+    </div>
+
+    <button
+      class="alert-btn"
+      id="alert-close"
+    >
+      ACKNOWLEDGE
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- =======================================================
+     CRITICAL FINAL CONFIRMATION
+     ======================================================== -->
+
+<div
+  class="critical-modal-wrapper"
+  id="critical-modal"
+>
+
+  <div class="arrow-stream-container">
+
+    <div class="arrow-row move-right">
+      &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;
+      &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;
+    </div>
+
+    <div class="arrow-row move-left">
+      &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+      &lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;&lt;
+    </div>
+
+    <div class="arrow-row move-right">
+      &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;
+      &gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;&gt;
+    </div>
+
+  </div>
+
+
+  <div class="critical-dialog">
+
+    <div class="critical-header">
+      CRITICAL TRANSMISSION
+    </div>
+
+    <div class="critical-subheader">
+      APPLICATION READY FOR DEPLOYMENT
+    </div>
+
+
+    <div class="critical-body">
+
+      You are about to transmit this application
+      to the HYPR recruitment network.
+
+      <br><br>
+
+      Once transmitted, your application will be
+      delivered to the recruitment department for review.
+
+      <br><br>
+
+      <strong>
+        VERIFY YOUR INFORMATION BEFORE CONTINUING.
+      </strong>
+
+    </div>
+
+
+    <div class="critical-actions">
+
+      <button
+        class="btn-abort-final"
+        id="abort-final"
+      >
+        ABORT TRANSMISSION
+      </button>
+
+      <button
+        class="btn-confirm-final"
+        id="confirm-final"
+      >
+        TRANSMIT APPLICATION
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<script>
+
+/* =========================================================
+   AUDIO ENGINE
+   Original synthesized sci-fi / reactor-style system audio
+   ========================================================= */
+
+let audioEnabled = true;
+
+let audioCtx = null;
+
+let reactorGain = null;
+let reactorOscA = null;
+let reactorOscB = null;
+
+
+function ensureAudio() {
+
   if (!audioCtx) {
-    const AudioContextClass = window.AudioContext || window.webkitAudioContext;
-    if (AudioContextClass) {
-      audioCtx = new AudioContextClass();
-    }
+
+    audioCtx =
+      new (
+        window.AudioContext ||
+        window.webkitAudioContext
+      )();
+
   }
-  if (audioCtx && audioCtx.state === 'suspended') {
+
+  if (audioCtx.state === 'suspended') {
     audioCtx.resume();
   }
 }
 
-// Crisp Mechanical/Tactical Keyboard Keystroke Acoustics Generator
-function playMechanicalKeystroke(key = '') {
-  if (audioMuted) return;
-  initAudio();
-  if (!audioCtx) return;
+
+/* ---------------------------------------------------------
+   Generic tone
+   --------------------------------------------------------- */
+
+function synthTone(
+  frequency,
+  duration = 0.1,
+  type = 'sine',
+  volume = 0.04,
+  detune = 0
+) {
+
+  if (!audioEnabled) return;
+
+  ensureAudio();
 
   try {
-    const now = audioCtx.currentTime;
-    
-    // 1. Tactile Snap Noise Burst (20ms micro-burst)
-    const bufferSize = Math.floor(audioCtx.sampleRate * 0.022);
-    const buffer = audioCtx.createBuffer(1, bufferSize, audioCtx.sampleRate);
-    const data = buffer.getChannelData(0);
-    for (let i = 0; i < bufferSize; i++) {
-      data[i] = Math.random() * 2 - 1;
+
+    const osc =
+      audioCtx.createOscillator();
+
+    const gain =
+      audioCtx.createGain();
+
+    osc.type = type;
+
+    osc.frequency.setValueAtTime(
+      frequency,
+      audioCtx.currentTime
+    );
+
+    osc.detune.setValueAtTime(
+      detune,
+      audioCtx.currentTime
+    );
+
+    gain.gain.setValueAtTime(
+      0.0001,
+      audioCtx.currentTime
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+      volume,
+      audioCtx.currentTime + 0.008
+    );
+
+    gain.gain.exponentialRampToValueAtTime(
+      0.0001,
+      audioCtx.currentTime + duration
+    );
+
+    osc.connect(gain);
+
+    gain.connect(
+      audioCtx.destination
+    );
+
+    osc.start();
+
+    osc.stop(
+      audioCtx.currentTime + duration + 0.02
+    );
+
+  } catch (e) {}
+
+}
+
+
+/* ---------------------------------------------------------
+   Reactor startup
+   --------------------------------------------------------- */
+
+function reactorStartupSound() {
+
+  if (!audioEnabled) return;
+
+  ensureAudio();
+
+  const now =
+    audioCtx.currentTime;
+
+
+  const master =
+    audioCtx.createGain();
+
+  master.gain.setValueAtTime(
+    0.0001,
+    now
+  );
+
+  master.gain.exponentialRampToValueAtTime(
+    0.07,
+    now + 0.35
+  );
+
+  master.gain.exponentialRampToValueAtTime(
+    0.0001,
+    now + 1.8
+  );
+
+  master.connect(
+    audioCtx.destination
+  );
+
+
+  const low =
+    audioCtx.createOscillator();
+
+  low.type =
+    'sine';
+
+  low.frequency.setValueAtTime(
+    38,
+    now
+  );
+
+  low.frequency.exponentialRampToValueAtTime(
+    92,
+    now + 1.5
+  );
+
+
+  const harmonic =
+    audioCtx.createOscillator();
+
+  harmonic.type =
+    'triangle';
+
+  harmonic.frequency.setValueAtTime(
+    76,
+    now
+  );
+
+  harmonic.frequency.exponentialRampToValueAtTime(
+    184,
+    now + 1.5
+  );
+
+
+  low.connect(master);
+
+  harmonic.connect(master);
+
+
+  low.start(now);
+
+  harmonic.start(now);
+
+
+  low.stop(
+    now + 1.9
+  );
+
+  harmonic.stop(
+    now + 1.9
+  );
+
+
+  setTimeout(() => {
+
+    synthTone(
+      220,
+      0.18,
+      'triangle',
+      0.035
+    );
+
+  }, 300);
+
+
+  setTimeout(() => {
+
+    synthTone(
+      440,
+      0.22,
+      'sine',
+      0.045
+    );
+
+  }, 650);
+
+
+  setTimeout(() => {
+
+    synthTone(
+      880,
+      0.35,
+      'sine',
+      0.05
+    );
+
+  }, 1050);
+
+}
+
+
+/* ---------------------------------------------------------
+   UI click
+   --------------------------------------------------------- */
+
+function uiClick() {
+
+  synthTone(
+    920,
+    0.045,
+    'square',
+    0.018
+  );
+
+}
+
+
+/* ---------------------------------------------------------
+   UI confirm
+   --------------------------------------------------------- */
+
+function uiConfirm() {
+
+  synthTone(
+    520,
+    0.08,
+    'triangle',
+    0.025
+  );
+
+  setTimeout(() => {
+
+    synthTone(
+      780,
+      0.12,
+      'sine',
+      0.035
+    );
+
+  }, 55);
+
+}
+
+
+/* ---------------------------------------------------------
+   Warning
+   --------------------------------------------------------- */
+
+function warningSound() {
+
+  synthTone(
+    180,
+    0.12,
+    'sawtooth',
+    0.025
+  );
+
+  setTimeout(() => {
+
+    synthTone(
+      120,
+      0.18,
+      'sawtooth',
+      0.02
+    );
+
+  }, 100);
+
+}
+
+
+/* ---------------------------------------------------------
+   Boot tick
+   --------------------------------------------------------- */
+
+function bootTick() {
+
+  synthTone(
+    700 + Math.random() * 500,
+    0.025,
+    'square',
+    0.008
+  );
+
+}
+
+
+/* =========================================================
+   AUDIO TOGGLE
+   ========================================================= */
+
+const audioBtn =
+  document.getElementById(
+    'audio-btn'
+  );
+
+audioBtn.addEventListener(
+  'click',
+  () => {
+
+    audioEnabled =
+      !audioEnabled;
+
+    if (audioEnabled) {
+
+      ensureAudio();
+
+      audioBtn.innerText =
+        '[ AUDIO: ON ]';
+
+      audioBtn.classList.add(
+        'active'
+      );
+
+      uiConfirm();
+
+    } else {
+
+      audioBtn.innerText =
+        '[ AUDIO: OFF ]';
+
+      audioBtn.classList.remove(
+        'active'
+      );
+
     }
 
-    const noise = audioCtx.createBufferSource();
-    noise.buffer = buffer;
-
-    const filter = audioCtx.createBiquadFilter();
-    filter.type = 'bandpass';
-    
-    // Randomize pitch slightly for organic typing feel
-    let centerFreq = 2100 + (Math.random() * 700 - 350);
-    if (key === 'Space' || key === ' ') centerFreq = 1100 + (Math.random() * 200 - 100);
-    else if (key === 'Enter') centerFreq = 1350 + (Math.random() * 200 - 100);
-
-    filter.frequency.setValueAtTime(centerFreq, now);
-    filter.Q.setValueAtTime(3.8, now);
-
-    const noiseGain = audioCtx.createGain();
-    const noiseVol = (key === 'Space' || key === 'Enter') ? 0.07 : 0.045;
-    noiseGain.gain.setValueAtTime(noiseVol, now);
-    noiseGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.02);
-
-    noise.connect(filter);
-    filter.connect(noiseGain);
-    noiseGain.connect(audioCtx.destination);
-
-    // 2. Tonal Body Resonance (Keycap bottom-out body)
-    const osc = audioCtx.createOscillator();
-    const oscGain = audioCtx.createGain();
-    osc.type = 'triangle';
-    
-    let basePitch = 580 + (Math.random() * 240 - 120);
-    if (key === 'Space') basePitch = 310 + (Math.random() * 60);
-    else if (key === 'Enter') basePitch = 410 + (Math.random() * 60);
-
-    osc.frequency.setValueAtTime(basePitch, now);
-    osc.frequency.exponentialRampToValueAtTime(basePitch * 0.35, now + 0.025);
-
-    oscGain.gain.setValueAtTime(0.035, now);
-    oscGain.gain.exponentialRampToValueAtTime(0.0001, now + 0.025);
-
-    osc.connect(oscGain);
-    oscGain.connect(audioCtx.destination);
-
-    noise.start(now);
-    osc.start(now);
-    osc.stop(now + 0.03);
-  } catch (e) {
-    console.error(e);
   }
-}
+);
 
-// Reverted Original Hover Micro-Beep Tone
-function playHoverSound() {
-  if (audioMuted) return;
-  initAudio();
-  if (!audioCtx) return;
-  try {
-    const now = audioCtx.currentTime;
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(1850 + Math.random() * 120, now);
-    gain.gain.setValueAtTime(0.025, now);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.03);
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start(now);
-    osc.stop(now + 0.035);
-  } catch (e) {}
-}
 
-// Reverted Original Tactical Pulse Click
-function playClickSound() {
-  if (audioMuted) return;
-  initAudio();
-  if (!audioCtx) return;
-  try {
-    const now = audioCtx.currentTime;
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = 'triangle';
-    osc.frequency.setValueAtTime(820, now);
-    osc.frequency.exponentialRampToValueAtTime(160, now + 0.035);
-    gain.gain.setValueAtTime(0.06, now);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.035);
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start(now);
-    osc.stop(now + 0.04);
-  } catch (e) {}
-}
+/* =========================================================
+   CURSOR
+   ========================================================= */
 
-// Reverted Original Frequency Sweep Tone for Wizard Steps
-function playStepSound(isNext = true) {
-  if (audioMuted) return;
-  initAudio();
-  if (!audioCtx) return;
-  try {
-    const now = audioCtx.currentTime;
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = 'sine';
-    const startFreq = isNext ? 420 : 850;
-    const endFreq = isNext ? 950 : 380;
-    osc.frequency.setValueAtTime(startFreq, now);
-    osc.frequency.exponentialRampToValueAtTime(endFreq, now + 0.08);
-    gain.gain.setValueAtTime(0.05, now);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.08);
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start(now);
-    osc.stop(now + 0.085);
-  } catch (e) {}
-}
+const cursorDot =
+  document.getElementById(
+    'cursor-dot'
+  );
 
-// Reverted Original Dual-Frequency Chime Click for Checkbox/Toggle
-function playToggleSound(checked = true) {
-  if (audioMuted) return;
-  initAudio();
-  if (!audioCtx) return;
-  try {
-    const now = audioCtx.currentTime;
-    const osc1 = audioCtx.createOscillator();
-    const osc2 = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
+const cursorRing =
+  document.getElementById(
+    'cursor-ring'
+  );
 
-    osc1.type = 'sine';
-    osc2.type = 'sine';
+const cursorTriangle =
+  document.getElementById(
+    'cursor-triangle'
+  );
 
-    const f1 = checked ? 520 : 780;
-    const f2 = checked ? 880 : 440;
+const cursorText =
+  document.getElementById(
+    'cursor-text'
+  );
 
-    osc1.frequency.setValueAtTime(f1, now);
-    osc2.frequency.setValueAtTime(f2, now + 0.025);
 
-    gain.gain.setValueAtTime(0.045, now);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.07);
+let mouseX =
+  window.innerWidth / 2;
 
-    osc1.connect(gain);
-    osc2.connect(gain);
-    gain.connect(audioCtx.destination);
+let mouseY =
+  window.innerHeight / 2;
 
-    osc1.start(now);
-    osc1.stop(now + 0.03);
-    osc2.start(now + 0.025);
-    osc2.stop(now + 0.07);
-  } catch (e) {}
-}
+let ringX =
+  mouseX;
 
-// Reverted Original Error Low Alert Pulse
-function playErrorSound() {
-  if (audioMuted) return;
-  initAudio();
-  if (!audioCtx) return;
-  try {
-    const now = audioCtx.currentTime;
-    const osc1 = audioCtx.createOscillator();
-    const osc2 = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
+let ringY =
+  mouseY;
 
-    osc1.type = 'sawtooth';
-    osc2.type = 'square';
 
-    osc1.frequency.setValueAtTime(190, now);
-    osc1.frequency.linearRampToValueAtTime(110, now + 0.18);
-    osc2.frequency.setValueAtTime(235, now);
-    osc2.frequency.linearRampToValueAtTime(135, now + 0.18);
+/* ---------------------------------------------------------
+   Cursor targets
+   --------------------------------------------------------- */
 
-    gain.gain.setValueAtTime(0.06, now);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.18);
+const interactiveSelector = [
+  'button:not(:disabled)',
+  'a',
+  '[role="button"]',
+  '.accordion-trigger',
+  '.accordion-option',
+  '.directive-card'
+].join(',');
 
-    osc1.connect(gain);
-    osc2.connect(gain);
-    gain.connect(audioCtx.destination);
+const textSelector = [
+  'input:not([type="button"]):not([type="submit"]):not([type="checkbox"]):not([type="radio"])',
+  'textarea',
+  '[contenteditable="true"]',
+  '[data-cursor="text"]'
+].join(',');
 
-    osc1.start(now);
-    osc2.start(now);
-    osc1.stop(now + 0.18);
-    osc2.stop(now + 0.18);
-  } catch (e) {}
-}
 
-// Reverted Original Critical Warning Siren Pitch Engine
-let alarmOsc1 = null, alarmOsc2 = null, alarmGain = null;
-
-function playCriticalAlarmSound() {
-  if (audioMuted) return;
-  initAudio();
-  if (!audioCtx) return;
-  try {
-    stopCriticalAlarmSound();
-    const now = audioCtx.currentTime;
-    alarmOsc1 = audioCtx.createOscillator();
-    alarmOsc2 = audioCtx.createOscillator();
-    alarmGain = audioCtx.createGain();
-
-    alarmOsc1.type = 'sawtooth';
-    alarmOsc2.type = 'sawtooth';
-
-    alarmOsc1.frequency.setValueAtTime(880, now);
-    alarmOsc2.frequency.setValueAtTime(894, now); // Detuned warning beat
-
-    alarmGain.gain.setValueAtTime(0.05, now);
-
-    alarmOsc1.connect(alarmGain);
-    alarmOsc2.connect(alarmGain);
-    alarmGain.connect(audioCtx.destination);
-
-    alarmOsc1.start(now);
-    alarmOsc2.start(now);
-  } catch (e) {}
-}
-
-function stopCriticalAlarmSound() {
-  if (alarmOsc1) {
-    try { alarmOsc1.stop(); alarmOsc1.disconnect(); } catch (e) {}
-    alarmOsc1 = null;
-  }
-  if (alarmOsc2) {
-    try { alarmOsc2.stop(); alarmOsc2.disconnect(); } catch (e) {}
-    alarmOsc2 = null;
-  }
-  alarmGain = null;
-}
-
-// Reverted Original Rich Multi-Harmonic Boot Completion Chime
-function playBootCompleteChime() {
-  if (audioMuted) return;
-  initAudio();
-  if (!audioCtx) return;
-  try {
-    const notes = [440, 554.37, 659.25, 880, 1108.73]; // Upward A Major Arpeggio Chime
-    const now = audioCtx.currentTime;
-
-    notes.forEach((freq, idx) => {
-      const osc = audioCtx.createOscillator();
-      const gain = audioCtx.createGain();
-      osc.type = 'sine';
-      osc.frequency.setValueAtTime(freq, now + idx * 0.06);
-
-      gain.gain.setValueAtTime(0, now + idx * 0.06);
-      gain.gain.linearRampToValueAtTime(0.045, now + idx * 0.06 + 0.01);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + idx * 0.06 + 0.65);
-
-      osc.connect(gain);
-      gain.connect(audioCtx.destination);
-
-      osc.start(now + idx * 0.06);
-      osc.stop(now + idx * 0.06 + 0.7);
-    });
-  } catch (e) {}
-}
-
-// Audio Toggle Pitch Indicator
-function playAudioToggleSound(isOn) {
-  if (!audioCtx) initAudio();
-  if (!audioCtx) return;
-  try {
-    const now = audioCtx.currentTime;
-    const osc = audioCtx.createOscillator();
-    const gain = audioCtx.createGain();
-    osc.type = 'sine';
-    osc.frequency.setValueAtTime(isOn ? 600 : 900, now);
-    osc.frequency.exponentialRampToValueAtTime(isOn ? 1200 : 300, now + 0.06);
-    gain.gain.setValueAtTime(0.05, now);
-    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.06);
-    osc.connect(gain);
-    gain.connect(audioCtx.destination);
-    osc.start(now);
-    osc.stop(now + 0.065);
-  } catch (e) {}
-}
-
-// -------------------------------------------------------------
-// CUSTOM CURSOR & 3D TERMINAL TILT
-// -------------------------------------------------------------
-const cursorDot = document.getElementById('cursor-dot');
-const cursorRing = document.getElementById('cursor-ring');
-const terminalFrame = document.getElementById('terminal-frame');
-
-let mouseX = window.innerWidth / 2;
-let mouseY = window.innerHeight / 2;
-let ringX = mouseX;
-let ringY = mouseY;
-
-document.addEventListener('mousemove', (e) => {
-  mouseX = e.clientX;
-  mouseY = e.clientY;
-  cursorDot.style.left = `${mouseX}px`;
-  cursorDot.style.top = `${mouseY}px`;
-
-  // Perspective 3D Tilt calculation
-  const centerX = window.innerWidth / 2;
-  const centerY = window.innerHeight / 2;
-  const rotateX = ((mouseY - centerY) / centerY) * -5;
-  const rotateY = ((mouseX - centerX) / centerX) * 5;
-
-  if (terminalFrame) {
-    terminalFrame.style.transform = `rotateX(${rotateX.toFixed(2)}deg) rotateY(${rotateY.toFixed(2)}deg)`;
-  }
+/* Mark the important UI copy as text-cursor regions. */
+document.querySelectorAll([
+  '.logo-top-sub',
+  '.logo-title',
+  '.module-tag',
+  '.meta-label',
+  '.tactical-tagline',
+  '.protocol-tag',
+  '.main-title',
+  '.sub-tagline',
+  '.form-label',
+  '.form-desc',
+  '.briefing-card',
+  '.critical-header',
+  '.critical-subheader',
+  '.critical-body',
+  '#alert-msg'
+].join(',')).forEach(element => {
+  element.dataset.cursor = 'text';
 });
+
+
+function setCursorMode(target) {
+
+  const interactive =
+    target &&
+    target.closest(interactiveSelector);
+
+  if (interactive) {
+    document.body.classList.add('cursor-interactive');
+    document.body.classList.remove('cursor-text');
+    return;
+  }
+
+  const textTarget =
+    target &&
+    target.closest(textSelector);
+
+  if (textTarget) {
+    document.body.classList.add('cursor-text');
+    document.body.classList.remove('cursor-interactive');
+    return;
+  }
+
+  document.body.classList.remove('cursor-interactive');
+  document.body.classList.remove('cursor-text');
+}
+
+
+window.addEventListener(
+  'mousemove',
+  event => {
+
+    mouseX =
+      event.clientX;
+
+    mouseY =
+      event.clientY;
+
+
+    cursorDot.style.transform =
+      `translate3d(
+        ${mouseX}px,
+        ${mouseY}px,
+        0
+      ) translate(-50%, -50%)`;
+
+    cursorTriangle.style.left =
+      `${mouseX}px`;
+
+    cursorTriangle.style.top =
+      `${mouseY}px`;
+
+    cursorText.style.left =
+      `${mouseX}px`;
+
+    cursorText.style.top =
+      `${mouseY}px`;
+
+
+    setCursorMode(event.target);
+
+  }
+);
+
+
+window.addEventListener(
+  'mouseover',
+  event => {
+    setCursorMode(event.target);
+  }
+);
+
+
+window.addEventListener(
+  'mousedown',
+  () => {
+
+    document.body.classList.add(
+      'mouse-pressed'
+    );
+
+    uiClick();
+
+  }
+);
+
+
+window.addEventListener(
+  'mouseup',
+  () => {
+
+    document.body.classList.remove(
+      'mouse-pressed'
+    );
+
+  }
+);
+
+
+window.addEventListener(
+  'mouseleave',
+  () => {
+
+    document.body.classList.add('cursor-hidden');
+
+  }
+);
+
+
+window.addEventListener(
+  'mouseenter',
+  () => {
+
+    document.body.classList.remove('cursor-hidden');
+    setCursorMode(document.elementFromPoint(mouseX, mouseY));
+
+  }
+);
+
 
 function animateCursor() {
-  ringX += (mouseX - ringX) * 0.22;
-  ringY += (mouseY - ringY) * 0.22;
-  cursorRing.style.left = `${ringX}px`;
-  cursorRing.style.top = `${ringY}px`;
-  requestAnimationFrame(animateCursor);
+
+  ringX +=
+    (mouseX - ringX) *
+    0.22;
+
+  ringY +=
+    (mouseY - ringY) *
+    0.22;
+
+
+  cursorRing.style.transform =
+    `translate3d(
+      ${ringX}px,
+      ${ringY}px,
+      0
+    ) translate(-50%, -50%)`;
+
+
+  requestAnimationFrame(
+    animateCursor
+  );
+
 }
-animateCursor();
 
-document.addEventListener('mousedown', () => document.body.classList.add('mouse-pressed'));
-document.addEventListener('mouseup', () => document.body.classList.remove('mouse-pressed'));
+requestAnimationFrame(
+  animateCursor
+);
 
-// Bind hover audio to all interactive elements
-function bindHoverSounds() {
-  const interactives = document.querySelectorAll('button, input, textarea, .directive-card, .accordion-option, .accordion-trigger, .audio-toggle');
-  interactives.forEach(el => {
-    el.addEventListener('mouseenter', () => playHoverSound());
-  });
+
+/* =========================================================
+   TERRAIN BACKGROUND
+   ========================================================= */
+
+const terrainCanvas =
+  document.getElementById(
+    'terrain-canvas'
+  );
+
+const terrainCtx =
+  terrainCanvas.getContext('2d');
+
+let terrainWidth = 0;
+let terrainHeight = 0;
+
+
+function resizeTerrainCanvas() {
+
+  const dpr =
+    Math.min(
+      window.devicePixelRatio || 1,
+      2
+    );
+
+  terrainWidth =
+    window.innerWidth;
+
+  terrainHeight =
+    window.innerHeight;
+
+
+  terrainCanvas.width =
+    terrainWidth * dpr;
+
+  terrainCanvas.height =
+    terrainHeight * dpr;
+
+
+  terrainCtx.setTransform(
+    dpr,
+    0,
+    0,
+    dpr,
+    0,
+    0
+  );
+
 }
 
-// -------------------------------------------------------------
-// SPLASH BOOT SEQUENCE LOADER
-// -------------------------------------------------------------
-const splashFill = document.getElementById('boot-left-fill');
-const bootNum = document.getElementById('boot-percent-num');
-const bootLabel = document.getElementById('boot-status-label');
-const splashBtn = document.getElementById('splash-btn');
-const splashScreen = document.getElementById('splash-screen');
 
-let progress = 0;
-const statusStages = [
-  { pct: 0, msg: "INITIALIZING SYSTEM MODULES..." },
-  { pct: 25, msg: "ESTABLISHING ENCRYPTED LINK..." },
-  { pct: 50, msg: "LOADING HYPR TACTICAL PROTOCOLS..." },
-  { pct: 75, msg: "VERIFYING TELEMETRY INTEGRITY..." },
-  { pct: 100, msg: "SYSTEM READY // AWAITING OPERATOR DISPATCH" }
-];
+function drawTerrain(time) {
 
-function runBootSequence() {
-  const interval = setInterval(() => {
-    progress += Math.floor(Math.random() * 3) + 1;
-    if (progress >= 100) {
-      progress = 100;
-      clearInterval(interval);
+  terrainCtx.clearRect(
+    0,
+    0,
+    terrainWidth,
+    terrainHeight
+  );
 
-      // On completion
-      splashBtn.removeAttribute('disabled');
-      splashBtn.classList.add('ready');
-      playBootCompleteChime();
+
+  const spacing =
+    window.innerWidth < 600
+      ? 55
+      : 70;
+
+
+  terrainCtx.lineWidth =
+    0.6;
+
+  terrainCtx.strokeStyle =
+    'rgba(255,200,0,0.10)';
+
+
+  for (
+    let y = -spacing;
+    y < terrainHeight + spacing;
+    y += spacing
+  ) {
+
+    terrainCtx.beginPath();
+
+
+    for (
+      let x = -spacing;
+      x < terrainWidth + spacing;
+      x += spacing
+    ) {
+
+      const wave =
+        Math.sin(
+          x * 0.008 +
+          time * 0.0004
+        ) * 14;
+
+      const wave2 =
+        Math.cos(
+          y * 0.012 +
+          time * 0.0003
+        ) * 8;
+
+
+      const yy =
+        y +
+        wave +
+        wave2;
+
+
+      if (x === -spacing) {
+
+        terrainCtx.moveTo(
+          x,
+          yy
+        );
+
+      } else {
+
+        terrainCtx.lineTo(
+          x,
+          yy
+        );
+
+      }
+
     }
 
-    splashFill.style.height = `${progress}%`;
-    bootNum.textContent = progress;
 
-    const currentStage = statusStages.reduce((prev, curr) => (progress >= curr.pct ? curr : prev));
-    bootLabel.textContent = currentStage.msg;
-  }, 35);
+    terrainCtx.stroke();
+
+  }
+
+
+  requestAnimationFrame(
+    drawTerrain
+  );
+
 }
 
-window.addEventListener('load', () => {
-  runBootSequence();
-  bindHoverSounds();
-});
 
-splashBtn.addEventListener('click', () => {
-  playClickSound();
-  splashScreen.classList.add('hidden');
-});
+resizeTerrainCanvas();
 
-// Audio Toggle Button Event Listener
-const audioBtn = document.getElementById('audio-btn');
-audioBtn.addEventListener('click', () => {
-  audioMuted = !audioMuted;
-  if (!audioMuted) {
-    audioBtn.classList.add('active');
-    audioBtn.textContent = '[AUDIO: ON]';
-    playAudioToggleSound(true);
-  } else {
-    audioBtn.classList.remove('active');
-    audioBtn.textContent = '[AUDIO: OFF]';
-  }
-});
+requestAnimationFrame(
+  drawTerrain
+);
 
-// -------------------------------------------------------------
-// FORM WIZARD & COMPLIANCE DIRECTIVES ENGINE
-// -------------------------------------------------------------
-let currentStep = 0;
-const totalSteps = 5;
 
-const stepPanels = [
-  document.getElementById('step-0'),
-  document.getElementById('step-1'),
-  document.getElementById('step-2'),
-  document.getElementById('step-3'),
-  document.getElementById('step-4')
-];
+/* =========================================================
+   SPLASH / BOOT SYSTEM
+   ========================================================= */
 
-const progressSteps = [
-  document.getElementById('pstep-0'),
-  document.getElementById('pstep-1'),
-  document.getElementById('pstep-2'),
-  document.getElementById('pstep-3'),
-  document.getElementById('pstep-4')
-];
+const splashScreen =
+  document.getElementById(
+    'splash-screen'
+  );
 
-const btnPrev = document.getElementById('btn-prev');
-const btnNext = document.getElementById('btn-next');
-const submitBtn = document.getElementById('submit-btn');
+const splashBtn =
+  document.getElementById(
+    'splash-btn'
+  );
 
-// Keystroke sound listener on all form inputs
-document.getElementById('dispatch-form').addEventListener('keydown', (e) => {
-  if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA') {
-    playMechanicalKeystroke(e.key);
-  }
-});
+const bootLeftFill =
+  document.getElementById(
+    'boot-left-fill'
+  );
 
-// Character Counter for Step 4 Justification
-const justificationField = document.getElementById('field-justification');
-const charCountSpan = document.getElementById('char-count');
-const charCounterDiv = document.getElementById('char-counter');
+const bootPercentNum =
+  document.getElementById(
+    'boot-percent-num'
+  );
 
-justificationField.addEventListener('input', () => {
-  const len = justificationField.value.length;
-  charCountSpan.textContent = len;
-  if (len >= 30 && len <= 500) {
-    charCounterDiv.classList.add('valid');
-  } else {
-    charCounterDiv.classList.remove('valid');
-  }
-});
+const bootPercentTracker =
+  document.getElementById(
+    'boot-percent-tracker'
+  );
 
-// Accordion Inline Dropdown Setup
-const clearanceAccordion = document.getElementById('clearance-accordion');
-const accordionTrigger = document.getElementById('accordion-trigger');
-const accordionLabel = document.getElementById('accordion-label');
-const roleInput = document.getElementById('role-input');
-const accordionOptions = document.querySelectorAll('.accordion-option');
+const bootStatusLabel =
+  document.getElementById(
+    'boot-status-label'
+  );
 
-accordionTrigger.addEventListener('click', () => {
-  playClickSound();
-  clearanceAccordion.classList.toggle('open');
-});
 
-accordionOptions.forEach(option => {
-  option.addEventListener('click', () => {
-    const val = option.getAttribute('data-value');
-    const txt = option.textContent;
-    roleInput.value = val;
-    accordionLabel.textContent = txt;
-    clearanceAccordion.classList.remove('open');
-    playToggleSound(true);
-  });
-});
+let systemInitialized =
+  false;
 
-// Compliance Directive Checkboxes Setup
-const directiveCards = document.querySelectorAll('.directive-card');
-directiveCards.forEach(card => {
-  card.addEventListener('click', () => {
-    const checkbox = card.querySelector('input[type="checkbox"]');
-    const badge = card.querySelector('.badge');
-    checkbox.checked = !checkbox.checked;
+let progress =
+  0;
 
-    if (checkbox.checked) {
-      card.classList.add('active');
-      badge.textContent = 'CONFIRMED [OK]';
-      playToggleSound(true);
-    } else {
-      card.classList.remove('active');
-      badge.textContent = 'UNCHECKED';
-      playToggleSound(false);
-    }
-    checkDirectivesCompletion();
-  });
-});
 
-function checkDirectivesCompletion() {
-  const allChecked = Array.from(directiveCards).every(c => c.querySelector('input[type="checkbox"]').checked);
-  if (allChecked) {
-    submitBtn.removeAttribute('disabled');
-    submitBtn.classList.add('unlocked');
-  } else {
-    submitBtn.setAttribute('disabled', 'true');
-    submitBtn.classList.remove('unlocked');
-  }
+/* ---------------------------------------------------------
+   THIS IS THE IMPORTANT PART
+   Percentage physically follows loading bar.
+   --------------------------------------------------------- */
+
+function updateSplashTracker(
+  currentProgress
+) {
+
+  currentProgress =
+    Math.max(
+      0,
+      Math.min(
+        100,
+        currentProgress
+      )
+    );
+
+
+  bootPercentNum.innerText =
+    currentProgress;
+
+
+  bootLeftFill.style.height =
+    `${currentProgress}%`;
+
+
+  const barPosition =
+    window.innerHeight *
+    (currentProgress / 100);
+
+
+  const trackerHeight =
+    bootPercentTracker.offsetHeight ||
+    90;
+
+
+  let targetTop =
+    barPosition -
+    (trackerHeight / 2);
+
+
+  const minimumTop =
+    20;
+
+
+  const maximumTop =
+    window.innerHeight -
+    trackerHeight -
+    20;
+
+
+  targetTop =
+    Math.max(
+      minimumTop,
+      Math.min(
+        targetTop,
+        maximumTop
+      )
+    );
+
+
+  bootPercentTracker.style.top =
+    `${targetTop}px`;
+
 }
 
-// Alert Modal Handler
-const alertModal = document.getElementById('alert-modal');
-const alertMsg = document.getElementById('alert-msg');
-const alertClose = document.getElementById('alert-close');
 
-function showAlert(msg) {
-  alertMsg.textContent = msg;
-  alertModal.classList.add('active');
-  playErrorSound();
+/* ---------------------------------------------------------
+   Text scramble
+   --------------------------------------------------------- */
+
+function scrambleTextLengthPreserved(
+  element,
+  targetText,
+  duration = 1200
+) {
+
+  const scrambleChars =
+    '@$#!%?ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+  let frame =
+    0;
+
+  const totalFrames =
+    32;
+
+
+  const interval =
+    setInterval(
+      () => {
+
+        frame++;
+
+
+        const progressRatio =
+          frame /
+          totalFrames;
+
+
+        const revealedLength =
+          Math.floor(
+            targetText.length *
+            progressRatio
+          );
+
+
+        let result =
+          '';
+
+
+        for (
+          let i = 0;
+          i < targetText.length;
+          i++
+        ) {
+
+          if (
+            targetText[i] === ' '
+          ) {
+
+            result += ' ';
+
+          } else if (
+            i < revealedLength
+          ) {
+
+            result +=
+              targetText[i];
+
+          } else {
+
+            result +=
+              scrambleChars[
+                Math.floor(
+                  Math.random() *
+                  scrambleChars.length
+                )
+              ];
+
+          }
+
+        }
+
+
+        element.innerText =
+          result;
+
+
+        bootTick();
+
+
+        if (
+          frame >= totalFrames
+        ) {
+
+          clearInterval(
+            interval
+          );
+
+          element.innerText =
+            targetText;
+
+        }
+
+      },
+      duration /
+      totalFrames
+    );
+
 }
 
-alertClose.addEventListener('click', () => {
-  playClickSound();
-  alertModal.classList.remove('active');
-});
 
-// Step Validation Rules
-function validateCurrentStep() {
-  if (currentStep === 0) {
-    const opVal = document.getElementById('field-op-id').value.trim();
-    if (!opVal || opVal.length < 3) {
-      showAlert("VALIDATION ERROR: Please enter a valid Operator Discord Handle (minimum 3 characters).");
+/* ---------------------------------------------------------
+   Boot progression
+   --------------------------------------------------------- */
+
+const loadInterval =
+  setInterval(
+    () => {
+
+      progress +=
+        Math.floor(
+          Math.random() * 3
+        ) + 1;
+
+
+      if (
+        progress >= 15 &&
+        progress < 35
+      ) {
+
+        bootStatusLabel.innerText =
+          'INITIALIZING CORE SYSTEMS...';
+
+      }
+
+
+      if (
+        progress >= 35 &&
+        progress < 60
+      ) {
+
+        bootStatusLabel.innerText =
+          'VERIFYING TELEMETRY...';
+
+      }
+
+
+      if (
+        progress >= 60 &&
+        progress < 82
+      ) {
+
+        bootStatusLabel.innerText =
+          'SYNCHRONIZING HYPR NETWORK...';
+
+      }
+
+
+      if (
+        progress >= 82 &&
+        progress < 100
+      ) {
+
+        bootStatusLabel.innerText =
+          'CALIBRATING RECRUITMENT MODULE...';
+
+      }
+
+
+      if (
+        progress >= 100
+      ) {
+
+        progress =
+          100;
+
+        clearInterval(
+          loadInterval
+        );
+
+
+        scrambleTextLengthPreserved(
+          bootStatusLabel,
+          'WELCOME TO STAFF RECRUITMENT',
+          1200
+        );
+
+
+        splashBtn.classList.add(
+          'ready'
+        );
+
+        splashBtn.disabled =
+          false;
+
+
+        reactorStartupSound();
+
+      }
+
+
+      updateSplashTracker(
+        progress
+      );
+
+    },
+    38
+  );
+
+
+/* ---------------------------------------------------------
+   Resize
+   --------------------------------------------------------- */
+
+window.addEventListener(
+  'resize',
+  () => {
+
+    updateSplashTracker(
+      progress
+    );
+
+    resizeTerrainCanvas();
+
+  }
+);
+
+
+/* ---------------------------------------------------------
+   Initialize
+   --------------------------------------------------------- */
+
+splashBtn.addEventListener(
+  'click',
+  () => {
+
+    ensureAudio();
+
+    reactorStartupSound();
+
+    splashScreen.classList.add(
+      'hidden'
+    );
+
+    systemInitialized =
+      true;
+
+    uiConfirm();
+
+  }
+);
+
+
+/* =========================================================
+   TERMINAL TILT
+   ========================================================= */
+
+const terminal =
+  document.getElementById(
+    'terminal-frame'
+  );
+
+
+window.addEventListener(
+  'mousemove',
+  event => {
+
+    if (
+      window.innerWidth <= 600
+    ) return;
+
+
+    const x =
+      (event.clientX /
+      window.innerWidth) -
+      0.5;
+
+
+    const y =
+      (event.clientY /
+      window.innerHeight) -
+      0.5;
+
+
+    terminal.style.transform =
+      `rotateY(${x * 3}deg)
+       rotateX(${-y * 3}deg)`;
+
+  }
+);
+
+
+/* =========================================================
+   WIZARD
+   ========================================================= */
+
+const panels =
+  document.querySelectorAll(
+    '.step-panel'
+  );
+
+const progressSteps =
+  document.querySelectorAll(
+    '.progress-step'
+  );
+
+const prevBtn =
+  document.getElementById(
+    'prev-btn'
+  );
+
+const nextBtn =
+  document.getElementById(
+    'next-btn'
+  );
+
+
+let stepIdx =
+  0;
+
+
+/* ---------------------------------------------------------
+   Alert
+   --------------------------------------------------------- */
+
+const alertModal =
+  document.getElementById(
+    'alert-modal'
+  );
+
+const alertMessage =
+  document.getElementById(
+    'alert-msg'
+  );
+
+const alertClose =
+  document.getElementById(
+    'alert-close'
+  );
+
+
+function showCustomAlert(
+  message
+) {
+
+  alertMessage.innerText =
+    message;
+
+  alertModal.classList.add(
+    'active'
+  );
+
+  warningSound();
+
+}
+
+
+alertClose.addEventListener(
+  'click',
+  () => {
+
+    alertModal.classList.remove(
+      'active'
+    );
+
+    uiClick();
+
+  }
+);
+
+
+/* ---------------------------------------------------------
+   Validate current step
+   --------------------------------------------------------- */
+
+function validateStep() {
+
+  if (
+    stepIdx === 0
+  ) {
+
+    const value =
+      document
+        .getElementById(
+          'field-discord'
+        )
+        .value
+        .trim();
+
+
+    if (!value) {
+
+      showCustomAlert(
+        'OPERATOR IDENTIFICATION REQUIRED.'
+      );
+
       return false;
+
     }
-  } else if (currentStep === 1) {
-    const emailVal = document.getElementById('field-email').value.trim();
-    if (!emailVal || !emailVal.includes('@') || !emailVal.includes('.')) {
-      showAlert("VALIDATION ERROR: Please provide a valid Dispatch Communication Email address.");
-      return false;
-    }
-  } else if (currentStep === 2) {
-    if (!roleInput.value) {
-      showAlert("VALIDATION ERROR: You must select an Administrative Sector Clearance Role.");
-      return false;
-    }
-  } else if (currentStep === 3) {
-    const len = justificationField.value.trim().length;
-    if (len < 30 || len > 500) {
-      showAlert("VALIDATION ERROR: Authorization Justification must be between 30 and 500 characters.");
-      return false;
-    }
+
   }
+
+
+  if (
+    stepIdx === 1
+  ) {
+
+    const input =
+      document.getElementById(
+        'field-email'
+      );
+
+
+    if (
+      !input.value.trim() ||
+      !input.checkValidity()
+    ) {
+
+      showCustomAlert(
+        'VALID DISPATCH COMMUNICATION EMAIL REQUIRED.'
+      );
+
+      return false;
+
+    }
+
+  }
+
+
+  if (
+    stepIdx === 2
+  ) {
+
+    const role =
+      document.getElementById(
+        'field-role'
+      ).value;
+
+
+    if (!role) {
+
+      showCustomAlert(
+        'ASSIGNMENT SECTOR MUST BE SELECTED.'
+      );
+
+      return false;
+
+    }
+
+  }
+
+
+  if (
+    stepIdx === 3
+  ) {
+
+    const reason =
+      document
+        .getElementById(
+          'field-reason'
+        )
+        .value
+        .trim();
+
+
+    if (
+      !reason ||
+      reason.length < 20
+    ) {
+
+      showCustomAlert(
+        'MOTIVATION REPORT REQUIRED: PROVIDE AT LEAST 20 CHARACTERS.'
+      );
+
+      return false;
+
+    }
+
+  }
+
+
+  if (
+    stepIdx === 4
+  ) {
+
+    const accepted =
+      document.querySelectorAll(
+        '.directive-card.active'
+      ).length;
+
+
+    if (
+      accepted !== 5
+    ) {
+
+      showCustomAlert(
+        `COMPLIANCE INCOMPLETE: ${accepted}/5 DIRECTIVES ACKNOWLEDGED.`
+      );
+
+      return false;
+
+    }
+
+  }
+
+
   return true;
+
 }
 
-// Step Navigation
-function updateStepView() {
-  stepPanels.forEach((panel, idx) => {
-    panel.classList.toggle('active', idx === currentStep);
-  });
 
-  progressSteps.forEach((step, idx) => {
-    step.classList.remove('active', 'completed');
-    if (idx < currentStep) step.classList.add('completed');
-    if (idx === currentStep) step.classList.add('active');
-  });
+/* ---------------------------------------------------------
+   Update wizard
+   --------------------------------------------------------- */
 
-  btnPrev.disabled = (currentStep === 0);
+function updateWizard() {
 
-  if (currentStep === totalSteps - 1) {
-    btnNext.style.display = 'none';
-    submitBtn.style.display = 'block';
+  panels.forEach(
+    (panel, index) => {
+
+      panel.classList.toggle(
+        'active',
+        index === stepIdx
+      );
+
+    }
+  );
+
+
+  progressSteps.forEach(
+    (bar, index) => {
+
+      bar.classList.remove(
+        'active',
+        'completed'
+      );
+
+
+      if (
+        index === stepIdx
+      ) {
+
+        bar.classList.add(
+          'active'
+        );
+
+      } else if (
+        index < stepIdx
+      ) {
+
+        bar.classList.add(
+          'completed'
+        );
+
+      }
+
+    }
+  );
+
+
+  prevBtn.disabled =
+    stepIdx === 0;
+
+
+  if (
+    stepIdx === panels.length - 1
+  ) {
+
+    nextBtn.innerText =
+      'TRANSMIT APPLICATION';
+
   } else {
-    btnNext.style.display = 'block';
-    submitBtn.style.display = 'none';
+
+    nextBtn.innerText =
+      'CONTINUE →';
+
   }
+
+
+  if (
+    stepIdx === 4 &&
+    document.querySelectorAll(
+      '.directive-card.active'
+    ).length === 5
+  ) {
+
+    nextBtn.classList.add(
+      'unlocked'
+    );
+
+  } else {
+
+    nextBtn.classList.remove(
+      'unlocked'
+    );
+
+  }
+
 }
 
-btnNext.addEventListener('click', () => {
-  if (validateCurrentStep()) {
-    currentStep++;
-    playStepSound(true);
-    updateStepView();
+
+/* ---------------------------------------------------------
+   Next
+   --------------------------------------------------------- */
+
+nextBtn.addEventListener(
+  'click',
+  () => {
+
+    if (
+      !validateStep()
+    ) return;
+
+
+    if (
+      stepIdx <
+      panels.length - 1
+    ) {
+
+      stepIdx++;
+
+      updateWizard();
+
+      uiConfirm();
+
+      return;
+
+    }
+
+
+    /*
+     * Final step.
+     */
+
+    document
+      .getElementById(
+        'critical-modal'
+      )
+      .classList.add(
+        'active'
+      );
+
+
+    warningSound();
+
   }
-});
+);
 
-btnPrev.addEventListener('click', () => {
-  if (currentStep > 0) {
-    currentStep--;
-    playStepSound(false);
-    updateStepView();
+
+/* ---------------------------------------------------------
+   Back
+   --------------------------------------------------------- */
+
+prevBtn.addEventListener(
+  'click',
+  () => {
+
+    if (
+      stepIdx <= 0
+    ) return;
+
+
+    stepIdx--;
+
+    updateWizard();
+
+    uiClick();
+
   }
-});
+);
 
-// -------------------------------------------------------------
-// CRITICAL WARNING INTERCEPT & SUBMISSION HANDLING
-// -------------------------------------------------------------
-const criticalModal = document.getElementById('critical-modal');
-const btnFinalConfirm = document.getElementById('btn-final-confirm');
-const btnFinalAbort = document.getElementById('btn-final-abort');
-const criticalBody = document.getElementById('critical-modal-body');
-const criticalActions = document.getElementById('critical-modal-actions');
 
-submitBtn.addEventListener('click', () => {
-  if (!submitBtn.classList.contains('unlocked')) return;
-  criticalModal.classList.add('active');
-  playCriticalAlarmSound();
-});
+/* =========================================================
+   ROLE DROPDOWN
+   ========================================================= */
 
-btnFinalAbort.addEventListener('click', () => {
-  stopCriticalAlarmSound();
-  playClickSound();
-  criticalModal.classList.remove('active');
-});
+const roleDropdown =
+  document.getElementById(
+    'role-dropdown'
+  );
 
-btnFinalConfirm.addEventListener('click', () => {
-  stopCriticalAlarmSound();
-  playClickSound();
+const roleTrigger =
+  document.getElementById(
+    'role-trigger'
+  );
 
-  criticalBody.innerHTML = `
-    <div style="text-align: center; font-family: var(--font-heading); font-size: 1.5rem; color: var(--abs-accent);">
-      TRANSMITTING ENCRYPTED TELEMETRY DATA...
-    </div>
-  `;
-  criticalActions.style.display = 'none';
+const roleSelected =
+  document.getElementById(
+    'role-selected'
+  );
 
-  // Perform async transmission
-  setTimeout(() => {
-    criticalModal.classList.remove('active');
-    playBootCompleteChime();
+const roleField =
+  document.getElementById(
+    'field-role'
+  );
 
-    const formContainer = document.getElementById('dispatch-form');
-    const opHandle = document.getElementById('field-op-id').value;
-    const emailVal = document.getElementById('field-email').value;
-    const roleVal = roleInput.value;
 
-    formContainer.innerHTML = `
-      <div class="success-card">
-        <div class="success-title">// TRANSMISSION COMPLETE</div>
-        <div style="font-size: 0.88rem; color: #a2b0c2; line-height: 1.6;">
-          Operational Clearance Request transmitted to Absolute Industries Command Gateway.<br><br>
-          <strong>OPERATOR:</strong> @${opHandle}<br>
-          <strong>COMMUNICATION:</strong> ${emailVal}<br>
-          <strong>SECTOR ROLE:</strong> ${roleVal}
-        </div>
-        <button type="button" class="alert-btn" onclick="location.reload()" style="width: fit-content;">RE-INITIALIZE TERMINAL</button>
-      </div>
-    `;
-  }, 2200);
-});
+roleTrigger.addEventListener(
+  'click',
+  () => {
+
+    roleDropdown.classList.toggle(
+      'open'
+    );
+
+    uiClick();
+
+  }
+);
+
+
+document
+  .querySelectorAll(
+    '.accordion-option'
+  )
+  .forEach(
+    option => {
+
+      option.addEventListener(
+        'click',
+        () => {
+
+          const value =
+            option.dataset.value;
+
+
+          roleField.value =
+            value;
+
+
+          roleSelected.innerText =
+            value.toUpperCase();
+
+
+          roleDropdown.classList.remove(
+            'open'
+          );
+
+
+          uiConfirm();
+
+        }
+      );
+
+    }
+  );
+
+
+/* =========================================================
+   DIRECTIVES
+   ========================================================= */
+
+document
+  .querySelectorAll(
+    '.directive-card'
+  )
+  .forEach(
+    card => {
+
+      card.addEventListener(
+        'click',
+        () => {
+
+          card.classList.toggle(
+            'active'
+          );
+
+
+          const badge =
+            card.querySelector(
+              '.badge'
+            );
+
+
+          if (
+            card.classList.contains(
+              'active'
+            )
+          ) {
+
+            badge.innerText =
+              'ACKNOWLEDGED';
+
+            uiConfirm();
+
+          } else {
+
+            badge.innerText =
+              'UNCONFIRMED';
+
+            uiClick();
+
+          }
+
+
+          updateWizard();
+
+        }
+      );
+
+    }
+  );
+
+
+/* =========================================================
+   FINAL TRANSMISSION
+   ========================================================= */
+
+const criticalModal =
+  document.getElementById(
+    'critical-modal'
+  );
+
+const abortFinal =
+  document.getElementById(
+    'abort-final'
+  );
+
+const confirmFinal =
+  document.getElementById(
+    'confirm-final'
+  );
+
+const staffForm =
+  document.getElementById(
+    'staff-form'
+  );
+
+
+abortFinal.addEventListener(
+  'click',
+  () => {
+
+    criticalModal.classList.remove(
+      'active'
+    );
+
+    uiClick();
+
+  }
+);
+
+
+confirmFinal.addEventListener(
+  'click',
+  () => {
+
+    ensureAudio();
+
+
+    /*
+     * Final transmission sound.
+     */
+
+    synthTone(
+      110,
+      0.5,
+      'sine',
+      0.06
+    );
+
+
+    setTimeout(
+      () => {
+
+        synthTone(
+          220,
+          0.35,
+          'triangle',
+          0.045
+        );
+
+      },
+      180
+    );
+
+
+    setTimeout(
+      () => {
+
+        synthTone(
+          440,
+          0.4,
+          'sine',
+          0.04
+        );
+
+      },
+      360
+    );
+
+
+    /*
+     * Actually submit to Formspree.
+     */
+
+    staffForm.submit();
+
+  }
+);
+
+
+/* =========================================================
+   INITIALIZE
+   ========================================================= */
+
+updateWizard();
+
+updateSplashTracker(0);
+
 </script>
+
 </body>
 </html>
