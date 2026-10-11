@@ -31,12 +31,13 @@
     --font-mono: 'JetBrains Mono', monospace;
   }
 
-  * {
+  *, *::before, *::after {
     box-sizing: border-box;
     margin: 0;
     padding: 0;
     font-family: var(--font-mono);
     user-select: none;
+    cursor: none !important; /* Universal OS cursor removal */
   }
 
   ::selection {
@@ -54,7 +55,6 @@
     padding: 20px;
     position: relative;
     overflow-x: hidden;
-    cursor: none;
   }
 
   .crt-overlay {
@@ -285,7 +285,6 @@
     text-transform: uppercase;
   }
 
-  /* STARTUP INITIALIZE BUTTON */
   .splash-enter-btn {
     margin-top: 10px;
     background: transparent;
@@ -296,7 +295,6 @@
     font-size: 0.9rem;
     font-weight: 700;
     letter-spacing: 3px;
-    cursor: none;
     text-transform: uppercase;
     opacity: 0;
     visibility: hidden;
@@ -436,7 +434,6 @@
     font-size: 0.62rem;
     font-weight: 500;
     color: var(--abs-text-sub);
-    cursor: none;
     display: inline-flex;
     align-items: center;
     gap: 4px;
@@ -535,21 +532,16 @@
     padding-left: 8px !important;
   }
 
-  /* REPLACE THIS BLOCK IN YOUR <style>: */
-input[type="text"], input[type="email"], textarea {
-  width: 100%;
-  background: rgba(6, 8, 12, 0.85);
-  border: 1px solid var(--abs-border-light);
-  color: var(--abs-text-main);
-  padding: 13px 14px;
-  font-size: 0.92rem;
-  outline: none;
-  transition: border-color 0.25s ease, box-shadow 0.25s ease;
-  
-  /* --- ADD THESE 2 LINES BELOW --- */
-  cursor: none !important;
-  caret-color: transparent !important; /* Hides native blinking text line */
-}
+  input[type="text"], input[type="email"], textarea {
+    width: 100%;
+    background: rgba(6, 8, 12, 0.85);
+    border: 1px solid var(--abs-border-light);
+    color: var(--abs-text-main);
+    padding: 13px 14px;
+    font-size: 0.92rem;
+    outline: none;
+    transition: border-color 0.25s ease, box-shadow 0.25s ease;
+    caret-color: transparent !important; /* Hides native blinking cursor bar */
   }
   input[type="text"]:focus, input[type="email"]:focus, textarea:focus {
     border-color: var(--abs-accent);
@@ -591,7 +583,6 @@ input[type="text"], input[type="email"], textarea {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    cursor: none;
     font-size: 0.9rem;
     color: var(--abs-text-main);
     font-family: var(--font-ui);
@@ -618,7 +609,6 @@ input[type="text"], input[type="email"], textarea {
 
   .accordion-option {
     padding: 12px 16px;
-    cursor: none;
     font-size: 0.85rem;
     color: #9cb0c7;
     border-bottom: 1px solid #141a24;
@@ -650,7 +640,6 @@ input[type="text"], input[type="email"], textarea {
     background: rgba(8, 11, 16, 0.85);
     border: 1px solid var(--abs-border);
     padding: 15px 18px;
-    cursor: none;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -696,7 +685,6 @@ input[type="text"], input[type="email"], textarea {
     font-family: var(--font-ui);
     font-weight: 700;
     letter-spacing: 1.5px;
-    cursor: none;
     transition: all 0.25s ease;
     text-align: center;
   }
@@ -720,7 +708,6 @@ input[type="text"], input[type="email"], textarea {
     font-weight: 700;
     letter-spacing: 2px;
     text-transform: uppercase;
-    cursor: none;
     transition: all 0.3s ease;
   }
   .submit-btn.unlocked {
@@ -771,7 +758,6 @@ input[type="text"], input[type="email"], textarea {
     border: none;
     padding: 10px 24px;
     font-weight: 700;
-    cursor: none;
   }
 
   .critical-modal-wrapper {
@@ -858,7 +844,7 @@ input[type="text"], input[type="email"], textarea {
   .critical-actions { display: flex; gap: 15px; }
   
   .btn-confirm-final, .btn-abort-final {
-    flex: 1; padding: 16px; font-weight: 700; letter-spacing: 2px; cursor: none;
+    flex: 1; padding: 16px; font-weight: 700; letter-spacing: 2px;
     font-family: var(--font-ui);
     text-transform: uppercase;
     transition: all 0.25s ease;
@@ -908,24 +894,29 @@ input[type="text"], input[type="email"], textarea {
     transition: width 0.22s cubic-bezier(0.16, 1, 0.3, 1), 
                 height 0.22s cubic-bezier(0.16, 1, 0.3, 1), 
                 border-radius 0.22s cubic-bezier(0.16, 1, 0.3, 1), 
-                background-color 0.22s cubic-bezier(0.16, 1, 0.3, 1), 
-                border-color 0.22s cubic-bezier(0.16, 1, 0.3, 1), 
-                box-shadow 0.22s cubic-bezier(0.16, 1, 0.3, 1), 
+                background-color 0.22s ease, 
+                border-color 0.22s ease, 
+                box-shadow 0.22s ease, 
                 opacity 0.22s ease;
   }
 
-  /* CLICK COLLAPSE STATE */
-  body.mouse-pressed #cursor-dot {
-    width: 10px; height: 10px;
-    background: #ffffff;
-  }
-  body.mouse-pressed #cursor-ring {
-    width: 18px; height: 18px;
-    border-color: #ffffff;
-    background: rgba(255, 200, 0, 0.3);
+  /* CLICK COLLAPSE / MIDPOINT CONVERGENCE STATE */
+  body.mouse-pressed:not(.text-mode) #cursor-dot {
+    width: 14px !important;
+    height: 14px !important;
+    background: #ffffff !important;
+    box-shadow: 0 0 15px #ffffff, 0 0 25px var(--abs-accent) !important;
   }
 
-  /* TEXT / I-BEAM LINE CARET TRANSITION MODE */
+  body.mouse-pressed:not(.text-mode) #cursor-ring {
+    width: 18px !important;
+    height: 18px !important;
+    border-color: #ffffff !important;
+    background: rgba(255, 200, 0, 0.35) !important;
+    box-shadow: 0 0 20px var(--abs-accent-bright), 0 0 10px #ffffff !important;
+  }
+
+  /* TEXT / I-BEAM LINE CARET TRANSITION MODE (ON HOVER & FOCUS) */
   body.text-mode #cursor-dot {
     opacity: 0;
     transform: translate(-50%, -50%) scale(0);
@@ -946,12 +937,12 @@ input[type="text"], input[type="email"], textarea {
     50% { opacity: 0.35; }
   }
 
-  /* TYPING SMOOTH MOTION GLOW BURST */
+  /* ACTIVE TYPING GLOW STATE */
   body.text-typing #cursor-ring {
     animation: none !important;
     opacity: 1 !important;
-    box-shadow: 0 0 20px var(--abs-accent-bright), 0 0 10px #ffffff !important;
-    transform: translate(-50%, -50%) scaleY(1.15) !important;
+    box-shadow: 0 0 25px var(--abs-accent-bright), 0 0 12px #ffffff !important;
+    height: 26px !important;
   }
 
   .footer-watermark {
@@ -1035,7 +1026,7 @@ input[type="text"], input[type="email"], textarea {
         <div class="sub-tagline">MISSION-DEPENDENT PAYLOAD // ABSOLUTE RADIANCE</div>
       </div>
       <div style="text-align: right;">
-        <div class="telemetry-tag">// HYPR_NETWORK_ONLINE</div>
+        <div class="telemetry-tag">// HYPR ONLINEdiv>
         <div style="margin-top: 10px;">
           <span class="audio-toggle active" id="audio-btn">[AUDIO: ON]</span>
         </div>
@@ -1362,9 +1353,30 @@ let isTextFocused = false;
 let activeInputElement = null;
 let typingGlowTimeout = null;
 
-// Real-time canvas text measurement engine for precise caret coordinates
+// Off-screen canvas text measurement engine for precise caret coordinates
 const textCanvas = document.createElement('canvas');
 const textCtx = textCanvas.getContext('2d');
+
+// Helper to check if physical mouse coordinate is inside an element's bounding box
+function isMouseInsideElement(el) {
+  if (!el) return false;
+  const rect = el.getBoundingClientRect();
+  return (
+    mouseX >= rect.left &&
+    mouseX <= rect.right &&
+    mouseY >= rect.top &&
+    mouseY <= rect.bottom
+  );
+}
+
+// Find if mouse is currently hovering over ANY text input/textarea
+function getHoveredInputElement() {
+  const inputs = document.querySelectorAll('input[type="text"], input[type="email"], textarea');
+  for (let input of inputs) {
+    if (isMouseInsideElement(input)) return input;
+  }
+  return null;
+}
 
 function getCaretViewportCoordinates(inputEl) {
   if (!inputEl) return { x: mouseX, y: mouseY };
@@ -1379,10 +1391,8 @@ function getCaretViewportCoordinates(inputEl) {
   const textBeforeCaret = textVal.substring(0, caretIdx);
 
   const paddingLeft = parseFloat(computed.paddingLeft) || 14;
-  const paddingTop = parseFloat(computed.paddingTop) || 13;
 
   if (inputEl.tagName.toLowerCase() === 'textarea') {
-    // Multi-line measurement using mirror element
     let mirror = document.getElementById('textarea-caret-mirror');
     if (!mirror) {
       mirror = document.createElement('div');
@@ -1417,7 +1427,6 @@ function getCaretViewportCoordinates(inputEl) {
 
     return { x: posX, y: posY };
   } else {
-    // Single-line inputs (Text / Email)
     const textWidth = textCtx.measureText(textBeforeCaret).width;
     const posX = rect.left + paddingLeft + textWidth - inputEl.scrollLeft + 2;
     const posY = rect.top + (rect.height / 2);
@@ -1431,11 +1440,6 @@ window.addEventListener('mousemove', (e) => {
   mouseX = e.clientX;
   mouseY = e.clientY;
 
-  if (!isTextFocused) {
-    targetX = mouseX;
-    targetY = mouseY;
-  }
-
   // 3D Terminal Frame Tilt Physics
   const centerX = window.innerWidth / 2;
   const centerY = window.innerHeight / 2;
@@ -1447,21 +1451,10 @@ window.addEventListener('mousemove', (e) => {
 
 // Bind Input Typing & Focus Listeners
 document.querySelectorAll('input[type="text"], input[type="email"], textarea').forEach(input => {
-  // Mouse Hover State
-  input.addEventListener('mouseenter', () => document.body.classList.add('text-mode'));
-  input.addEventListener('mouseleave', () => {
-    if (!isTextFocused) document.body.classList.remove('text-mode');
-  });
-
   // Focus In
   input.addEventListener('focus', () => {
     isTextFocused = true;
     activeInputElement = input;
-    document.body.classList.add('text-mode');
-
-    const caretPos = getCaretViewportCoordinates(input);
-    targetX = caretPos.x;
-    targetY = caretPos.y;
   });
 
   // Focus Out / Blur
@@ -1469,21 +1462,15 @@ document.querySelectorAll('input[type="text"], input[type="email"], textarea').f
     isTextFocused = false;
     activeInputElement = null;
     document.body.classList.remove('text-mode', 'text-typing');
-    targetX = mouseX;
-    targetY = mouseY;
   });
 
-  // Real-time Caret Movement on Typing & Navigation
+  // Typing & Key events
   ['input', 'keydown', 'keyup', 'click', 'select'].forEach(evtType => {
     input.addEventListener(evtType, () => {
       if (evtType === 'input') playThonkSound();
 
-      if (isTextFocused && activeInputElement) {
-        const caretPos = getCaretViewportCoordinates(activeInputElement);
-        targetX = caretPos.x;
-        targetY = caretPos.y;
-
-        // Visual Typing Pulse Activation
+      if (isTextFocused && activeInputElement && isMouseInsideElement(activeInputElement)) {
+        // Visual Typing Pulse Activation only if mouse is inside
         document.body.classList.add('text-typing');
         clearTimeout(typingGlowTimeout);
         typingGlowTimeout = setTimeout(() => {
@@ -1494,13 +1481,25 @@ document.querySelectorAll('input[type="text"], input[type="email"], textarea').f
   });
 });
 
-// Main Animation Loop with Hardware Acceleration
+// Main Animation Loop with Smooth Hover & Dynamic Bounds Engine
 function animateCursorEngine() {
-  if (isTextFocused && activeInputElement) {
+  const hoveredInput = getHoveredInputElement();
+  const isFocusedInside = isTextFocused && activeInputElement && isMouseInsideElement(activeInputElement);
+
+  if (isFocusedInside) {
+    // 1. Focused & Mouse Inside Text Box -> Line mode locked to typing caret position
+    document.body.classList.add('text-mode');
     const caretPos = getCaretViewportCoordinates(activeInputElement);
     targetX = caretPos.x;
     targetY = caretPos.y;
+  } else if (hoveredInput) {
+    // 2. Hovering Over Text Box -> Smoothly morph into line caret at physical mouse coordinates
+    document.body.classList.add('text-mode');
+    targetX = mouseX;
+    targetY = mouseY;
   } else {
+    // 3. Mouse Outside Text Boxes -> Revert back to circle pointer at physical mouse coordinates
+    document.body.classList.remove('text-mode', 'text-typing');
     targetX = mouseX;
     targetY = mouseY;
   }
@@ -1509,15 +1508,27 @@ function animateCursorEngine() {
   ringX += (targetX - ringX) * 0.24;
   ringY += (targetY - ringY) * 0.24;
 
-  cursorDot.style.transform = `translate3d(${mouseX}px,${mouseY}px, 0) translate(-50%, -50%)`;
-  cursorRing.style.transform = `translate3d(${ringX}px,${ringY}px, 0) translate(-50%, -50%)`;
+  cursorDot.style.transform = `translate3d(${mouseX}px, ${mouseY}px, 0) translate(-50%, -50%)`;
+  cursorRing.style.transform = `translate3d(${ringX}px, ${ringY}px, 0) translate(-50%, -50%)`;
 
   requestAnimationFrame(animateCursorEngine);
 }
 animateCursorEngine();
 
-window.addEventListener('mousedown', () => document.body.classList.add('mouse-pressed'));
-window.addEventListener('mouseup', () => document.body.classList.remove('mouse-pressed'));
+/* ==========================================================================
+   CLICK PRESS ANIMATION LISTENERS
+   ========================================================================== */
+window.addEventListener('mousedown', () => {
+  document.body.classList.add('mouse-pressed');
+});
+
+window.addEventListener('mouseup', () => {
+  document.body.classList.remove('mouse-pressed');
+});
+
+window.addEventListener('mouseleave', () => {
+  document.body.classList.remove('mouse-pressed');
+});
 
 /* ==========================================================================
    WIZARD NAVIGATION & FORM VALIDATION ENGINE
